@@ -1,0 +1,10 @@
+export { default as HomePage } from "./HomePage";
+export { default as LoginPage } from "./LoginPage";
+export { default as RegisterPage } from "./RegisterPage";
+export { default as TestsPage } from "./TestsPage";
+export { default as TestPage } from "./TestPage";
+export { default as ResultsPage } from "./ResultsPage";
+export { default as AdminDashboard } from "./AdminDashboard";
+export { default as GroupsPage } from "./GroupsPage";
+export { default as ManageTestsPage } from "./ManageTestsPage";
+export { default as ManageResultsPage } from "./ManageResultsPage";
