@@ -1,0 +1,64 @@
+.header {
+  width: 100%;
+  height: 60px;
+  background-color: #212529;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 0 20px;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.logo:hover {
+  color: #adb5bd;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Стили для имени пользователя и иконки */
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userIcon {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.userName {
+  color: #fff;
+  font-weight: bold;
+}
+
+.logoutIcon {
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: color 0.2s;
+}
+
+.logoutIcon:hover {
+  color: #adb5bd;
+}
+
+/* Bootstrap стили кнопки Login */
+.loginButton {
+  font-weight: bold;
+  font-size: 1rem;
+}

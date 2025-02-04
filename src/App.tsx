@@ -1,6 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoute from "./routes/ProtectedRoute";
-
 import {
   HomePage,
   LoginPage,
@@ -13,25 +11,34 @@ import {
   ManageTestsPage,
   ManageResultsPage,
 } from "./pages";
+import Header from "./components/layout/Header";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import GuestOnlyRoute from "./routes/GuestOnlyRoute";
+import { TEST_CREATOR, USER } from "./constants/roles";
 
 const App = () => {
   return (
     <BrowserRouter>
+      <Header />
       <Routes>
-        {/* Гостевые маршруты */}
+        {/* Главная страница */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
 
-        {/* Маршруты для пользователей (user) */}
-        <Route element={<ProtectedRoute requiredRole="user" />}>
+        {/* Гостевые маршруты */}
+        <Route element={<GuestOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
+        {/* Маршруты для пользователей с ролью USER */}
+        <Route element={<ProtectedRoute requiredRole={USER} />}>
           <Route path="/tests" element={<TestsPage />} />
           <Route path="/test/:id" element={<TestPage />} />
           <Route path="/results" element={<ResultsPage />} />
         </Route>
 
-        {/* Маршруты для создателей тестов (creator) */}
-        <Route element={<ProtectedRoute requiredRole="creator" />}>
+        {/* Маршруты для пользователей с ролью TEST_CREATOR */}
+        <Route element={<ProtectedRoute requiredRole={TEST_CREATOR} />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/groups" element={<GroupsPage />} />
           <Route path="/admin/tests" element={<ManageTestsPage />} />
