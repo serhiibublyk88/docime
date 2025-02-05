@@ -1,19 +1,19 @@
 import { Navbar, Container, Button } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser, logout } from "../../../redux/authSlice";
-import styles from "./Header.module.css";
+import { authActions, selectUser, RootState } from "../../../redux"; 
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import styles from "./Header.module.css";
 
 const Header = () => {
-  const user = useSelector(selectUser);
+  const user = useSelector((state: RootState) => selectUser(state));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/"); 
+    dispatch(authActions.logout());
+    navigate("/");
   };
 
   const isLoginPage = location.pathname === "/login";

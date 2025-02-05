@@ -1,10 +1,10 @@
 export { default as HomePage } from "./HomePage/HomePage";
 export { default as LoginPage } from "./LoginPage/LoginPage";
 export { default as RegisterPage } from "./RegisterPage/RegisterPage";
-export { default as TestsPage } from "./TestsPage";
-export { default as TestPage } from "./TestPage";
-export { default as ResultsPage } from "./ResultsPage";
-export { default as AdminDashboard } from "./AdminDashboard";
+export { default as TestsPage } from "./TestsPage/TestsPage";
+export { default as TestPage } from "./TestPage/TestPage";
+export { default as ResultsPage } from "./ResultsPage/ResultsPage";
+export { default as AdminDashboard } from "./AdminDashboard/AdminDashboard";
 export { default as GroupsPage } from "./GroupsPage/GroupsPage";
-export { default as ManageTestsPage } from "./ManageTestsPage";
-export { default as ManageResultsPage } from "./ManageResultsPage";
+export { default as ManageTestsPage } from "./ManageTestsPage/ManageTestsPage";
+export { default as ManageResultsPage } from "./ManageResultsPage/ManageResultsPage";

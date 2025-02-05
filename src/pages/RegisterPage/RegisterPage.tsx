@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import CreatorPasswordModal from "../../components/ui/CreatorPasswordModal/CreatorPasswordModal";
-import { registerUser, getGroups } from "../../services/api";
-import { login as loginAction } from "../../redux/authSlice";
-import { TEST_CREATOR, USER } from "../../constants/roles";
+import { CreatorPasswordModal } from "../../components";
+import { authApi, groupApi } from "../../services/api"; 
+import { authActions } from "../../redux"; 
+import { roles } from "../../constants"; 
 import styles from "./RegisterPage.module.css";
 
 const RegisterPage = () => {
@@ -13,7 +13,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [groupId, setGroupId] = useState("");
-  const [role, setRole] = useState<number>(USER);
+  const [role, setRole] = useState<number>(roles.USER);
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
@@ -24,7 +24,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (location.search.includes("role=creator")) {
-      setRole(TEST_CREATOR);
+      setRole(roles.TEST_CREATOR);
       setShowCreatorModal(true);
     }
   }, [location.search]);
@@ -32,7 +32,7 @@ const RegisterPage = () => {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const data = await getGroups();
+        const data = await groupApi.getGroups();
         setGroups(data);
       } catch {
         setError("Fehler beim Laden der Gruppen.");
@@ -52,19 +52,19 @@ const RegisterPage = () => {
     }
 
     try {
-      const user = await registerUser({
+      const user = await authApi.registerUser({
         username,
         email,
         password,
         role,
-        groupId: role === USER ? groupId : null,
+        groupId: role === roles.USER ? groupId : null,
       });
 
-      dispatch(loginAction({ user }));
+      dispatch(authActions.login({ user }));
 
-      if (user.role === USER) {
+      if (user.role === roles.USER) {
         navigate("/tests");
-      } else if (user.role === TEST_CREATOR) {
+      } else if (user.role === roles.TEST_CREATOR) {
         navigate("/admin/groups");
       }
     } catch {
@@ -126,7 +126,7 @@ const RegisterPage = () => {
           required
         />
 
-        {role === USER && (
+        {role === roles.USER && (
           <>
             <label>Gruppe:</label>
             <select
@@ -148,7 +148,7 @@ const RegisterPage = () => {
           Registrieren
         </button>
 
-        {role === USER && (
+        {role === roles.USER && (
           <p className={styles.creatorSignup}>
             Als Testersteller registrieren?{" "}
             <span className={styles.creatorLink} onClick={handleCreatorSignup}>

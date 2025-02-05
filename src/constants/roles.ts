@@ -1,2 +1,4 @@
-export const TEST_CREATOR = 0;
-export const USER = 1;
+export const roles = {
+  TEST_CREATOR: 0,
+  USER: 1,
+};

@@ -1,15 +1,18 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { selectUser } from "../redux/authSlice";
-import { USER } from "../constants/roles";
+import { selectUser } from "../redux/authSlice"; 
+import { roles } from "../constants"; 
+import { RootState } from "../redux"; 
 
 const GuestOnlyRoute = () => {
-  const user = useSelector(selectUser);
+  const user = useSelector((state: RootState) => selectUser(state)); 
 
   if (user) {
-    
     return (
-      <Navigate to={user.role === USER ? "/tests" : "/admin/groups"} replace />
+      <Navigate
+        to={user.role === roles.USER ? "/tests" : "/admin/groups"}
+        replace
+      />
     );
   }
 

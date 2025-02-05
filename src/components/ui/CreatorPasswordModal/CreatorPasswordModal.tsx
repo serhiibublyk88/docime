@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { checkCreatorPassword } from "../../../services/api";
+import { authApi } from "../../../services/api";
 import styles from "./CreatorPasswordModal.module.css";
 
 interface Props {
@@ -13,7 +13,6 @@ const CreatorPasswordModal = ({ onSuccess, onClose }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -23,7 +22,7 @@ const CreatorPasswordModal = ({ onSuccess, onClose }: Props) => {
     setError(null);
 
     try {
-      const success = await checkCreatorPassword(password);
+      const success = await authApi.checkCreatorPassword(password); 
       if (success) {
         onSuccess();
       } else {
@@ -46,7 +45,7 @@ const CreatorPasswordModal = ({ onSuccess, onClose }: Props) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Passwort"
-          autoComplete="off" 
+          autoComplete="off"
           name="creator-password-input"
         />
         <div className={styles.buttons}>

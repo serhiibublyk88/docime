@@ -1,6 +1,5 @@
 import axios from "axios";
-import store from "../redux/store";
-import { logout } from "../redux/authSlice";
+import { store, authActions } from "../redux"; 
 
 // Базовый URL API
 const api = axios.create({
@@ -11,7 +10,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Перехватчик ответов: обработка ошибок
+// Перехватчик ошибок
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -19,7 +18,8 @@ api.interceptors.response.use(
       const { status } = error.response;
 
       if (status === 401) {
-        store.dispatch(logout());
+        
+        store.dispatch(authActions.logout());
       }
     }
 
@@ -49,42 +49,36 @@ interface Group {
   name: string;
 }
 
-// API-функции для работы с бекендом
+// Объект `authApi` для аутентификации
+export const authApi = {
+  login: async (email: string, password: string): Promise<User> => {
+    const response = await api.post<{ message: string; user: User }>(
+      "/auth/login",
+      { email, password }
+    );
+    return response.data.user;
+  },
 
-// Логин пользователя
-export const login = async (email: string, password: string): Promise<User> => {
-  const response = await api.post<{ message: string; user: User }>(
-    "/auth/login",
-    { email, password }
-  );
+  registerUser: async (userData: RegisterData): Promise<User> => {
+    const response = await api.post<{ user: User }>("/auth/register", userData);
+    return response.data.user;
+  },
 
-  return response.data.user;
+  checkCreatorPassword: async (password: string): Promise<boolean> => {
+    const response = await api.post<{ success: boolean }>(
+      "/auth/check-creator-password",
+      { password }
+    );
+    return response.data.success;
+  },
 };
 
-// Регистрация пользователя
-export const registerUser = async (userData: RegisterData): Promise<User> => {
-  const response = await api.post<{ user: User }>("/auth/register", userData);
-
-  return response.data.user;
-};
-
-// Получение списка групп
-export const getGroups = async (): Promise<Group[]> => {
-  const response = await api.get<Group[]>("/groups/public");
-  return response.data;
-};
-
-// Проверка пароля создателя тестов
-export const checkCreatorPassword = async (
-  password: string
-): Promise<boolean> => {
-  const response = await api.post<{ success: boolean }>(
-    "/auth/check-creator-password",
-    {
-      password,
-    }
-  );
-  return response.data.success;
+// Объект `groupApi` для работы с группами
+export const groupApi = {
+  getGroups: async (): Promise<Group[]> => {
+    const response = await api.get<Group[]>("/groups/public");
+    return response.data;
+  },
 };
 
 export default api;

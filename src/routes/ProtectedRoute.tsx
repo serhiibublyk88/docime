@@ -1,14 +1,15 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import { selectUser } from "../redux/authSlice";
-import { USER } from "../constants/roles";
+import { selectUser } from "../redux/authSlice"; 
+import { roles } from "../constants"; 
+import { RootState } from "../redux"; 
 
 interface ProtectedRouteProps {
   requiredRole: number;
 }
 
 const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
-  const user = useSelector(selectUser);
+  const user = useSelector((state: RootState) => selectUser(state)); 
 
   if (!user) {
     return <Navigate to="/" replace />;
@@ -17,7 +18,7 @@ const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
   if (user.role !== requiredRole) {
     return (
       <Navigate
-        to={requiredRole === USER ? "/tests" : "/admin/groups"}
+        to={requiredRole === roles.USER ? "/tests" : "/admin/groups"}
         replace
       />
     );

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { login as loginApi } from "../../services/api";
-import { login as loginAction } from "../../redux/authSlice";
-import { TEST_CREATOR, USER } from "../../constants/roles";
+import { authApi } from "../../services/api";
+import { authActions } from "../../redux"; 
+import { roles } from "../../constants"; 
 import styles from "./LoginPage.module.css";
 
 const LoginPage = () => {
@@ -18,29 +18,29 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      // Отправка запроса на логин
-      const user = await loginApi(email, password);
+      
+      const user = await authApi.login(email, password);
 
-      // Проверка наличия пользователя
+      
       if (!user) {
-        throw new Error("Ошибка: отсутствуют данные пользователя.");
+        throw new Error("Fehler: Benutzerdaten fehlen.");
       }
 
-      // Сохранение пользователя в Redux Store
-      dispatch(loginAction({ user }));
+      
+      dispatch(authActions.login({ user }));
 
-      // Редирект в зависимости от роли пользователя
+      
       switch (user.role) {
-        case USER:
+        case roles.USER:
           navigate("/tests", { replace: true });
           break;
-        case TEST_CREATOR:
+        case roles.TEST_CREATOR:
           navigate("/admin/groups", { replace: true });
           break;
         default:
           setError("Unbekannte Rolle. Bitte wenden Sie sich an den Support.");
       }
-    } catch  {
+    } catch {
       setError(
         "Ungültige E-Mail oder Passwort. Bitte versuchen Sie es erneut."
       );

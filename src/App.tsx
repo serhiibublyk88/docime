@@ -11,10 +11,9 @@ import {
   ManageTestsPage,
   ManageResultsPage,
 } from "./pages";
-import Header from "./components/layout/Header";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import GuestOnlyRoute from "./routes/GuestOnlyRoute";
-import { TEST_CREATOR, USER } from "./constants/roles";
+import { Header } from "./components";
+import { ProtectedRoute, GuestOnlyRoute } from "./routes"; 
+import { roles } from "./constants"; 
 
 const App = () => {
   return (
@@ -31,14 +30,14 @@ const App = () => {
         </Route>
 
         {/* Маршруты для пользователей с ролью USER */}
-        <Route element={<ProtectedRoute requiredRole={USER} />}>
+        <Route element={<ProtectedRoute requiredRole={roles.USER} />}>
           <Route path="/tests" element={<TestsPage />} />
           <Route path="/test/:id" element={<TestPage />} />
           <Route path="/results" element={<ResultsPage />} />
         </Route>
 
         {/* Маршруты для пользователей с ролью TEST_CREATOR */}
-        <Route element={<ProtectedRoute requiredRole={TEST_CREATOR} />}>
+        <Route element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/groups" element={<GroupsPage />} />
           <Route path="/admin/tests" element={<ManageTestsPage />} />
