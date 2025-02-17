@@ -1,19 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface Group {
-  id: string;
-  name: string;
-}
-
-interface GroupState {
-  groups: Group[];
-}
+import { Group, GroupState } from "../../types/reduxTypes";
 
 const initialState: GroupState = {
   groups: [],
 };
 
-const groupSlice = createSlice({
+export const groupSlice = createSlice({
   name: "group",
   initialState,
   reducers: {
@@ -23,5 +15,5 @@ const groupSlice = createSlice({
   },
 });
 
-export const { setGroups } = groupSlice.actions;
-export default groupSlice.reducer;
+export const groupActions = groupSlice.actions;
+export const groupReducer = groupSlice.reducer;

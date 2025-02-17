@@ -1,5 +1,7 @@
-const ManageResultsPage = () => {
-  return <h1>Анализ результатов</h1>;
+export const ManageResultsPage = () => {
+  return (
+    <div className="main-content">
+      <h1>Анализ результатов</h1>
+    </div>
+  );
 };
-
-export default ManageResultsPage;

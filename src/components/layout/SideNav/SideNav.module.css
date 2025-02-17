@@ -1,6 +1,22 @@
 .sideNav {
-  width: 200px;
-  height: 100vh;
-  background-color: #212529;
-  color: white;
+  width: 260px;
+  top: 60px;
 }
+
+.hidden {
+  display: none;
+}
+
+.active {
+  background-color: #3e4449;
+}
+.navItem {
+  cursor: pointer; 
+}
+.navItem:hover {
+  color: #61666b;
+  background-color: #2c3238;
+}
+
+
+

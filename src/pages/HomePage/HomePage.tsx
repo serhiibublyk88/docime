@@ -1,11 +1,11 @@
 import styles from "./HomePage.module.css";
 
-const HomePage = () => {
+export const HomePage = () => {
   return (
-    <div className={styles.container}>
-      <h3 className={styles.message}>
+    <div className="main-content">
+      <h3>
         Der Test ist vorübergehend, aber das Wissen bleibt ewig{" "}
-        <span className={styles.dots}>
+        <span className={`${styles.dots} fw-bold`}>
           <span>.</span>
           <span>.</span>
           <span>.</span>
@@ -14,5 +14,3 @@ const HomePage = () => {
     </div>
   );
 };
-
-export default HomePage;

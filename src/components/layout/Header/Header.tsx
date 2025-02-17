@@ -1,64 +1,105 @@
-import { Navbar, Container, Button } from "react-bootstrap";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Navbar, Container } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { authActions, selectUser, RootState } from "../../../redux"; 
-import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
-import styles from "./Header.module.css";
+import { authActions, selectUser } from "../../../redux";
+import {
+  FaUserCircle,
+  FaSignOutAlt,
+  FaSignInAlt,
+  FaBars,
+} from "react-icons/fa";
+import { Tooltip } from "bootstrap";
+import { HeaderProps } from "../../../types/uiTypes"; // ✅ Используем `HeaderProps` из `uiTypes.ts`
 
-const Header = () => {
-  const user = useSelector((state: RootState) => selectUser(state));
+export const Header = ({
+  onLeftMenuToggle,
+  onRightMenuToggle,
+  children,
+}: HeaderProps) => {
+  const user = useSelector(selectUser); // ✅ Убрали `RootState`
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const handleLogout = () => {
-    dispatch(authActions.logout());
-    navigate("/");
+  useEffect(() => {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+      Tooltip.getInstance(el)?.dispose();
+      new Tooltip(el);
+    });
+
+    return () => {
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+        Tooltip.getInstance(el)?.dispose();
+      });
+    };
+  }, [user?.role]); // ✅ Добавили очистку Tooltip для предотвращения утечек памяти
+
+  const handleNavigation = (path: string, action?: () => void) => {
+    document
+      .querySelectorAll('[data-bs-toggle="tooltip"]')
+      .forEach((el) => Tooltip.getInstance(el)?.hide());
+    if (action) action();
+    navigate(path);
   };
-
-  const isLoginPage = location.pathname === "/login";
 
   return (
     <Navbar
-      className={`${styles.header} px-3 shadow-sm`}
+      className="px-3 shadow"
       fixed="top"
       bg="dark"
       variant="dark"
+      style={{ height: "60px" }}
     >
       <Container
         fluid
         className="d-flex justify-content-between align-items-center px-4"
       >
-        <Navbar.Brand as={Link} to="/" className={styles.logo}>
+        {onLeftMenuToggle && (
+          <button className="btn" onClick={onLeftMenuToggle}>
+            <FaBars className="icon" />
+          </button>
+        )}
+
+        <Navbar.Brand as={Link} to="/" className="mx-md-3 ps-3">
           DOKIME
         </Navbar.Brand>
 
-        <div className={styles.rightSection}>
+        <div className="d-flex align-items-center gap-3">
+          {children}
+
+          {onRightMenuToggle && (
+            <button className="btn" onClick={onRightMenuToggle}>
+              <FaBars className="icon" />
+            </button>
+          )}
+
           {user ? (
-            <div className={styles.userInfo}>
-              <FaUserCircle className={styles.userIcon} />
-              <span className={styles.userName}>{user.username}</span>
-              <FaSignOutAlt
-                className={styles.logoutIcon}
-                onClick={handleLogout}
+            <div className="d-flex align-items-center gap-2">
+              <FaUserCircle className="icon" />
+              <span className="fw">{user.username}</span>
+              <button
+                className="btn"
+                data-bs-toggle="tooltip"
                 title="Abmelden"
-              />
+                onClick={() =>
+                  handleNavigation("/", () => dispatch(authActions.logout()))
+                }
+              >
+                <FaSignOutAlt className="icon" />
+              </button>
             </div>
           ) : (
-            !isLoginPage && (
-              <Button
-                variant="outline-light"
-                onClick={() => navigate("/login")}
-                className={styles.loginButton}
-              >
-                Anmelden
-              </Button>
-            )
+            <button
+              className="btn"
+              data-bs-toggle="tooltip"
+              title="Anmelden"
+              onClick={() => handleNavigation("/login")}
+            >
+              <FaSignInAlt className="icon" />
+            </button>
           )}
         </div>
       </Container>
     </Navbar>
   );
 };
-
-export default Header;

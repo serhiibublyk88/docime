@@ -1,23 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-interface Test {
-  id: string;
-  name: string;
-  description: string;
-  timeLimit: number;
-}
-
-interface TestState {
-  tests: Test[];
-  currentTest: Test | null;
-}
+import { Test, TestState } from "../../types/reduxTypes"; 
 
 const initialState: TestState = {
   tests: [],
   currentTest: null,
 };
 
-const testSlice = createSlice({
+export const testSlice = createSlice({
   name: "test",
   initialState,
   reducers: {
@@ -30,5 +19,5 @@ const testSlice = createSlice({
   },
 });
 
-export const { setTests, setCurrentTest } = testSlice.actions;
-export default testSlice.reducer;
+export const testActions = testSlice.actions;
+export const testReducer = testSlice.reducer;

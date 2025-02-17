@@ -1,5 +1,7 @@
-const GroupsPage = () => {
-  return <h1>Управление группами</h1>;
+export const GroupsPage = () => {
+  return (
+    <div className="main-content">
+      <h1>Управление группами</h1>
+    </div>
+  );
 };
-
-export default GroupsPage;

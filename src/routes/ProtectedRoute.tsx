@@ -1,30 +1,19 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import { selectUser } from "../redux/authSlice"; 
-import { roles } from "../constants"; 
-import { RootState } from "../redux"; 
+import { selectUser } from "../redux";
 
 interface ProtectedRouteProps {
   requiredRole: number;
 }
 
-const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
-  const user = useSelector((state: RootState) => selectUser(state)); 
+export const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
+  const user = useSelector(selectUser);
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (user.role !== requiredRole) {
-    return (
-      <Navigate
-        to={requiredRole === roles.USER ? "/tests" : "/admin/groups"}
-        replace
-      />
-    );
-  }
-
-  return <Outlet />;
+  return !user ? (
+    <Navigate to="/" replace />
+  ) : user.role !== requiredRole ? (
+    <Navigate to="/access-denied" replace />
+  ) : (
+    <Outlet />
+  );
 };
-
-export default ProtectedRoute;

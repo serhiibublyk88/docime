@@ -1,2 +1,2 @@
-export { default as GuestOnlyRoute } from "./GuestOnlyRoute";
-export { default as ProtectedRoute } from "./ProtectedRoute";
+export { GuestOnlyRoute } from "./GuestOnlyRoute";
+export { ProtectedRoute } from "./ProtectedRoute";

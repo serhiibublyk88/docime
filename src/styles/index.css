@@ -1,3 +1,17 @@
+@font-face {
+  font-family: "Century Gothic";
+  src: url("../assets/fonts/century-gothic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Century Gothic";
+  src: url("../assets/fonts/century-gothic-bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
 :root {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -7,16 +21,49 @@
 
 body {
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: "Century Gothic", "Apple Gothic", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 #root {
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.icon {
+  font-size: 1.5rem;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  color: #61666b;
+}
+
+@media (max-width: 768px) {
+  .with-menu,
+  .with-right-menu {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.main-content {
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.form-small {
+  width: 350px;
 }

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   HomePage,
@@ -10,42 +11,46 @@ import {
   GroupsPage,
   ManageTestsPage,
   ManageResultsPage,
+  NotFoundPage,
+  AccessDeniedPage,
 } from "./pages";
 import { Header } from "./components";
-import { ProtectedRoute, GuestOnlyRoute } from "./routes"; 
-import { roles } from "./constants"; 
+import { ProtectedRoute, GuestOnlyRoute } from "./routes";
+import { roles } from "./constants";
 
-const App = () => {
+export const App = () => {
+  useEffect(() => {
+    const handleResize = () => {};
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <BrowserRouter>
       <Header />
-      <Routes>
-        {/* Главная страница */}
-        <Route path="/" element={<HomePage />} />
-
-        {/* Гостевые маршруты */}
-        <Route element={<GuestOnlyRoute />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Route>
-
-        {/* Маршруты для пользователей с ролью USER */}
-        <Route element={<ProtectedRoute requiredRole={roles.USER} />}>
-          <Route path="/tests" element={<TestsPage />} />
-          <Route path="/test/:id" element={<TestPage />} />
-          <Route path="/results" element={<ResultsPage />} />
-        </Route>
-
-        {/* Маршруты для пользователей с ролью TEST_CREATOR */}
-        <Route element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/groups" element={<GroupsPage />} />
-          <Route path="/admin/tests" element={<ManageTestsPage />} />
-          <Route path="/admin/results" element={<ManageResultsPage />} />
-        </Route>
-      </Routes>
+      <div className="main-content container-fluid">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route element={<GuestOnlyRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+          <Route element={<ProtectedRoute requiredRole={roles.USER} />}>
+            <Route path="/tests" element={<TestsPage />} />
+            <Route path="/test/:id" element={<TestPage />} />
+            <Route path="/results" element={<ResultsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/groups" element={<GroupsPage />} />
+            <Route path="/admin/tests" element={<ManageTestsPage />} />
+            <Route path="/admin/results" element={<ManageResultsPage />} />
+          </Route>
+          <Route path="/access-denied" element={<AccessDeniedPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 };
-
-export default App;

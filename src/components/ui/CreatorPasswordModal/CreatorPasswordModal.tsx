@@ -1,30 +1,41 @@
-import { useState, useEffect, useRef } from "react";
-import { authApi } from "../../../services/api";
-import styles from "./CreatorPasswordModal.module.css";
+import { useEffect, useRef, useState } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
+import { authApi } from "../../../services";
+import { AlertMessage } from "../../../components";
+import { useAuthForm } from "../../../hooks";
+import { CreatorPasswordModalProps } from "../../../types/uiTypes"; 
 
-interface Props {
-  onSuccess: () => void;
-  onClose: () => void;
-}
-
-const CreatorPasswordModal = ({ onSuccess, onClose }: Props) => {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+export const CreatorPasswordModal: React.FC<CreatorPasswordModalProps> = ({
+  onSuccess,
+  onClose,
+  onClearParentError,
+}) => {
+  const [password, setPassword] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const { error, setError, clearAllErrors, handleFieldChange } = useAuthForm();
+
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
+    inputRef.current?.focus();
+    onClearParentError?.();
+  }, [onClearParentError]);
+
+  const handleChange = (value: string) => {
+    setPassword(value);
+    handleFieldChange();
+  };
 
   const handleSubmit = async () => {
-    setError(null);
+    if (!password.trim()) {
+      setError("Das Passwort darf nicht leer sein.");
+      return;
+    }
 
     try {
-      const success = await authApi.checkCreatorPassword(password); 
+      const success = await authApi.checkCreatorPassword(password);
       if (success) {
         onSuccess();
+        handleClose();
       } else {
         setError("Das Passwort ist ungültig.");
       }
@@ -33,32 +44,57 @@ const CreatorPasswordModal = ({ onSuccess, onClose }: Props) => {
     }
   };
 
+  const handleClose = () => {
+    clearAllErrors();
+    onClose();
+  };
+
   return (
-    <div className={styles.modalContainer}>
-      <div className={styles.backdrop} onClick={onClose}></div>
-      <div className={styles.modal}>
-        <h3>Geben Sie das Passwort für Testersteller ein</h3>
-        {error && <p className={styles.error}>{error}</p>}
-        <input
-          ref={inputRef}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Passwort"
-          autoComplete="off"
-          name="creator-password-input"
+    <>
+      {error && (
+        <AlertMessage
+          message={error}
+          type="danger"
+          onClose={clearAllErrors}
+          zIndex={1070}
         />
-        <div className={styles.buttons}>
-          <button type="button" onClick={handleSubmit}>
-            Überprüfen
-          </button>
-          <button type="button" onClick={onClose}>
+      )}
+
+      <Modal
+        show
+        onHide={handleClose}
+        centered
+        backdrop="static"
+        dialogClassName="form-small"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Sind Sie Testersteller?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={(e) => {e.preventDefault(); handleSubmit()}}>
+            <div className="form-floating mb-3">
+              <Form.Control
+                ref={inputRef}
+                type="password"
+                value={password}
+                onChange={(e) => handleChange(e.target.value)}
+                placeholder="Passwort"
+                autoComplete="off"
+                id="creator-password-input"
+              />
+              <Form.Label htmlFor="creator-password-input">Passwort</Form.Label>
+            </div>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer className="d-flex justify-content-around w-100">
+          <Button variant="outline-secondary" onClick={handleClose}>
             Abbrechen
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+          <Button variant="outline-light" onClick={handleSubmit}>
+            Überprüfen
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
-
-export default CreatorPasswordModal;

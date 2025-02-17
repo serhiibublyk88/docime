@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./authSlice";
-import testReducer from "./testSlice";
-import groupReducer from "./groupSlice";
-import resultReducer from "./resultSlice";
+import { authReducer } from "./auth/authSlice"; 
+import { testReducer } from "./test/testSlice";
+import { groupReducer } from "./group/groupSlice";
+import { resultReducer } from "./result/resultSlice";
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     auth: authReducer,
     test: testReducer,
@@ -15,4 +15,3 @@ const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export default store;
