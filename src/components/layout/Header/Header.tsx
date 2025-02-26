@@ -10,29 +10,30 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { Tooltip } from "bootstrap";
-import { HeaderProps } from "../../../types/uiTypes"; // ✅ Используем `HeaderProps` из `uiTypes.ts`
+import { HeaderProps } from "../../../types/uiTypes";
 
-export const Header = ({
+export const Header: React.FC<HeaderProps> = ({
   onLeftMenuToggle,
   onRightMenuToggle,
-  children,
-}: HeaderProps) => {
-  const user = useSelector(selectUser); // ✅ Убрали `RootState`
+  shouldShowBurgers,
+  shouldShowRightBurger,
+}) => {
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // ✅ Упрощаем работу с Tooltip
   useEffect(() => {
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach((el) => {
       Tooltip.getInstance(el)?.dispose();
       new Tooltip(el);
     });
 
     return () => {
-      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
-        Tooltip.getInstance(el)?.dispose();
-      });
+      tooltips.forEach((el) => Tooltip.getInstance(el)?.dispose());
     };
-  }, [user?.role]); // ✅ Добавили очистку Tooltip для предотвращения утечек памяти
+  }, [user?.role]);
 
   const handleNavigation = (path: string, action?: () => void) => {
     document
@@ -44,31 +45,48 @@ export const Header = ({
 
   return (
     <Navbar
-      className="px-3 shadow"
+      className="px-3 shadow position-fixed top-0 start-0 w-100"
       fixed="top"
       bg="dark"
       variant="dark"
-      style={{ height: "60px" }}
+      style={{ height: "60px", zIndex: "1050" }}
     >
       <Container
         fluid
         className="d-flex justify-content-between align-items-center px-4"
       >
-        {onLeftMenuToggle && (
-          <button className="btn" onClick={onLeftMenuToggle}>
+        {/* ✅ Левый бургер (если shouldShowBurgers) */}
+        {user && shouldShowBurgers && (
+          <button
+            className="btn position-absolute d-md-none start-0 ms-1"
+            data-menu-toggle="left"
+            aria-label="Меню"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLeftMenuToggle?.();
+            }}
+          >
             <FaBars className="icon" />
           </button>
         )}
 
-        <Navbar.Brand as={Link} to="/" className="mx-md-3 ps-3">
+        {/* Логотип */}
+        <Navbar.Brand as={Link} to="/" className="ps-5">
           DOKIME
         </Navbar.Brand>
 
         <div className="d-flex align-items-center gap-3">
-          {children}
-
-          {onRightMenuToggle && (
-            <button className="btn" onClick={onRightMenuToggle}>
+          {/* ✅ Правый бургер (теперь он корректно рендерится и работает) */}
+          {user && shouldShowRightBurger && (
+            <button
+              className="btn position-absolute d-md-none end-0 me-1"
+              data-menu-toggle="right"
+              aria-label="Контекстное меню"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRightMenuToggle?.(); // ✅ Теперь открывает правое меню стабильно
+              }}
+            >
               <FaBars className="icon" />
             </button>
           )}

@@ -8,7 +8,7 @@ export interface User {
 
 export interface RegisterData {
   username: string;
-  email: string;
+  email: string; 
   password: string;
   groupId: string | null;
   role: number;
@@ -17,4 +17,10 @@ export interface RegisterData {
 export interface Group {
   id: string;
   name: string;
+  description?: string; 
+  createdBy?: {
+    id: string;
+    username: string;
+  }; 
+  members?: { id: string; username: string }[]; 
 }

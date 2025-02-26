@@ -62,8 +62,11 @@ body {
   align-items: center;
   text-align: center;
   box-sizing: border-box;
+  
 }
 
 .form-small {
   width: 350px;
 }
+
+

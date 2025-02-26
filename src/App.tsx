@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   HomePage,
@@ -9,26 +8,22 @@ import {
   ResultsPage,
   AdminDashboard,
   GroupsPage,
-  ManageTestsPage,
+  CreateTestPage,
   ManageResultsPage,
   NotFoundPage,
   AccessDeniedPage,
 } from "./pages";
-import { Header } from "./components";
 import { ProtectedRoute, GuestOnlyRoute } from "./routes";
+import { SideNavController } from "./components/navigation/SideNavController";
 import { roles } from "./constants";
 
-export const App = () => {
-  useEffect(() => {
-    const handleResize = () => {};
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+export const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <Header />
+      {/* ✅ Теперь `SideNavController` сам вызывает `useSideNav()` */}
+      <SideNavController />
+
+      {/* ✅ Основной контейнер */}
       <div className="main-content container-fluid">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -44,7 +39,8 @@ export const App = () => {
           <Route element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/groups" element={<GroupsPage />} />
-            <Route path="/admin/tests" element={<ManageTestsPage />} />
+            <Route path="/admin/tests" element={<TestsPage />} />
+            <Route path="/admin/create-test" element={<CreateTestPage />} />
             <Route path="/admin/results" element={<ManageResultsPage />} />
           </Route>
           <Route path="/access-denied" element={<AccessDeniedPage />} />

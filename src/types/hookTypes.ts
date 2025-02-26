@@ -1,3 +1,6 @@
+//hookTypes.ts
+import { MenuItem } from "./uiTypes";
+
 export interface AuthForm {
   error: string | undefined;
   setError: (error?: string) => void;
@@ -20,3 +23,25 @@ export interface RegisterHook extends AuthForm {
   setShowCreatorModal: (value: boolean) => void;
   handleSubmit: (formData: Record<string, string>) => Promise<void>;
 }
+
+export interface SideNavHook {
+  isMobile: boolean; // ✅ Добавили флаг мобильного режима
+
+  isLeftMenuOpen: boolean;
+  isRightMenuOpen: boolean; // ✅ Обновили название правого меню
+  setIsLeftMenuOpen: () => void;
+  setIsRightMenuOpen: () => void; // ✅ Обновили название правого меню
+
+  leftMenuItems: MenuItem[];
+  rightMenuItems: MenuItem[];
+  user: { role: number } | null;
+
+  isGroupModalOpen: boolean;
+  setIsGroupModalOpen: (isOpen: boolean) => void;
+
+  shouldShowBurgers: boolean;
+  shouldShowRightBurger: boolean; // ✅ Добавили флаг для правого бургера
+
+}
+
+

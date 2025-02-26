@@ -6,3 +6,8 @@ export { SideNav } from "./layout/SideNav/SideNav";
 export { CreatorPasswordModal } from "./ui/CreatorPasswordModal/CreatorPasswordModal";
 export { AlertMessage } from "./ui/AlertMessage/AlertMessage";
 export { ValidatedForm } from "./ui/ValidatedForm/ValidatedForm";
+export { GroupCreationModal } from "./ui/GroupCreationModal/GroupCreationModal";
+
+
+// navigation
+export { SideNavController } from "./navigation/SideNavController";

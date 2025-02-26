@@ -1,10 +1,11 @@
-// types/uiTypes.ts
 import { FieldConfig } from "./constantsTypes";
+// import { JSX } from "react"; // ✅ Импортируем JSX.Element для иконок
 
 export interface HeaderProps {
-  onLeftMenuToggle?: () => void;
-  onRightMenuToggle?: () => void;
-  children?: React.ReactNode;
+  onLeftMenuToggle?: () => void; // ✅ Теперь без аргументов
+  onRightMenuToggle?: () => void; // ✅ Теперь без аргументов
+  shouldShowBurgers: boolean; // ✅ Добавлено
+  shouldShowRightBurger: boolean; // ✅ Добавлено
 }
 
 export interface MenuItem {
@@ -21,6 +22,13 @@ export interface SideNavProps {
   isMobile?: boolean;
   isOpen: boolean;
   onClose: () => void;
+}
+
+// ✅ Обновляем конфиг навигации (модульное меню)
+export interface SideNavConfig {
+  isOpen: boolean;
+  items: MenuItem[];
+  setOpen: (open: boolean) => void; // ✅ Теперь принимает аргумент boolean
 }
 
 export interface AlertMessageProps {
@@ -48,4 +56,3 @@ export interface ValidatedFormProps {
   children: React.ReactNode;
   className?: string;
 }
-
