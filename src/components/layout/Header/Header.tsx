@@ -22,7 +22,6 @@ export const Header: React.FC<HeaderProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ Упрощаем работу с Tooltip
   useEffect(() => {
     const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     tooltips.forEach((el) => {
@@ -55,7 +54,6 @@ export const Header: React.FC<HeaderProps> = ({
         fluid
         className="d-flex justify-content-between align-items-center px-4"
       >
-        {/* ✅ Левый бургер (если shouldShowBurgers) */}
         {user && shouldShowBurgers && (
           <button
             className="btn position-absolute d-md-none start-0 ms-1"
@@ -70,13 +68,11 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Логотип */}
         <Navbar.Brand as={Link} to="/" className="ps-5">
           DOKIME
         </Navbar.Brand>
 
         <div className="d-flex align-items-center gap-3">
-          {/* ✅ Правый бургер (теперь он корректно рендерится и работает) */}
           {user && shouldShowRightBurger && (
             <button
               className="btn position-absolute d-md-none end-0 me-1"
@@ -84,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Контекстное меню"
               onClick={(e) => {
                 e.stopPropagation();
-                onRightMenuToggle?.(); // ✅ Теперь открывает правое меню стабильно
+                onRightMenuToggle?.();
               }}
             >
               <FaBars className="icon" />

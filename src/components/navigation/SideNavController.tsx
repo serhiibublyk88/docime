@@ -8,15 +8,13 @@ export const SideNavController: React.FC = () => {
 
   return (
     <>
-      {/* ✅ Хедер получает обработчики переключения меню */}
       <Header
         onLeftMenuToggle={sideNav.setIsLeftMenuOpen}
         onRightMenuToggle={sideNav.setIsRightMenuOpen}
         shouldShowBurgers={sideNav.shouldShowBurgers}
-        shouldShowRightBurger={sideNav.shouldShowRightBurger} // ✅ Теперь правый бургер работает стабильно
+        shouldShowRightBurger={sideNav.shouldShowRightBurger}
       />
 
-      {/* ✅ Левое меню теперь скрывается на мобилке, но открывается по бургеру */}
       {sideNav.user && sideNav.isLeftMenuOpen && (
         <SideNav
           position="left"
@@ -26,7 +24,6 @@ export const SideNavController: React.FC = () => {
         />
       )}
 
-      {/* 🔥 Фикс: теперь правое меню не появляется само по себе, но бургер работает */}
       {sideNav.user && sideNav.isRightMenuOpen && (
         <SideNav
           position="right"
@@ -36,7 +33,6 @@ export const SideNavController: React.FC = () => {
         />
       )}
 
-      {/* ✅ Модалка создания группы */}
       {sideNav.user && sideNav.isGroupModalOpen && (
         <GroupCreationModal
           isOpen={sideNav.isGroupModalOpen}

@@ -20,10 +20,8 @@ import { roles } from "./constants";
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
-      {/* ✅ Теперь `SideNavController` сам вызывает `useSideNav()` */}
       <SideNavController />
 
-      {/* ✅ Основной контейнер */}
       <div className="main-content container-fluid">
         <Routes>
           <Route path="/" element={<HomePage />} />

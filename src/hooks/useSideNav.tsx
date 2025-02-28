@@ -156,10 +156,30 @@ export const useSideNav = (): SideNavHook => {
   const rightMenuItems = useMemo<MenuItem[]>(() => {
     if (location.pathname !== "/admin/create-test") return [];
     return [
-      { label: "Einzelauswahl", path: "#single", icon: <FaCheck /> },
-      { label: "Mehrfachauswahl", path: "#multiple", icon: <FaList /> },
-      { label: "Zahleneingabe", path: "#number", icon: <FaHashtag /> },
-      { label: "Texteingabe", path: "#text", icon: <FaFont /> },
+      {
+        label: "Einzelauswahl",
+        path: "#single",
+        icon: <FaCheck />,
+        addIcon: <FaPlus />,
+      },
+      {
+        label: "Mehrfachauswahl",
+        path: "#multiple",
+        icon: <FaList />,
+        addIcon: <FaPlus />,
+      },
+      {
+        label: "Zahleneingabe",
+        path: "#number",
+        icon: <FaHashtag />,
+        addIcon: <FaPlus />,
+      },
+      {
+        label: "Texteingabe",
+        path: "#text",
+        icon: <FaFont />,
+        addIcon: <FaPlus />,
+      },
     ];
   }, [location.pathname]);
 

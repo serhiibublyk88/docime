@@ -62,11 +62,27 @@ body {
   align-items: center;
   text-align: center;
   box-sizing: border-box;
-  
 }
 
 .form-small {
   width: 350px;
 }
 
+
+.add-icon {
+  transition: transform 0.1s ease, color 0.15s ;
+ 
+}
+
+
+.add-icon:hover {
+  transform: scale(1.1);
+   color: #ffffff;
+}
+
+.add-icon:active {
+  transform: scale(0.7);
+  color: #7c7878;
+  
+}
 

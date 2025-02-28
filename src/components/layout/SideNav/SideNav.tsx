@@ -12,43 +12,40 @@ export const SideNav = ({
   const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement | null>(null);
-
-  // ✅ Отслеживаем размер экрана
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     const handleResize = () => {
-      const newIsMobile = window.innerWidth < 768;
-      setIsMobile(newIsMobile);
-
-      // ✅ Если увеличиваем экран → закрываем бургер и показываем меню
-      if (!newIsMobile && position === "right") {
-        onClose(); // Закрываем бургер
-      }
+      setIsMobile(window.innerWidth < 768);
+      if (!isMobile && position === "right") onClose();
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [position, onClose]);
+  }, [position, onClose, isMobile]);
 
-  // ✅ Функция навигации (переход + закрытие меню на мобильных)
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    if (isMobile) onClose();
+  
+  const handleClick = (
+    e: React.MouseEvent,
+    path: string,
+    onAddClick?: () => void
+  ) => {
+    if (onAddClick) {
+      e.stopPropagation();
+      onAddClick();
+      if (isMobile && position === "left" && path === "/admin/tests") {
+        onClose(); 
+      }
+    } else {
+      navigate(path);
+      if (isMobile) onClose();
+    }
   };
 
-  // ✅ Закрытие меню при клике вне него
   useEffect(() => {
     if (!isOpen) return;
-
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-
-      if (target.closest("[data-menu-toggle]")) return;
-
-      if (menuRef.current && !menuRef.current.contains(target)) {
-        onClose();
-      }
+      if (!menuRef.current?.contains(event.target as Node)) onClose();
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -61,7 +58,7 @@ export const SideNav = ({
     <div
       ref={menuRef}
       className={`${styles.sideNav} position-fixed vh-100 shadow 
-      } ${position === "left" ? "start-0" : "end-0"}`}
+      ${position === "left" ? "start-0" : "end-0"}`}
     >
       <div className="d-flex flex-column pt-3">
         {items.map(({ label, path, icon, addIcon, onAddClick }) => (
@@ -70,31 +67,50 @@ export const SideNav = ({
             className={`d-flex align-items-center p-3 ${styles.navItem} ${
               location.pathname === path ? styles.active : ""
             }`}
+            onClick={
+              position === "right" ? undefined : (e) => handleClick(e, path)
+            }
           >
-            {/* ✅ Переход по пункту меню */}
-            <button
-              className="d-flex align-items-center w-100 border-0 bg-transparent p-0"
-              onClick={() => handleNavigation(path)}
-            >
-              {icon && (
-                <span className="d-flex icon align-items-center me-3">
-                  {icon}
-                </span>
-              )}
-              <span>{label}</span>
-            </button>
-
-            {/* ✅ Плюсики: правильная обработка */}
-            {addIcon && (
-              <span
-                className="ms-auto"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onAddClick) onAddClick();
-                }}
-              >
-                {addIcon}
-              </span>
+           
+            {position === "left" ? (
+              <>
+                {icon && (
+                  <span className="d-flex icon align-items-center me-3">
+                    {icon}
+                  </span>
+                )}
+                <button className="d-flex align-items-center border-0 bg-transparent p-0 flex-grow-1">
+                  <span className="text-start">{label}</span>
+                </button>
+                {addIcon && (
+                  <span
+                    className="ms-auto add-icon"
+                    onClick={(e) => handleClick(e, path, onAddClick)}
+                  >
+                    {addIcon}
+                  </span>
+                )}
+              </>
+            ) : (
+              
+              <>
+                {addIcon && (
+                  <span
+                    className="me-3 add-icon"
+                    onClick={(e) => handleClick(e, path, onAddClick)}
+                  >
+                    {addIcon}
+                  </span>
+                )}
+                <button className="d-flex align-items-center flex-grow-1 border-0 bg-transparent p-0">
+                  <span className="text-end flex-grow-1">{label}</span>
+                </button>
+                {icon && (
+                  <span className="ms-3 d-flex icon align-items-center">
+                    {icon}
+                  </span>
+                )}
+              </>
             )}
           </div>
         ))}
