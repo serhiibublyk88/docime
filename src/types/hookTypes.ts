@@ -25,12 +25,12 @@ export interface RegisterHook extends AuthForm {
 }
 
 export interface SideNavHook {
-  isMobile: boolean; // ✅ Добавили флаг мобильного режима
+  isMobile: boolean;
 
   isLeftMenuOpen: boolean;
-  isRightMenuOpen: boolean; // ✅ Обновили название правого меню
-  setIsLeftMenuOpen: () => void;
-  setIsRightMenuOpen: () => void; // ✅ Обновили название правого меню
+  isRightMenuOpen: boolean;
+  setIsLeftMenuOpen: (event?: React.MouseEvent) => void;
+  setIsRightMenuOpen: (event?: React.MouseEvent) => void;
 
   leftMenuItems: MenuItem[];
   rightMenuItems: MenuItem[];
@@ -40,8 +40,8 @@ export interface SideNavHook {
   setIsGroupModalOpen: (isOpen: boolean) => void;
 
   shouldShowBurgers: boolean;
-  shouldShowRightBurger: boolean; // ✅ Добавили флаг для правого бургера
-
+  shouldShowRightBurger: boolean;
+  // isBackdropVisible: boolean;
 }
 
 

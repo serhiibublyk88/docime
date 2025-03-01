@@ -27,44 +27,38 @@ export const useSideNav = (): SideNavHook => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1199);
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(
-    window.innerWidth >= 768 && !!user?.role
+    window.innerWidth >= 1199 && !!user?.role
   );
-  const [isRightMenuOpen, setIsRightMenuOpen] = useState(false);
+  const [isRightMenuOpen, setIsRightMenuOpen] = useState(
+    window.innerWidth >= 1199 &&
+      location.pathname === "/admin/create-test" &&
+      localStorage.getItem("rightMenuOpen") === "true"
+  );
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [shouldShowRightBurger, setShouldShowRightBurger] = useState(false);
 
-  // ✅ Плавное определение мобильной версии при изменении размера экрана
   useEffect(() => {
-    let timeout: number | null = null;
-
     const handleResize = () => {
-      if (timeout !== null) clearTimeout(timeout);
-      timeout = window.setTimeout(() => {
-        const newIsMobile = window.innerWidth < 768;
-        setIsMobile(newIsMobile);
+      const newIsMobile = window.innerWidth < 1199;
+      setIsMobile(newIsMobile);
 
-        if (!newIsMobile) {
-          setIsLeftMenuOpen(true);
-          if (location.pathname === "/admin/create-test") {
-            setIsRightMenuOpen(true);
-          }
-        } else {
-          setIsLeftMenuOpen(false);
-          setIsRightMenuOpen(false);
+      if (!newIsMobile) {
+        setIsLeftMenuOpen(true);
+        if (location.pathname === "/admin/create-test") {
+          setIsRightMenuOpen(true);
         }
-      }, 100);
+      } else {
+        setIsLeftMenuOpen(false);
+        setIsRightMenuOpen(false);
+      }
     };
 
     window.addEventListener("resize", handleResize);
-    return () => {
-      if (timeout !== null) clearTimeout(timeout);
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, [location.pathname]);
 
-  // ✅ Закрываем левое меню при переходе на `/admin/create-test` (мобилка)
   useLayoutEffect(() => {
     if (isMobile && location.pathname === "/admin/create-test") {
       setIsLeftMenuOpen(false);
@@ -73,43 +67,64 @@ export const useSideNav = (): SideNavHook => {
     }
   }, [location.pathname, isMobile]);
 
-  // ✅ Отключаем правое меню при уходе со страницы `/admin/create-test`
   useEffect(() => {
     if (location.pathname !== "/admin/create-test") {
       setIsRightMenuOpen(false);
       setShouldShowRightBurger(false);
+      localStorage.removeItem("rightMenuOpen");
     }
   }, [location.pathname]);
 
   useEffect(() => {
     if (user?.role !== undefined) {
-      setIsLeftMenuOpen(window.innerWidth >= 768);
+      setIsLeftMenuOpen(window.innerWidth >= 1199);
     }
   }, [user]);
 
-  // ✅ Универсальная функция переключения меню (с перекрёстным закрытием)
   const toggleMenu = useCallback(
-    (menu: "left" | "right") => {
+    (menu: "left" | "right", event?: React.MouseEvent) => {
+      event?.preventDefault();
+      event?.stopPropagation();
+
       if (isMobile) {
-        setIsLeftMenuOpen(menu === "left" ? (prev) => !prev : false);
-        setIsRightMenuOpen(menu === "right" ? (prev) => !prev : false);
-      } else if (menu === "right") {
-        setIsRightMenuOpen(true);
+        if (menu === "left") {
+          setIsLeftMenuOpen((prev) => !prev);
+          setIsRightMenuOpen(false);
+        } else if (menu === "right") {
+          setIsRightMenuOpen((prev) => !prev);
+          setIsLeftMenuOpen(false);
+        }
+      } else {
+        if (menu === "right") {
+          if (location.pathname === "/admin/create-test") {
+            setIsRightMenuOpen(true);
+            localStorage.setItem("rightMenuOpen", "true");
+          } else {
+            setIsRightMenuOpen((prev) => !prev);
+            localStorage.setItem("rightMenuOpen", String(!isRightMenuOpen));
+          }
+        }
       }
     },
-    [isMobile]
+    [
+      isMobile,
+      location.pathname,
+      setIsLeftMenuOpen,
+      setIsRightMenuOpen,
+      isRightMenuOpen,
+    ]
   );
 
   const toggleLeftMenu = useCallback(() => toggleMenu("left"), [toggleMenu]);
   const toggleRightMenu = useCallback(() => toggleMenu("right"), [toggleMenu]);
 
-  // ✅ Открываем правое меню при переходе (но только на десктопе)
   const handleAddClick = useCallback(
     (path: string) => {
       navigate(path);
       if (path === "/admin/create-test") {
         if (!isMobile) {
           setIsRightMenuOpen(true);
+          localStorage.setItem("rightMenuOpen", "true");
         } else {
           setIsRightMenuOpen(false);
         }
@@ -118,7 +133,6 @@ export const useSideNav = (): SideNavHook => {
     [navigate, isMobile]
   );
 
-  // ✅ Левое меню по ролям
   const leftMenuItems = useMemo<MenuItem[]>(() => {
     if (!user) return [];
 
@@ -152,7 +166,6 @@ export const useSideNav = (): SideNavHook => {
     return [];
   }, [user, handleAddClick]);
 
-  // ✅ Правое меню
   const rightMenuItems = useMemo<MenuItem[]>(() => {
     if (location.pathname !== "/admin/create-test") return [];
     return [

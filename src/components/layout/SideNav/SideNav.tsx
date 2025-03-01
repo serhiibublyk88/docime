@@ -12,11 +12,11 @@ export const SideNav = ({
   const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1199);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1199);
       if (!isMobile && position === "right") onClose();
     };
 
@@ -57,7 +57,7 @@ export const SideNav = ({
   return (
     <div
       ref={menuRef}
-      className={`${styles.sideNav} position-fixed vh-100 shadow 
+      className={`${styles.sideNav} position-fixed vh-100 shadow bg-dark
       ${position === "left" ? "start-0" : "end-0"}`}
     >
       <div className="d-flex flex-column pt-3">
@@ -71,7 +71,6 @@ export const SideNav = ({
               position === "right" ? undefined : (e) => handleClick(e, path)
             }
           >
-           
             {position === "left" ? (
               <>
                 {icon && (
@@ -92,7 +91,6 @@ export const SideNav = ({
                 )}
               </>
             ) : (
-              
               <>
                 {addIcon && (
                   <span

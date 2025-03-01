@@ -56,12 +56,13 @@ export const Header: React.FC<HeaderProps> = ({
       >
         {user && shouldShowBurgers && (
           <button
-            className="btn position-absolute d-md-none start-0 ms-1"
+            className="btn position-absolute d-xl-none start-0 ms-1"
             data-menu-toggle="left"
-            aria-label="Меню"
-            onClick={(e) => {
+            aria-label="Menu"
+            onMouseDown={(e) => {
+              e.preventDefault();
               e.stopPropagation();
-              onLeftMenuToggle?.();
+              onLeftMenuToggle?.(); // ✅ Проверяем существование перед вызовом
             }}
           >
             <FaBars className="icon" />
@@ -75,12 +76,13 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="d-flex align-items-center gap-3">
           {user && shouldShowRightBurger && (
             <button
-              className="btn position-absolute d-md-none end-0 me-1"
+              className="btn position-absolute d-xl-none end-0 me-1"
               data-menu-toggle="right"
-              aria-label="Контекстное меню"
-              onClick={(e) => {
+              aria-label="Context Menu"
+              onMouseDown={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                onRightMenuToggle?.();
+                onRightMenuToggle?.(); // ✅ Проверяем существование перед вызовом
               }}
             >
               <FaBars className="icon" />
