@@ -2,6 +2,7 @@ export interface User {
   id: string;
   username: string;
   role: number;
+  token?: string;
 }
 
 export interface AuthState {
@@ -9,8 +10,12 @@ export interface AuthState {
 }
 
 export interface Group {
-  id: string;
+  id: string; 
   name: string;
+  description?: string;
+  membersCount: number; 
+  createdBy: string;
+  createdAt: string;
 }
 
 export interface GroupState {

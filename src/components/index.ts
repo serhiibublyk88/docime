@@ -7,7 +7,7 @@ export { CreatorPasswordModal } from "./ui/CreatorPasswordModal/CreatorPasswordM
 export { AlertMessage } from "./ui/AlertMessage/AlertMessage";
 export { ValidatedForm } from "./ui/ValidatedForm/ValidatedForm";
 export { GroupCreationModal } from "./ui/GroupCreationModal/GroupCreationModal";
-
+export { DeleteGroupModal } from "./ui/DeleteGroupModal/DeleteGroupModal";
 
 // navigation
 export { SideNavController } from "./navigation/SideNavController";

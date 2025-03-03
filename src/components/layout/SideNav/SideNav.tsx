@@ -24,7 +24,6 @@ export const SideNav = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [position, onClose, isMobile]);
 
-  
   const handleClick = (
     e: React.MouseEvent,
     path: string,
@@ -34,7 +33,7 @@ export const SideNav = ({
       e.stopPropagation();
       onAddClick();
       if (isMobile && position === "left" && path === "/admin/tests") {
-        onClose(); 
+        onClose();
       }
     } else {
       navigate(path);

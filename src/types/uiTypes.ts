@@ -56,3 +56,9 @@ export interface ValidatedFormProps {
   children: React.ReactNode;
   className?: string;
 }
+
+
+export interface GroupCreationModalProps {
+  show: boolean;
+  onClose: () => void;
+}

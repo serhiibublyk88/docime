@@ -6,7 +6,7 @@ export { loginUser, logoutUser } from "./auth/authActions";
 export { selectUser } from "./auth/authSelectors";
 
 export { groupReducer, groupActions } from "./group/groupSlice";
-export { fetchGroups } from "./group/groupActions";
+export { fetchGroups,deleteGroup, editGroup, createGroup } from "./group/groupActions";
 export { selectGroups } from "./group/groupSelectors";
 
 export { testReducer, testActions } from "./test/testSlice";
@@ -20,3 +20,5 @@ export { selectResults } from "./result/resultSelectors";
 export { errorReducer } from "./error/errorSlice";
 export { triggerError, resetError } from "./error/errorActions";
 export { selectError } from "./error/errorSelectors";
+
+

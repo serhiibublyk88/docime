@@ -27,7 +27,7 @@ export const App: React.FC = () => {
 
   return (
     <>
-      {/* Глобальный AlertMessage */}
+      
       {error && (
         <AlertMessage
           message={error}
@@ -38,7 +38,7 @@ export const App: React.FC = () => {
 
       <BrowserRouter>
         <SideNavController />
-        <div className="main-content container-fluid">
+        <div className="container-fluid" style={{ marginTop: "60px" }}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route element={<GuestOnlyRoute />}>

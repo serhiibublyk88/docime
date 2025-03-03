@@ -35,7 +35,7 @@ export const SideNavController: React.FC = () => {
 
       {sideNav.user && sideNav.isGroupModalOpen && (
         <GroupCreationModal
-          isOpen={sideNav.isGroupModalOpen}
+          show={sideNav.isGroupModalOpen}
           onClose={() => sideNav.setIsGroupModalOpen(false)}
         />
       )}

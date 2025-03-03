@@ -1,51 +1,64 @@
-import React from "react";
-
-interface GroupCreationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { useState, useEffect, useRef } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
+import { useAppDispatch } from "../../../hooks";
+import { createGroup } from "../../../redux";
+import { GroupCreationModalProps } from "../../../types/uiTypes";
 
 export const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
-  isOpen,
+  show,
   onClose,
 }) => {
-  if (!isOpen) return null;
+  const dispatch = useAppDispatch();
+  const [groupName, setGroupName] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (show) {
+      setGroupName("");
+      inputRef.current?.focus();
+    }
+  }, [show]);
+
+  const handleCreate = async () => {
+    if (!groupName.trim()) return;
+
+    await dispatch(createGroup(groupName.trim()));
+    onClose();
+  };
 
   return (
-    <div
-      className="modal fade show d-flex justify-content-center align-items-center"
-      style={{
-        display: "flex",
-        position: "fixed",
-        top: "60px", // Учитываем Header (60px)
-        left: "0",
-        width: "100%",
-        height: "calc(100vh - 60px)", // Учитываем Header (60px)
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: 1050, // Bootstrap модалки используют 1050
-      }}
-    >
-      <div className="modal-dialog">
-        <div className="modal-content p-4">
-          <h2 className="mb-3 text-center">Введите имя новой группы</h2>
-          <input
-            type="text"
-            className="form-control mb-3"
-            placeholder="Название группы"
-          />
-          <div className="d-flex justify-content-end">
-            <button
-              className="btn btn-primary me-2"
-              onClick={() => alert("Группа создана!")}
-            >
-              Сохранить
-            </button>
-            <button className="btn btn-secondary" onClick={onClose}>
-              Отмена
-            </button>
+    <Modal show={show} onHide={onClose} centered backdrop="static">
+      <Modal.Header closeButton>
+        <Modal.Title>Neue Gruppe erstellen</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCreate();
+          }}
+        >
+          <div className="form-floating mb-3">
+            <Form.Control
+              ref={inputRef}
+              type="text"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              placeholder="Gruppenname"
+              autoComplete="off"
+            />
+            <Form.Label>Gruppenname</Form.Label>
           </div>
-        </div>
-      </div>
-    </div>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer className="d-flex justify-content-around w-100">
+        <Button variant="outline-secondary" onClick={onClose}>
+          Abbrechen
+        </Button>
+        <Button variant="outline-light" onClick={handleCreate}>
+          Erstellen
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
