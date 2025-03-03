@@ -9,4 +9,7 @@ export { ValidatedForm } from "./ui/ValidatedForm/ValidatedForm";
 export { GroupCreationModal } from "./ui/GroupCreationModal/GroupCreationModal";
 export { DeleteGroupModal } from "./ui/DeleteGroupModal/DeleteGroupModal";
 export { Loader } from "./ui/Loader/Loader";
+export { Carousel } from "./ui/Carousel/Carousel";
+export { ItemList } from "./ui/ItemList/ItemList";
+
 

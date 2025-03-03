@@ -20,7 +20,7 @@ export const GroupsPage: React.FC = () => {
     confirmDeleteGroup,
     handleKeyDown,
     handleNavigateToGroup,
-  } = useGroups();
+  } = useGroups(); 
 
   return (
     <Container fluid>

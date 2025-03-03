@@ -1,0 +1,46 @@
+.item {
+  position: relative;
+  transition: background-color 0.2s ease-in-out, opacity 0.1s ease-in-out;
+  cursor: pointer;
+  min-height: 53px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.item.editing {
+  background-color: rgba(255, 255, 255, 0.1);
+  cursor: default;
+}
+
+.iconContainer {
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.item:hover .iconContainer,
+.item.editing .iconContainer {
+  opacity: 1;
+}
+
+.icon {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #fff;
+  transition: color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+.editInput {
+  flex: 1;
+  font-size: 1rem;
+  padding: 5px 8px;
+  border-radius: 5px;
+  margin-right: 10px;
+  min-height: 36px;
+}
