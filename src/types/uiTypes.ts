@@ -24,11 +24,11 @@ export interface SideNavProps {
   onClose: () => void;
 }
 
-// ✅ Обновляем конфиг навигации (модульное меню)
+
 export interface SideNavConfig {
   isOpen: boolean;
   items: MenuItem[];
-  setOpen: (open: boolean) => void; // ✅ Теперь принимает аргумент boolean
+  setOpen: (open: boolean) => void; 
 }
 
 export interface AlertMessageProps {
@@ -62,3 +62,11 @@ export interface GroupCreationModalProps {
   show: boolean;
   onClose: () => void;
 }
+
+export type LoaderProps = {
+  size?: "sm" | "md" | "lg"; 
+  variant?: "light" | "dark" | "primary" | "secondary"; 
+  centered?: boolean; 
+  text?: string; 
+};
+

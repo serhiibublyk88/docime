@@ -8,6 +8,7 @@ export { AlertMessage } from "./ui/AlertMessage/AlertMessage";
 export { ValidatedForm } from "./ui/ValidatedForm/ValidatedForm";
 export { GroupCreationModal } from "./ui/GroupCreationModal/GroupCreationModal";
 export { DeleteGroupModal } from "./ui/DeleteGroupModal/DeleteGroupModal";
+export { Loader } from "./ui/Loader/Loader";
 
 // navigation
 export { SideNavController } from "./navigation/SideNavController";

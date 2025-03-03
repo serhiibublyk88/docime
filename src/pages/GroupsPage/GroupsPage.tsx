@@ -9,24 +9,33 @@ import {
   selectGroups,
   groupActions,
 } from "../../redux";
-import { ListGroup, Spinner, Container, Row, Col, Form } from "react-bootstrap";
+import { ListGroup, Container, Row, Col, Form } from "react-bootstrap";
 import { FaEdit, FaSave, FaTimes, FaTrash } from "react-icons/fa";
-import { DeleteGroupModal } from "../../components";
+import { DeleteGroupModal, Loader, AlertMessage } from "../../components";
 import styles from "./GroupsPage.module.css";
 
 export const GroupsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const groups = useSelector(selectGroups);
-  const isLoading = false; // Пока заглушка, заменим при добавлении `loading`
-
+  const [isLoading, setIsLoading] = useState(false);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
   const [groupName, setGroupName] = useState<string | null>(null);
   const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchGroups());
+    setIsLoading(true);
+    dispatch(fetchGroups()).finally(() => setIsLoading(false));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!isLoading && groups.length === 0) {
+      setShowAlert(true);
+    } else {
+      setShowAlert(false);
+    }
+  }, [groups.length, isLoading]);
 
   const handleEditClick = (
     event: React.MouseEvent,
@@ -49,22 +58,18 @@ export const GroupsPage: React.FC = () => {
     }
   };
 
- const handleSaveClick = async (event: React.MouseEvent) => {
-   event.stopPropagation();
+  const handleSaveClick = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!editGroupId || !groupName?.trim()) return;
 
-   if (!editGroupId || !groupName?.trim()) return;
+    const updatedGroups = groups.map((group) =>
+      group.id === editGroupId ? { ...group, name: groupName.trim() } : group
+    );
 
-   const updatedGroups = groups.map((group) =>
-     group.id === editGroupId ? { ...group, name: groupName.trim() } : group
-   );
-
-   dispatch(groupActions.setGroups(updatedGroups));
-
-   await dispatch(editGroup(editGroupId, groupName.trim()));
-
-   resetSelection(); 
- };
-
+    dispatch(groupActions.setGroups(updatedGroups));
+    await dispatch(editGroup(editGroupId, groupName.trim()));
+    resetSelection();
+  };
 
   const handleCancelEdit = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -91,7 +96,6 @@ export const GroupsPage: React.FC = () => {
     }
   };
 
-
   const handleNavigateToGroup = (groupId: string) => {
     if (!editGroupId) {
       navigate(`/admin/groups/${groupId}`);
@@ -106,92 +110,98 @@ export const GroupsPage: React.FC = () => {
 
           {isLoading ? (
             <div className="text-center">
-              <Spinner animation="border" role="status">
-                <span className="visually-hidden">Lädt...</span>
-              </Spinner>
+              <Loader size="md" text="Lädt Gruppen..." />
             </div>
           ) : (
-            <ListGroup>
-              {groups.length > 0 ? (
-                groups.map((group, index) => (
-                  <ListGroup.Item
-                    key={group.id || index} 
-                    tabIndex={editGroupId && editGroupId !== group.id ? -1 : 0}
-                    className={`${
-                      styles.groupItem
-                    } d-flex justify-content-between align-items-center list-group-item-action border-0 fs-5 ${
-                      editGroupId === group.id ? styles.editing : ""
-                    }`}
-                    style={{
-                      pointerEvents:
-                        editGroupId && editGroupId !== group.id
-                          ? "none"
-                          : "auto",
-                    }}
-                    onClick={() => handleNavigateToGroup(group.id)}
-                  >
-                    {editGroupId === group.id ? (
-                      <Form.Control
-                        type="text"
-                        value={groupName ?? ""}
-                        onChange={(e) => setGroupName(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        autoFocus
-                        className={styles.editInput}
-                      />
-                    ) : (
-                      <span>
-                        {index + 1}. {group.name}
-                      </span>
-                    )}
+            <>
+              {showAlert && (
+                <AlertMessage
+                  message="Keine Gruppen gefunden."
+                  type="danger"
+                  onClose={() => setShowAlert(false)}
+                />
+              )}
 
-                    <div
-                      className={`${styles.iconContainer} ${
-                        editGroupId && editGroupId !== group.id
-                          ? styles.hiddenIcons
-                          : ""
+              {groups.length > 0 && (
+                <ListGroup>
+                  {groups.map((group, index) => (
+                    <ListGroup.Item
+                      key={group.id || index}
+                      tabIndex={
+                        editGroupId && editGroupId !== group.id ? -1 : 0
+                      }
+                      className={`${
+                        styles.groupItem
+                      } d-flex justify-content-between align-items-center list-group-item-action border-0 fs-5 ${
+                        editGroupId === group.id ? styles.editing : ""
                       }`}
+                      style={{
+                        pointerEvents:
+                          editGroupId && editGroupId !== group.id
+                            ? "none"
+                            : "auto",
+                      }}
+                      onClick={() => handleNavigateToGroup(group.id)}
                     >
                       {editGroupId === group.id ? (
-                        <>
-                          <FaSave
-                            className={`${styles.icon} ${styles.saveIcon}`}
-                            title="Speichern"
-                            onClick={handleSaveClick}
-                          />
-                          <FaTimes
-                            className={`${styles.icon} ${styles.cancelIcon}`}
-                            title="Abbrechen"
-                            onClick={handleCancelEdit}
-                          />
-                        </>
+                        <Form.Control
+                          type="text"
+                          value={groupName ?? ""}
+                          onChange={(e) => setGroupName(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          autoFocus
+                          className={styles.editInput}
+                        />
                       ) : (
-                        <>
-                          <FaEdit
-                            className={`${styles.icon} ${styles.editIcon}`}
-                            title="Bearbeiten"
-                            onClick={(event) =>
-                              handleEditClick(event, group.id, group.name)
-                            }
-                          />
-                          <FaTrash
-                            className={`${styles.icon} ${styles.deleteIcon}`}
-                            title="Löschen"
-                            onClick={(event) =>
-                              handleDeleteClick(event, group.id)
-                            }
-                          />
-                        </>
+                        <span>
+                          {index + 1}. {group.name}
+                        </span>
                       )}
-                    </div>
-                  </ListGroup.Item>
-                ))
-              ) : (
-                <p className="text-muted text-center">
-                  Keine Gruppen gefunden.
-                </p>
+
+                      <div
+                        className={`${styles.iconContainer} ${
+                          editGroupId && editGroupId !== group.id
+                            ? styles.hiddenIcons
+                            : ""
+                        }`}
+                      >
+                        {editGroupId === group.id ? (
+                          <>
+                            <FaSave
+                              className={`${styles.icon} ${styles.saveIcon}`}
+                              title="Speichern"
+                              onClick={handleSaveClick}
+                            />
+                            <FaTimes
+                              className={`${styles.icon} ${styles.cancelIcon}`}
+                              title="Abbrechen"
+                              onClick={handleCancelEdit}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <FaEdit
+                              className={`${styles.icon} ${styles.editIcon}`}
+                              title="Bearbeiten"
+                              onClick={(event) =>
+                                handleEditClick(event, group.id, group.name)
+                              }
+                            />
+                            <FaTrash
+                              className={`${styles.icon} ${styles.deleteIcon}`}
+                              title="Löschen"
+                              onClick={(event) =>
+                                handleDeleteClick(event, group.id)
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
               )}
-            </ListGroup>
+            </>
           )}
         </Col>
       </Row>
