@@ -2,8 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectError, resetError } from "./redux";
 import { useAppDispatch } from "./hooks";
-import { AlertMessage, SideNavController } from "./components";
+import { AlertMessage} from "./components";
 import { ProtectedRoute, GuestOnlyRoute } from "./routes";
+import { SideNavController } from "./controllers";
 import { roles } from "./constants";
 
 import {
@@ -20,6 +21,7 @@ import {
   NotFoundPage,
   AccessDeniedPage,
 } from "./pages";
+
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();

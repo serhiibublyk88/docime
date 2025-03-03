@@ -1,7 +1,6 @@
-import { SideNav } from "../layout/SideNav/SideNav";
-import { Header } from "../layout/Header/Header";
-import { useSideNav } from "../../hooks/useSideNav";
-import { GroupCreationModal } from "../../components";
+import { SideNav, Header, GroupCreationModal } from "../components";
+import { useSideNav } from "../hooks";
+
 
 export const SideNavController: React.FC = () => {
   const sideNav = useSideNav();

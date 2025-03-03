@@ -1,3 +1,5 @@
+//uiTypes.ts
+
 import { FieldConfig } from "./constantsTypes";
 // import { JSX } from "react"; // ✅ Импортируем JSX.Element для иконок
 

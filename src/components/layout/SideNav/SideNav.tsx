@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "./SideNav.module.css";
 import { SideNavProps } from "../../../types/uiTypes";
+import styles from "./SideNav.module.css";
 
 export const SideNav = ({
   position = "left",

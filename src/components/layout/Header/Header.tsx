@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onLeftMenuToggle?.(); // ✅ Проверяем существование перед вызовом
+              onLeftMenuToggle?.(); 
             }}
           >
             <FaBars className="icon" />

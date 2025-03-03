@@ -10,5 +10,3 @@ export { GroupCreationModal } from "./ui/GroupCreationModal/GroupCreationModal";
 export { DeleteGroupModal } from "./ui/DeleteGroupModal/DeleteGroupModal";
 export { Loader } from "./ui/Loader/Loader";
 
-// navigation
-export { SideNavController } from "./navigation/SideNavController";
