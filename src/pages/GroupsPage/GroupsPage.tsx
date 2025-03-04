@@ -1,26 +1,32 @@
-import { Container, Row, Col, ListGroup, Form } from "react-bootstrap";
-import { FaEdit, FaSave, FaTimes, FaTrash } from "react-icons/fa";
-import { DeleteGroupModal, Loader, AlertMessage } from "../../components";
-import { useGroups } from "../../hooks/useGroups";
-import styles from "./GroupsPage.module.css";
+import { Container, Row, Col } from "react-bootstrap";
+import {
+  DeleteGroupModal,
+  Loader,
+  AlertMessage,
+  ItemList,
+} from "../../components";
+import { useGroups, useItemList } from "../../hooks";
+
+
 
 export const GroupsPage: React.FC = () => {
+  const { isLoading, showAlert, groups } = useGroups();
+
   const {
-    isLoading,
-    editGroupId,
-    groupName,
+    items,
+    editItemId,
+    editValue,
     deleteGroupId,
-    showAlert,
-    groups,
-    setGroupName,
+    handleItemClick,
     handleEditClick,
     handleSaveClick,
     handleCancelEdit,
     handleDeleteClick,
     confirmDeleteGroup,
-    handleKeyDown,
-    handleNavigateToGroup,
-  } = useGroups(); 
+    closeDeleteModal,
+    handleKeyDown, 
+    setEditValue,
+  } = useItemList();
 
   return (
     <Container fluid>
@@ -42,72 +48,19 @@ export const GroupsPage: React.FC = () => {
                 />
               )}
 
-              {groups.length > 0 && (
-                <ListGroup>
-                  {groups.map((group, index) => (
-                    <ListGroup.Item
-                      key={group.id || index}
-                      tabIndex={
-                        editGroupId && editGroupId !== group.id ? -1 : 0
-                      }
-                      className={`${
-                        styles.groupItem
-                      } d-flex justify-content-between align-items-center list-group-item-action border-0 fs-5 ${
-                        editGroupId === group.id ? styles.editing : ""
-                      }`}
-                      onClick={() => handleNavigateToGroup(group.id)}
-                    >
-                      {editGroupId === group.id ? (
-                        <Form.Control
-                          type="text"
-                          value={groupName ?? ""}
-                          onChange={(e) => setGroupName(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          autoFocus
-                          className={styles.editInput}
-                        />
-                      ) : (
-                        <span>
-                          {index + 1}. {group.name}
-                        </span>
-                      )}
-
-                      <div className={styles.iconContainer}>
-                        {editGroupId === group.id ? (
-                          <>
-                            <FaSave
-                              className={`${styles.icon} ${styles.saveIcon}`}
-                              title="Speichern"
-                              onClick={handleSaveClick}
-                            />
-                            <FaTimes
-                              className={`${styles.icon} ${styles.cancelIcon}`}
-                              title="Abbrechen"
-                              onClick={handleCancelEdit}
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <FaEdit
-                              className={`${styles.icon} ${styles.editIcon}`}
-                              title="Bearbeiten"
-                              onClick={(event) =>
-                                handleEditClick(event, group.id, group.name)
-                              }
-                            />
-                            <FaTrash
-                              className={`${styles.icon} ${styles.deleteIcon}`}
-                              title="Löschen"
-                              onClick={(event) =>
-                                handleDeleteClick(event, group.id)
-                              }
-                            />
-                          </>
-                        )}
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
+              {items.length > 0 && (
+                <ItemList
+                  items={items}
+                  editItemId={editItemId}
+                  editValue={editValue}
+                  onItemClick={handleItemClick}
+                  onEdit={handleEditClick}
+                  onSave={handleSaveClick}
+                  onCancel={handleCancelEdit}
+                  onDelete={handleDeleteClick}
+                  setEditValue={setEditValue}
+                  onKeyDown={handleKeyDown}  
+                />
               )}
             </>
           )}
@@ -121,7 +74,7 @@ export const GroupsPage: React.FC = () => {
             groups.find((group) => group.id === deleteGroupId)?.name || ""
           }
           onDelete={confirmDeleteGroup}
-          onClose={() => {}}
+          onClose={closeDeleteModal}
         />
       )}
     </Container>

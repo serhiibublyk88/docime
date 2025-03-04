@@ -5,7 +5,8 @@
   min-height: 53px;
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 10px 15px;
+  border-radius: 5px;
 }
 
 .item.editing {
@@ -32,13 +33,39 @@
   transition: color 0.2s ease-in-out, transform 0.1s ease-in-out;
 }
 
-.icon:hover {
+.editIcon:hover {
+  color: #ffc107;
   transform: scale(1.1);
+}
+
+.saveIcon:hover {
+  color: #28a745;
+  transform: scale(1.1);
+}
+
+.cancelIcon:hover {
+  color: #dc3545;
+  transform: scale(1.1);
+}
+
+.deleteIcon:hover {
+  color: #dc3545;
+  transform: scale(1.1);
+}
+
+.copyIcon:hover {
+  color: #17a2b8;
+  transform: scale(1.1);
+}
+
+.checkbox {
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .editInput {
   flex: 1;
-  font-size: 1rem;
+  font-size: 1.2rem;
   padding: 5px 8px;
   border-radius: 5px;
   margin-right: 10px;

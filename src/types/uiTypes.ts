@@ -1,13 +1,12 @@
 //uiTypes.ts
 
 import { FieldConfig } from "./constantsTypes";
-// import { JSX } from "react"; // ✅ Импортируем JSX.Element для иконок
 
 export interface HeaderProps {
-  onLeftMenuToggle?: () => void; // ✅ Теперь без аргументов
-  onRightMenuToggle?: () => void; // ✅ Теперь без аргументов
-  shouldShowBurgers: boolean; // ✅ Добавлено
-  shouldShowRightBurger: boolean; // ✅ Добавлено
+  onLeftMenuToggle?: () => void;
+  onRightMenuToggle?: () => void;
+  shouldShowBurgers: boolean;
+  shouldShowRightBurger: boolean;
 }
 
 export interface MenuItem {
@@ -26,11 +25,10 @@ export interface SideNavProps {
   onClose: () => void;
 }
 
-
 export interface SideNavConfig {
   isOpen: boolean;
   items: MenuItem[];
-  setOpen: (open: boolean) => void; 
+  setOpen: (open: boolean) => void;
 }
 
 export interface AlertMessageProps {
@@ -59,16 +57,36 @@ export interface ValidatedFormProps {
   className?: string;
 }
 
-
 export interface GroupCreationModalProps {
   show: boolean;
   onClose: () => void;
 }
 
 export type LoaderProps = {
-  size?: "sm" | "md" | "lg"; 
-  variant?: "light" | "dark" | "primary" | "secondary"; 
-  centered?: boolean; 
-  text?: string; 
+  size?: "sm" | "md" | "lg";
+  variant?: "light" | "dark" | "primary" | "secondary";
+  centered?: boolean;
+  text?: string;
 };
 
+export interface Item {
+  id: string;
+  name: string;
+}
+
+export interface ItemListProps {
+  items: Item[];
+  editItemId: string | null;
+  editValue: string;
+  onItemClick: (id: string) => void;
+  onEdit: (
+    id: string,
+    name: string,
+    event: React.MouseEvent<SVGElement>
+  ) => void;
+  onSave: (event: React.MouseEvent<SVGElement>) => void;
+  onCancel: (event: React.MouseEvent<SVGElement>) => void;
+  onDelete: (id: string, event: React.MouseEvent<SVGElement>) => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  setEditValue: (value: string) => void;
+}
