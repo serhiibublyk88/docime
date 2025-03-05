@@ -10,21 +10,27 @@ export const useGroups = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
-  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
 
+  // 🔹 Запуск загрузки групп
   useEffect(() => {
     setIsLoading(true);
-    dispatch(fetchGroups()).finally(() => setIsLoading(false));
+    setShowError(false);
+
+    dispatch(fetchGroups())
+      .catch(() => setShowError(true)) // Ошибка загрузки
+      .finally(() => setIsLoading(false));
   }, [dispatch]);
 
-  useEffect(() => {
-    setShowAlert(!isLoading && groups.length === 0);
-  }, [groups.length, isLoading]);
+  // 🔹 Функция для скрытия ошибки
+  const hideError = useCallback(() => setShowError(false), []);
 
+  // 🔹 Обработчик удаления
   const handleDeleteClick = useCallback((groupId: string) => {
     setDeleteGroupId(groupId);
   }, []);
 
+  // 🔹 Подтверждение удаления
   const confirmDeleteGroup = useCallback(() => {
     if (deleteGroupId) {
       dispatch(deleteGroup(deleteGroupId));
@@ -35,7 +41,8 @@ export const useGroups = () => {
   return {
     isLoading,
     deleteGroupId,
-    showAlert,
+    showError,
+    hideError,
     groups,
     handleDeleteClick,
     confirmDeleteGroup,

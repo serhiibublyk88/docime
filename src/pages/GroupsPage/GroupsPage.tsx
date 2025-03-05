@@ -7,10 +7,8 @@ import {
 } from "../../components";
 import { useGroups, useItemList } from "../../hooks";
 
-
-
 export const GroupsPage: React.FC = () => {
-  const { isLoading, showAlert, groups } = useGroups();
+  const { isLoading, showError, hideError, groups } = useGroups();
 
   const {
     items,
@@ -24,7 +22,7 @@ export const GroupsPage: React.FC = () => {
     handleDeleteClick,
     confirmDeleteGroup,
     closeDeleteModal,
-    handleKeyDown, 
+    handleKeyDown,
     setEditValue,
   } = useItemList();
 
@@ -34,21 +32,23 @@ export const GroupsPage: React.FC = () => {
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
           <h2 className="mb-3 text-center">Gruppen :</h2>
 
-          {isLoading ? (
+          {isLoading && (
             <div className="text-center">
               <Loader size="md" text="Lädt Gruppen..." />
             </div>
-          ) : (
+          )}
+
+          {!isLoading && (
             <>
-              {showAlert && (
+              {showError && (
                 <AlertMessage
-                  message="Keine Gruppen gefunden."
+                  message="Fehler beim Laden der Gruppen."
                   type="danger"
-                  onClose={() => {}}
+                  onClose={hideError} // ✅ Теперь ошибка скрывается
                 />
               )}
 
-              {items.length > 0 && (
+              {!showError && items.length > 0 && (
                 <ItemList
                   items={items}
                   editItemId={editItemId}
@@ -59,7 +59,7 @@ export const GroupsPage: React.FC = () => {
                   onCancel={handleCancelEdit}
                   onDelete={handleDeleteClick}
                   setEditValue={setEditValue}
-                  onKeyDown={handleKeyDown}  
+                  onKeyDown={handleKeyDown}
                 />
               )}
             </>
