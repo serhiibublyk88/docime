@@ -5,26 +5,27 @@ import {
   AlertMessage,
   ItemList,
 } from "../../components";
-import { useGroups, useItemList } from "../../hooks";
+import { useGroups } from "../../hooks";
 
 export const GroupsPage: React.FC = () => {
-  const { isLoading, showError, hideError, groups } = useGroups();
-
   const {
-    items,
+    isLoading,
+    showError,
+    hideError,
+    groups,
     editItemId,
     editValue,
-    deleteGroupId,
     handleItemClick,
     handleEditClick,
     handleSaveClick,
     handleCancelEdit,
     handleDeleteClick,
     confirmDeleteGroup,
-    closeDeleteModal,
+    closeDeleteModal, 
     handleKeyDown,
     setEditValue,
-  } = useItemList();
+    deleteGroupId,
+  } = useGroups();
 
   return (
     <Container fluid>
@@ -34,7 +35,7 @@ export const GroupsPage: React.FC = () => {
 
           {isLoading && (
             <div className="text-center">
-              <Loader size="md" text="Lädt Gruppen..." />
+              <Loader size="md" />
             </div>
           )}
 
@@ -44,13 +45,16 @@ export const GroupsPage: React.FC = () => {
                 <AlertMessage
                   message="Fehler beim Laden der Gruppen."
                   type="danger"
-                  onClose={hideError} // ✅ Теперь ошибка скрывается
+                  onClose={hideError}
                 />
               )}
 
-              {!showError && items.length > 0 && (
+              {!showError && groups.length > 0 && (
                 <ItemList
-                  items={items}
+                  items={groups.map((group) => ({
+                    id: group.id,
+                    name: group.name,
+                  }))}
                   editItemId={editItemId}
                   editValue={editValue}
                   onItemClick={handleItemClick}
@@ -74,7 +78,7 @@ export const GroupsPage: React.FC = () => {
             groups.find((group) => group.id === deleteGroupId)?.name || ""
           }
           onDelete={confirmDeleteGroup}
-          onClose={closeDeleteModal}
+          onClose={closeDeleteModal} 
         />
       )}
     </Container>

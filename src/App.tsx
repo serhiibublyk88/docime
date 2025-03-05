@@ -16,6 +16,7 @@ import {
   ResultsPage,
   AdminDashboard,
   GroupsPage,
+  GroupPage,
   CreateTestPage,
   ManageResultsPage,
   NotFoundPage,
@@ -29,7 +30,6 @@ export const App: React.FC = () => {
 
   return (
     <>
-      
       {error && (
         <AlertMessage
           message={error}
@@ -57,6 +57,7 @@ export const App: React.FC = () => {
             >
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/groups" element={<GroupsPage />} />
+              <Route path="/admin/groups/:id" element={<GroupPage />} />
               <Route path="/admin/tests" element={<TestsPage />} />
               <Route path="/admin/create-test" element={<CreateTestPage />} />
               <Route path="/admin/results" element={<ManageResultsPage />} />

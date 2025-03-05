@@ -10,3 +10,4 @@ export { RegisterPage } from "./RegisterPage/RegisterPage";
 export { ResultsPage } from "./ResultsPage/ResultsPage";
 export { TestPage } from "./TestPage/TestPage";
 export { TestsPage } from "./TestsPage/TestsPage";
+export { GroupPage } from "./GroupPage/GroupPage";
