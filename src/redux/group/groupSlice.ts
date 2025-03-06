@@ -32,7 +32,6 @@ export const groupSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🔹 **Получение группы**
       .addCase(fetchGroupById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -40,30 +39,32 @@ export const groupSlice = createSlice({
       .addCase(fetchGroupById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.group = action.payload.group;
-        state.members = action.payload.members;
+        state.members = action.payload.members.map((member) => ({
+          _id: member._id,
+          username: member.username ?? "Unbekannter Benutzer",
+          email: member.email ?? "",
+          role: member.role ?? 1,
+        }));
       })
       .addCase(fetchGroupById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Fehler beim Laden der Gruppe.";
       })
-
-      // 🔹 **Удаление участника**
       .addCase(removeMemberFromGroup.fulfilled, (state, action) => {
         state.members = state.members.filter(
-          (member) => member.id !== action.payload
+          (member) => member._id !== action.payload
         );
       })
       .addCase(removeMemberFromGroup.rejected, (state, action) => {
         state.error = action.payload || "Fehler beim Entfernen des Mitglieds.";
       })
-
-      // 🔹 **Редактирование участника**
       .addCase(editMemberInGroup.fulfilled, (state, action) => {
         const index = state.members.findIndex(
-          (member) => member.id === action.payload.id
+          (member) => member._id === action.payload._id
         );
+
         if (index !== -1) {
-          state.members[index] = action.payload;
+          state.members[index].username = action.payload.username;
         }
       })
       .addCase(editMemberInGroup.rejected, (state, action) => {
@@ -72,9 +73,5 @@ export const groupSlice = createSlice({
   },
 });
 
-
 export const groupActions = groupSlice.actions;
 export const groupReducer = groupSlice.reducer;
-
-
-

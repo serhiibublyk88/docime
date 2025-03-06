@@ -11,5 +11,6 @@ export { DeleteGroupModal } from "./ui/DeleteGroupModal/DeleteGroupModal";
 export { Loader } from "./ui/Loader/Loader";
 export { Carousel } from "./ui/Carousel/Carousel";
 export { ItemList } from "./ui/ItemList/ItemList";
+export {MemberDeleteModal} from "./ui/MemberDeleteModal/MemberDeleteModal"
 
 

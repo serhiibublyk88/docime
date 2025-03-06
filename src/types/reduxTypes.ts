@@ -2,7 +2,7 @@
 
 /// 🔹 Пользователь
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email?: string;
   role: number;
@@ -14,17 +14,16 @@ export interface AuthState {
   user: User | null;
 }
 
-/// 🔹 Одна группа
 export interface Group {
   id: string;
   name: string;
   description?: string;
-  membersCount: number; // Количество участников
+  members: User[];
   createdBy: string;
   createdAt: string;
+  groupsForCarousel?: string[];
 }
 
-/// 🔹 Состояние всех групп (множественное число)
 export interface GroupsState {
   groups: Group[];
 }
@@ -65,4 +64,23 @@ export interface TestResult {
 /// 🔹 Состояние результатов тестов
 export interface ResultState {
   results: TestResult[];
+}
+
+// 🔹 Формат данных от API
+export interface GroupResponse {
+  groupDetails: Group;
+  members: Array<{
+    _id: string;
+    name?: string;
+    email?: string;
+    role?: number;
+  }>;
+}
+
+// Интерфейс, описывающий ответ от сервера после редактирования участника
+export interface UpdatedUserResponse {
+  _id: string;
+  username?: string;
+  email?: string;
+  role?: number;
 }
