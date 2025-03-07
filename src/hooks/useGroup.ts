@@ -23,24 +23,19 @@ export function useGroup(groupId?: string) {
   const error = useSelector(selectGroupError);
   const groupsForCarousel = useSelector(selectGroupsForCarousel); // ✅ Берём данные из Redux
 
-  console.log("✅ [useGroup] group:", group);
-  console.log(
-    "✅ [useGroup] groupsForCarousel (from Redux):",
-    groupsForCarousel
-  );
 
   // ✅ Мемоизированный массив участников
   const members = useMemo(() => {
-    console.log("✅ [useGroup] rawMembers:", rawMembers);
+    
     return rawMembers ?? [];
   }, [rawMembers]);
 
   useEffect(() => {
     if (groupId) {
-      console.log("🚀 [useGroup] Fetching group with ID:", groupId);
+      
       dispatch(fetchGroupById(groupId))
         .unwrap()
-        .catch((err) => console.error("❌ Fehler beim Laden der Gruppe:", err));
+        .catch((err) => console.error("Fehler beim Laden der Gruppe:", err));
     }
   }, [dispatch, groupId]);
 
@@ -49,14 +44,14 @@ export function useGroup(groupId?: string) {
     members,
     isLoading,
     error,
-    groupsForCarousel, // ✅ Берём уже готовые данные из Redux (без лишних вычислений!)
+    groupsForCarousel, 
     removeMember: useCallback(
       async (memberId: string) => {
         if (!groupId) return;
         try {
           await dispatch(removeMemberFromGroup({ groupId, memberId })).unwrap();
         } catch (err) {
-          console.error("❌ Fehler beim Entfernen des Mitglieds:", err);
+          console.error(" Fehler beim Entfernen des Mitglieds:", err);
         }
       },
       [dispatch, groupId]
@@ -69,7 +64,7 @@ export function useGroup(groupId?: string) {
             editMemberInGroup({ groupId, memberId, newName })
           ).unwrap();
         } catch (err) {
-          console.error("❌ Fehler beim Bearbeiten des Mitgliedс:", err);
+          console.error(" Fehler beim Bearbeiten des Mitgliedс:", err);
         }
       },
       [dispatch, groupId]

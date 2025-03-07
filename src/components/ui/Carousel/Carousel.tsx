@@ -1,21 +1,23 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Loader } from "../../../components";
 import styles from "./Carousel.module.css";
 
 interface CarouselProps {
   items: { id: string; name: string }[];
   selectedItemId: string;
   onSelect: (id: string) => void;
+  isLoading?: boolean; 
 }
 
 export const Carousel: React.FC<CarouselProps> = ({
   items,
   selectedItemId,
   onSelect,
+  isLoading = false, 
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // ✅ Мемоизация индекса для избежания ненужных ререндеров
   const selectedIndex = useMemo(() => {
     return items.findIndex((item) => item.id === selectedItemId);
   }, [items, selectedItemId]);
@@ -26,7 +28,6 @@ export const Carousel: React.FC<CarouselProps> = ({
     }
   }, [selectedIndex]);
 
-  // ✅ Обработчики навигации (мемоизированные)
   const handleNext = useCallback(() => {
     if (items.length <= 1) return;
     setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
@@ -41,7 +42,14 @@ export const Carousel: React.FC<CarouselProps> = ({
     onSelect(items[(currentIndex - 1 + items.length) % items.length].id);
   }, [items, currentIndex, onSelect]);
 
-  // ✅ Если `items` пустой — рендерим сообщение
+  if (isLoading) {
+    return (
+      <div className="text-center">
+        <Loader size="md" /> 
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return <p className="text-center text-muted">Keine Gruppen verfügbar</p>;
   }
@@ -52,7 +60,6 @@ export const Carousel: React.FC<CarouselProps> = ({
         className={styles.navButton}
         onClick={handlePrev}
         disabled={items.length <= 1}
-        
       >
         <FaChevronLeft />
       </button>
@@ -70,7 +77,6 @@ export const Carousel: React.FC<CarouselProps> = ({
         className={styles.navButton}
         onClick={handleNext}
         disabled={items.length <= 1}
-        
       >
         <FaChevronRight />
       </button>

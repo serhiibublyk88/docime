@@ -71,7 +71,7 @@ export const groupSlice = createSlice({
 
         if (index !== -1) {
           state.members[index].username =
-            action.payload.username?.trim() || "Unbekannter Benutzer"; // ✅ Убираем случайные пробелы
+            action.payload.username?.trim() || "Unbekannter Benutzer"; 
         }
       })
       .addCase(editMemberInGroup.rejected, (state, action) => {

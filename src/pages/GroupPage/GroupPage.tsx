@@ -17,19 +17,19 @@ export const GroupPage = () => {
     members,
     isLoading,
     error,
-    groupsForCarousel, // ✅ Группы для карусели
+    groupsForCarousel, 
     removeMember,
     editMember,
     closeError,
   } = useGroup(id || "");
 
-  console.log("🔍 [GroupPage] groupsForCarousel:", groupsForCarousel);
+  
 
   const [editItemId, setEditItemId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null);
 
-  // ✅ Универсальная функция очистки
+  // ✅ Убираем фокус со всех активных элементов
   const clearSelection = useCallback(() => {
     setEditItemId(null);
     setEditValue("");
@@ -41,7 +41,7 @@ export const GroupPage = () => {
     document.body.focus();
   }, []);
 
-  // ✅ Функции для работы с участниками
+  // ✅ Начало редактирования
   const handleEdit = useCallback(
     (memberId: string, name: string) => {
       clearSelection();
@@ -51,6 +51,7 @@ export const GroupPage = () => {
     [clearSelection]
   );
 
+  // ✅ Сохранение изменений
   const handleSave = useCallback(async () => {
     if (editItemId && editValue.trim()) {
       await editMember(editItemId, editValue.trim());
@@ -58,8 +59,12 @@ export const GroupPage = () => {
     }
   }, [editItemId, editValue, editMember, clearSelection]);
 
-  const handleCancel = useCallback(clearSelection, [clearSelection]);
+  // ✅ Отмена редактирования
+  const handleCancel = useCallback(() => {
+    clearSelection();
+  }, [clearSelection]);
 
+  // ✅ Обработка клавиатуры
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (event.key === "Enter") {
@@ -71,6 +76,7 @@ export const GroupPage = () => {
     [handleSave, clearSelection]
   );
 
+  // ✅ Удаление участника
   const handleDeleteClick = useCallback(
     (memberId: string) => {
       clearSelection();
@@ -79,6 +85,7 @@ export const GroupPage = () => {
     [clearSelection]
   );
 
+  
   const confirmDeleteMember = useCallback(async () => {
     if (deleteMemberId) {
       await removeMember(deleteMemberId);
@@ -86,34 +93,33 @@ export const GroupPage = () => {
     }
   }, [deleteMemberId, removeMember, clearSelection]);
 
-  const closeDeleteModal = useCallback(clearSelection, [clearSelection]);
+  
+  const closeDeleteModal = useCallback(() => {
+    clearSelection();
+  }, [clearSelection]);
 
-  // ✅ Обработка клика по элементу списка (можно расширить)
-  const handleItemClick = useCallback((id: string) => {
-    console.log(`Item clicked: ${id}`);
-  }, []);
+  
+  const handleItemClick = useCallback(() => {  }, []);
 
-  console.log("Props for Carousel:", groupsForCarousel);
+  
 
   return (
     <Container fluid>
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
-          {/* ✅ Карусель рендерится только если есть данные */}
-          {groupsForCarousel.length > 0 ? (
+          {isLoading ? ( 
+            <div className="text-center">
+              <Loader size="md" />
+            </div>
+          ) : groupsForCarousel.length > 0 ? ( 
             <Carousel
               items={groupsForCarousel}
               selectedItemId={id || ""}
               onSelect={(newGroupId) => navigate(`/admin/groups/${newGroupId}`)}
+              isLoading={isLoading}
             />
           ) : (
-            <p className="text-center text-muted">Keine Gruppen verfügbar</p>
-          )}
-
-          {isLoading && (
-            <div className="text-center">
-              <Loader size="md" />
-            </div>
+            <p className="text-center text-muted">Keine Gruppen verfügbar</p> 
           )}
 
           {!isLoading && error && (
@@ -135,7 +141,7 @@ export const GroupPage = () => {
               editItemId={editItemId}
               editValue={editValue}
               setEditValue={setEditValue}
-              onItemClick={handleItemClick} // ✅ Добавлен onItemClick
+              onItemClick={handleItemClick}
               onSave={handleSave}
               onCancel={handleCancel}
               onKeyDown={handleKeyDown}
