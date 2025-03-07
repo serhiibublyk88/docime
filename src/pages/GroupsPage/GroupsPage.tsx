@@ -18,13 +18,12 @@ export const GroupsPage: React.FC = () => {
     handleItemClick,
     handleEditClick,
     handleSaveClick,
-    handleCancelEdit,
     handleDeleteClick,
     confirmDeleteGroup,
-    closeDeleteModal, 
-    handleKeyDown,
+    closeDeleteModal,
     setEditValue,
     deleteGroupId,
+    handleCancel, // ✅ Теперь передаём исправленный onCancel
   } = useGroups();
 
   return (
@@ -60,10 +59,9 @@ export const GroupsPage: React.FC = () => {
                   onItemClick={handleItemClick}
                   onEdit={handleEditClick}
                   onSave={handleSaveClick}
-                  onCancel={handleCancelEdit}
+                  onCancel={handleCancel} // ✅ Теперь `Escape` работает корректно
                   onDelete={handleDeleteClick}
                   setEditValue={setEditValue}
-                  onKeyDown={handleKeyDown}
                 />
               )}
             </>
@@ -78,7 +76,7 @@ export const GroupsPage: React.FC = () => {
             groups.find((group) => group.id === deleteGroupId)?.name || ""
           }
           onDelete={confirmDeleteGroup}
-          onClose={closeDeleteModal} 
+          onClose={closeDeleteModal}
         />
       )}
     </Container>

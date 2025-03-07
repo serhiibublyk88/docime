@@ -1,9 +1,8 @@
 import { ListGroup, Form } from "react-bootstrap";
 import { FaEdit, FaSave, FaTimes, FaTrash } from "react-icons/fa";
 import { ItemListProps } from "../../../types/uiTypes";
+import { useCallback } from "react";
 import styles from "./ItemList.module.css";
-
-
 
 export const ItemList: React.FC<ItemListProps> = ({
   items,
@@ -14,9 +13,46 @@ export const ItemList: React.FC<ItemListProps> = ({
   onSave,
   onCancel,
   onDelete,
-  onKeyDown,
   setEditValue,
 }) => {
+  const clearSelection = useCallback(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    document.body.focus();
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (editValue.trim()) {
+      onSave();
+      clearSelection();
+    }
+  }, [onSave, clearSelection, editValue]);
+
+  const handleCancel = useCallback(() => {
+    onCancel();
+    clearSelection();
+  }, [onCancel, clearSelection]);
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      onDelete(id);
+      clearSelection();
+    },
+    [onDelete, clearSelection]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") {
+        handleSave();
+      } else if (event.key === "Escape") {
+        handleCancel();
+      }
+    },
+    [handleSave, handleCancel]
+  );
+
   return (
     <ListGroup>
       {items.map((item, index) => (
@@ -33,7 +69,7 @@ export const ItemList: React.FC<ItemListProps> = ({
               type="text"
               value={editValue}
               onChange={(e) => setEditValue(e.currentTarget.value)}
-              onKeyDown={onKeyDown}
+              onKeyDown={handleKeyDown}
               autoFocus
               className={styles.editInput}
             />
@@ -52,12 +88,12 @@ export const ItemList: React.FC<ItemListProps> = ({
                 <FaSave
                   className={`${styles.icon} ${styles.saveIcon}`}
                   title="Speichern"
-                  onClick={onSave}
+                  onClick={handleSave}
                 />
                 <FaTimes
                   className={`${styles.icon} ${styles.cancelIcon}`}
                   title="Abbrechen"
-                  onClick={onCancel}
+                  onClick={handleCancel}
                 />
               </>
             ) : (
@@ -65,12 +101,12 @@ export const ItemList: React.FC<ItemListProps> = ({
                 <FaEdit
                   className={`${styles.icon} ${styles.editIcon}`}
                   title="Bearbeiten"
-                  onClick={(event) => onEdit(item.id, item.name, event)}
+                  onClick={() => onEdit(item.id, item.name)}
                 />
                 <FaTrash
                   className={`${styles.icon} ${styles.deleteIcon}`}
                   title="Löschen"
-                  onClick={(event) => onDelete(item.id, event)}
+                  onClick={() => handleDelete(item.id)}
                 />
               </>
             )}

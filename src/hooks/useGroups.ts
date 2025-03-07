@@ -42,25 +42,22 @@ export const useGroups = () => {
     [editItemId, navigate]
   );
 
-  // ✅ Новая версия clearSelection: Жёстко снимаем фокус и выделение
+  // ✅ Универсальная очистка выделений
   const clearSelection = useCallback(() => {
     setEditItemId(null);
     setEditValue("");
     setDeleteGroupId(null);
 
-    // 🔹 Убираем фокус со всех элементов
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-
-    // 🔹 Принудительно ставим фокус на body
     document.body.focus();
   }, []);
 
-  // 🔹 Удаление: сбрасываем фокус ПЕРЕД открытием модалки
+  // ✅ Удаление группы
   const handleDeleteClick = useCallback(
     (groupId: string) => {
-      clearSelection(); // ✅ Снимаем выделение ПЕРЕД модалкой
+      clearSelection(); // ✅ Снимаем выделение перед модалкой
       setDeleteGroupId(groupId);
     },
     [clearSelection]
@@ -73,15 +70,15 @@ export const useGroups = () => {
     }
   }, [deleteGroupId, dispatch, clearSelection]);
 
-  const closeDeleteModal = useCallback(() => {
-    clearSelection();
-  }, [clearSelection]);
+  const closeDeleteModal = useCallback(clearSelection, [clearSelection]);
 
+  // ✅ Начало редактирования
   const handleEditClick = useCallback((id: string, name: string) => {
     setEditItemId(id);
     setEditValue(name);
   }, []);
 
+  // ✅ Сохранение изменений
   const handleSaveClick = useCallback(() => {
     if (!editItemId || !editValue.trim()) return;
 
@@ -91,24 +88,8 @@ export const useGroups = () => {
 
     dispatch(groupsActions.setGroups(updatedGroups));
     dispatch(editGroup(editItemId, editValue.trim()));
-
-    clearSelection();
+    clearSelection(); // ✅ Теперь очищает редактирование после сохранения
   }, [editItemId, editValue, groups, dispatch, clearSelection]);
-
-  const handleCancelEdit = useCallback(() => {
-    clearSelection();
-  }, [clearSelection]);
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      if (event.key === "Enter") {
-        handleSaveClick();
-      } else if (event.key === "Escape") {
-        clearSelection();
-      }
-    },
-    [handleSaveClick, clearSelection]
-  );
 
   return {
     isLoading,
@@ -122,10 +103,9 @@ export const useGroups = () => {
     closeDeleteModal,
     handleEditClick,
     handleSaveClick,
-    handleCancelEdit,
-    handleKeyDown,
     editItemId,
     editValue,
     setEditValue,
+    handleCancel: clearSelection, // ✅ Теперь можно передавать в `ItemList`
   };
 };

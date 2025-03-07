@@ -24,3 +24,4 @@ export interface Group {
   }; 
   members?: { id: string; username: string }[]; 
 }
+ 

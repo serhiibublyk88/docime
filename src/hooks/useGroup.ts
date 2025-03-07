@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import { AppDispatch } from "../redux/store";
 import {
   fetchGroupById,
@@ -11,7 +11,7 @@ import {
   selectGroupMembers,
   selectGroupLoading,
   selectGroupError,
-  selectGroupsForCarousel, // ✅ Добавил селектор для карусели
+  selectGroupsForCarousel,
 } from "../redux/group/groupSelectors";
 
 export function useGroup(groupId?: string) {
@@ -21,59 +21,90 @@ export function useGroup(groupId?: string) {
   const rawMembers = useSelector(selectGroupMembers);
   const isLoading = useSelector(selectGroupLoading);
   const error = useSelector(selectGroupError);
-  const groupsForCarousel = useSelector(selectGroupsForCarousel); // ✅ Берём данные из Redux
+  const groupsForCarousel = useSelector(selectGroupsForCarousel);
 
+  // ✅ Локальное состояние
+  const [editItemId, setEditItemId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState<string>("");
+  const [deleteMemberId, setDeleteMemberId] = useState<string | null>(null);
 
-  // ✅ Мемоизированный массив участников
-  const members = useMemo(() => {
-    
-    return rawMembers ?? [];
-  }, [rawMembers]);
+  // ✅ Мемоизация массива участников
+  const members = useMemo(() => rawMembers ?? [], [rawMembers]);
 
   useEffect(() => {
     if (groupId) {
-      
       dispatch(fetchGroupById(groupId))
         .unwrap()
-        .catch((err) => console.error("Fehler beim Laden der Gruppe:", err));
+        .catch((err) => console.error("❌ Fehler beim Laden der Gruppe:", err));
     }
   }, [dispatch, groupId]);
+
+  // ✅ Очистка выделения
+  const clearSelection = useCallback(() => {
+    setEditItemId(null);
+    setEditValue("");
+    setDeleteMemberId(null);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    document.body.focus();
+  }, []);
+
+  // ✅ Редактирование участника
+  const handleEdit = useCallback((memberId: string, name: string) => {
+    setEditItemId(memberId);
+    setEditValue(name);
+  }, []);
+
+  // ✅ Сохранение изменений
+  const handleSave = useCallback(async () => {
+    if (editItemId && editValue.trim()) {
+      await dispatch(
+        editMemberInGroup({
+          groupId: groupId!,
+          memberId: editItemId,
+          newName: editValue.trim(),
+        })
+      ).unwrap();
+      clearSelection(); // Теперь корректно сбрасывает выделение
+    }
+  }, [dispatch, groupId, editItemId, editValue, clearSelection]);
+
+  // ✅ Отмена редактирования
+  const handleCancel = useCallback(() => {
+    clearSelection();
+  }, [clearSelection]);
+
+  // ✅ Удаление участника
+  const handleDeleteClick = useCallback((memberId: string) => {
+    setDeleteMemberId(memberId);
+  }, []);
+
+  const confirmDeleteMember = useCallback(async () => {
+    if (deleteMemberId) {
+      await dispatch(
+        removeMemberFromGroup({ groupId: groupId!, memberId: deleteMemberId })
+      ).unwrap();
+      clearSelection();
+    }
+  }, [dispatch, groupId, deleteMemberId, clearSelection]);
 
   return {
     group,
     members,
     isLoading,
     error,
-    groupsForCarousel, 
-    removeMember: useCallback(
-      async (memberId: string) => {
-        if (!groupId) return;
-        try {
-          await dispatch(removeMemberFromGroup({ groupId, memberId })).unwrap();
-        } catch (err) {
-          console.error(" Fehler beim Entfernen des Mitglieds:", err);
-        }
-      },
-      [dispatch, groupId]
-    ),
-    editMember: useCallback(
-      async (memberId: string, newName: string) => {
-        if (!groupId) return;
-        try {
-          await dispatch(
-            editMemberInGroup({ groupId, memberId, newName })
-          ).unwrap();
-        } catch (err) {
-          console.error(" Fehler beim Bearbeiten des Mitgliedс:", err);
-        }
-      },
-      [dispatch, groupId]
-    ),
-    closeError: useCallback(() => {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-      document.body.focus();
-    }, []),
+    groupsForCarousel,
+    editItemId,
+    editValue,
+    deleteMemberId,
+    setEditValue,
+    handleEdit,
+    handleSave,
+    handleCancel, // ✅ Теперь onCancel в `ItemList` сбрасывает состояние
+    handleDeleteClick,
+    confirmDeleteMember,
+    closeDeleteModal: clearSelection, // ✅ Теперь корректно очищает
+    closeError: clearSelection,
   };
 }

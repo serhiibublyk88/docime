@@ -79,14 +79,10 @@ export interface ItemListProps {
   editItemId: string | null;
   editValue: string;
   onItemClick: (id: string) => void;
-  onEdit: (
-    id: string,
-    name: string,
-    event: React.MouseEvent<SVGElement>
-  ) => void;
-  onSave: (event: React.MouseEvent<SVGElement>) => void;
-  onCancel: (event: React.MouseEvent<SVGElement>) => void;
-  onDelete: (id: string, event: React.MouseEvent<SVGElement>) => void;
-  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  onEdit: (id: string, name: string) => void; // ✅ Убрали event
+  onSave: () => void; // ✅ Без event
+  onCancel: () => void; // ✅ Без event
+  onDelete: (id: string) => void; // ✅ Убрали event
   setEditValue: (value: string) => void;
 }
+
