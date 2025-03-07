@@ -35,7 +35,7 @@ export function useGroup(groupId?: string) {
     if (groupId) {
       dispatch(fetchGroupById(groupId))
         .unwrap()
-        .catch((err) => console.error("❌ Fehler beim Laden der Gruppe:", err));
+        .catch((err) => console.error(" Fehler beim Laden der Gruppe:", err));
     }
   }, [dispatch, groupId]);
 
@@ -66,7 +66,7 @@ export function useGroup(groupId?: string) {
           newName: editValue.trim(),
         })
       ).unwrap();
-      clearSelection(); // Теперь корректно сбрасывает выделение
+      clearSelection(); 
     }
   }, [dispatch, groupId, editItemId, editValue, clearSelection]);
 
@@ -101,10 +101,10 @@ export function useGroup(groupId?: string) {
     setEditValue,
     handleEdit,
     handleSave,
-    handleCancel, // ✅ Теперь onCancel в `ItemList` сбрасывает состояние
+    handleCancel, 
     handleDeleteClick,
     confirmDeleteMember,
-    closeDeleteModal: clearSelection, // ✅ Теперь корректно очищает
+    closeDeleteModal: clearSelection, 
     closeError: clearSelection,
   };
 }

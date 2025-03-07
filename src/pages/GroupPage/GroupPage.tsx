@@ -23,7 +23,7 @@ export const GroupPage = () => {
     setEditValue,
     handleEdit,
     handleSave,
-    handleCancel, // ✅ Используем исправленный handleCancel
+    handleCancel, 
     handleDeleteClick,
     confirmDeleteMember,
     closeDeleteModal,
@@ -69,7 +69,7 @@ export const GroupPage = () => {
               setEditValue={setEditValue}
               onItemClick={() => {}}
               onSave={handleSave}
-              onCancel={handleCancel} // ✅ Теперь правильно сбрасывает редактирование
+              onCancel={handleCancel} 
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
             />

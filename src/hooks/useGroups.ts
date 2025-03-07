@@ -57,7 +57,7 @@ export const useGroups = () => {
   // ✅ Удаление группы
   const handleDeleteClick = useCallback(
     (groupId: string) => {
-      clearSelection(); // ✅ Снимаем выделение перед модалкой
+      clearSelection(); 
       setDeleteGroupId(groupId);
     },
     [clearSelection]
@@ -88,7 +88,7 @@ export const useGroups = () => {
 
     dispatch(groupsActions.setGroups(updatedGroups));
     dispatch(editGroup(editItemId, editValue.trim()));
-    clearSelection(); // ✅ Теперь очищает редактирование после сохранения
+    clearSelection(); 
   }, [editItemId, editValue, groups, dispatch, clearSelection]);
 
   return {
@@ -106,6 +106,6 @@ export const useGroups = () => {
     editItemId,
     editValue,
     setEditValue,
-    handleCancel: clearSelection, // ✅ Теперь можно передавать в `ItemList`
+    handleCancel: clearSelection, 
   };
 };

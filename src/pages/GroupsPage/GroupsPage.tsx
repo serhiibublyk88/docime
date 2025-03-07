@@ -23,7 +23,7 @@ export const GroupsPage: React.FC = () => {
     closeDeleteModal,
     setEditValue,
     deleteGroupId,
-    handleCancel, // ✅ Теперь передаём исправленный onCancel
+    handleCancel, 
   } = useGroups();
 
   return (
@@ -59,7 +59,7 @@ export const GroupsPage: React.FC = () => {
                   onItemClick={handleItemClick}
                   onEdit={handleEditClick}
                   onSave={handleSaveClick}
-                  onCancel={handleCancel} // ✅ Теперь `Escape` работает корректно
+                  onCancel={handleCancel} 
                   onDelete={handleDeleteClick}
                   setEditValue={setEditValue}
                 />
