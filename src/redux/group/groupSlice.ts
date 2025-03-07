@@ -9,6 +9,7 @@ import {
 const initialState: GroupState = {
   group: null,
   members: [],
+  groupsForCarousel: [], // ✅ Гарантируем, что это всегда массив
   isLoading: false,
   error: null,
 };
@@ -23,6 +24,7 @@ export const groupSlice = createSlice({
     clearGroup: (state) => {
       state.group = null;
       state.members = [];
+      state.groupsForCarousel = []; // ✅ Очищаем карусель при выходе
       state.isLoading = false;
       state.error = null;
     },
@@ -39,16 +41,20 @@ export const groupSlice = createSlice({
       .addCase(fetchGroupById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.group = action.payload.group;
+        state.groupsForCarousel = action.payload.groupsForCarousel ?? []; // ✅ Обеспечиваем, что всегда массив
         state.members = action.payload.members.map((member) => ({
           _id: member._id,
-          username: member.username ?? "Unbekannter Benutzer",
+          username: member.username?.trim() || "Unbekannter Benutzer", // ✅ Безопасно подставляем имя
           email: member.email ?? "",
           role: member.role ?? 1,
         }));
       })
       .addCase(fetchGroupById.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Fehler beim Laden der Gruppe.";
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : "Fehler beim Laden der Gruppe.";
       })
       .addCase(removeMemberFromGroup.fulfilled, (state, action) => {
         state.members = state.members.filter(
@@ -64,7 +70,8 @@ export const groupSlice = createSlice({
         );
 
         if (index !== -1) {
-          state.members[index].username = action.payload.username;
+          state.members[index].username =
+            action.payload.username?.trim() || "Unbekannter Benutzer"; // ✅ Убираем случайные пробелы
         }
       })
       .addCase(editMemberInGroup.rejected, (state, action) => {

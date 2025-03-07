@@ -21,9 +21,16 @@ export interface Group {
   members: User[];
   createdBy: string;
   createdAt: string;
-  groupsForCarousel?: string[];
+  groupsForCarousel?: { id: string; name: string }[];
 }
 
+/// 🔹 Группы для карусели (id + name)
+export interface GroupCarouselItem {
+  id: string;
+  name: string;
+}
+
+/// 🔹 Состояние всех групп
 export interface GroupsState {
   groups: Group[];
 }
@@ -32,6 +39,7 @@ export interface GroupsState {
 export interface GroupState {
   group: Group | null;
   members: User[];
+  groupsForCarousel: GroupCarouselItem[]; // ✅ Исправлено!
   isLoading: boolean;
   error: string | null;
 }
@@ -66,18 +74,20 @@ export interface ResultState {
   results: TestResult[];
 }
 
-// 🔹 Формат данных от API
+/// 🔹 Формат данных от API
 export interface GroupResponse {
   groupDetails: Group;
+  groupsForCarousel: Array<{ id: string; name: string }>;
   members: Array<{
     _id: string;
     name?: string;
     email?: string;
     role?: number;
   }>;
+  
 }
 
-// Интерфейс, описывающий ответ от сервера после редактирования участника
+/// 🔹 Интерфейс, описывающий ответ от сервера после редактирования участника
 export interface UpdatedUserResponse {
   _id: string;
   username?: string;

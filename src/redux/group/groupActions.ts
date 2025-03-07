@@ -8,13 +8,17 @@ import {
 
 // 🔹 **Получение одной группы**
 export const fetchGroupById = createAsyncThunk<
-  { group: Group; members: User[] },
+  {
+    group: Group;
+    members: User[];
+    groupsForCarousel: { id: string; name: string }[]; // ✅ Исправленный тип
+  },
   string,
   { rejectValue: string }
 >("group/fetchGroupById", async (groupId, { rejectWithValue }) => {
   try {
     const response = await fetch(
-      ` http://localhost:5000/api/groups/${groupId}`,
+      `http://localhost:5000/api/groups/${groupId}`,
       {
         method: "GET",
         credentials: "include",
@@ -27,18 +31,25 @@ export const fetchGroupById = createAsyncThunk<
 
     const data: GroupResponse = await response.json();
 
-    const members: User[] = (data.groupDetails.members || []).map((member) => {
-      return {
-        _id: String(member._id),
-        username: member.username ?? "Unbekannter Benutzer",
-        email: member.email ?? "",
-        role: member.role ?? 1,
-      };
-    });
+    // ✅ Корректная обработка списка участников
+    const members: User[] = (data.groupDetails.members || []).map((member) => ({
+      _id: String(member._id),
+      username: member.username ?? "Unbekannter Benutzer",
+      email: member.email ?? "",
+      role: member.role ?? 1,
+    }));
 
-    return { group: data.groupDetails, members };
+    // ✅ Корректная обработка `groupsForCarousel`
+    const groupsForCarousel = (data.groupsForCarousel || []).map((group) => ({
+      id: String(group.id),
+      name: group.name ?? "Unbenannte Gruppe",
+    }));
+
+    return { group: data.groupDetails, members, groupsForCarousel };
   } catch (error) {
-    return rejectWithValue((error as Error).message);
+    return rejectWithValue(
+      (error as Error).message || "Fehler beim Laden der Gruppe."
+    );
   }
 });
 
@@ -63,7 +74,9 @@ export const removeMemberFromGroup = createAsyncThunk<
 
     return memberId;
   } catch (error) {
-    return rejectWithValue((error as Error).message);
+    return rejectWithValue(
+      (error as Error).message || "Fehler beim Entfernen des Mitglieds."
+    );
   }
 });
 
@@ -99,7 +112,9 @@ export const editMemberInGroup = createAsyncThunk<
         role: updatedUser.role ?? 1,
       };
     } catch (error) {
-      return rejectWithValue((error as Error).message);
+      return rejectWithValue(
+        (error as Error).message || "Fehler beim Bearbeiten des Mitglieds."
+      );
     }
   }
 );
