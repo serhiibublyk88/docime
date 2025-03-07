@@ -1,6 +1,6 @@
 import { Container, Row, Col } from "react-bootstrap";
 import {
-  DeleteGroupModal,
+  ConfirmDeleteModal, 
   Loader,
   AlertMessage,
   ItemList,
@@ -23,7 +23,7 @@ export const GroupsPage: React.FC = () => {
     closeDeleteModal,
     setEditValue,
     deleteGroupId,
-    handleCancel, 
+    handleCancel,
   } = useGroups();
 
   return (
@@ -59,7 +59,7 @@ export const GroupsPage: React.FC = () => {
                   onItemClick={handleItemClick}
                   onEdit={handleEditClick}
                   onSave={handleSaveClick}
-                  onCancel={handleCancel} 
+                  onCancel={handleCancel}
                   onDelete={handleDeleteClick}
                   setEditValue={setEditValue}
                 />
@@ -70,11 +70,10 @@ export const GroupsPage: React.FC = () => {
       </Row>
 
       {deleteGroupId && (
-        <DeleteGroupModal
+        <ConfirmDeleteModal
           show={!!deleteGroupId}
-          groupName={
-            groups.find((group) => group.id === deleteGroupId)?.name || ""
-          }
+          title="Gruppe löschen"
+          message="Sind Sie sicher, dass Sie diese Gruppe löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
           onDelete={confirmDeleteGroup}
           onClose={closeDeleteModal}
         />

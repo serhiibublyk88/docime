@@ -6,7 +6,7 @@ import {
   ItemList,
   Loader,
   AlertMessage,
-  MemberDeleteModal,
+  ConfirmDeleteModal, 
 } from "../../components";
 
 export const GroupPage = () => {
@@ -23,7 +23,7 @@ export const GroupPage = () => {
     setEditValue,
     handleEdit,
     handleSave,
-    handleCancel, 
+    handleCancel,
     handleDeleteClick,
     confirmDeleteMember,
     closeDeleteModal,
@@ -69,7 +69,7 @@ export const GroupPage = () => {
               setEditValue={setEditValue}
               onItemClick={() => {}}
               onSave={handleSave}
-              onCancel={handleCancel} 
+              onCancel={handleCancel}
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
             />
@@ -78,12 +78,13 @@ export const GroupPage = () => {
       </Row>
 
       {deleteMemberId && (
-        <MemberDeleteModal
+        <ConfirmDeleteModal
           show={!!deleteMemberId}
-          memberName={
+          title="Mitglied entfernen"
+          message={`Bist du sicher, dass du ${
             members.find((m) => m._id === deleteMemberId)?.username ||
-            "Unbekanntes Mitglied"
-          }
+            "dieses Mitglied"
+          } aus der Gruppe entfernen möchtest?`}
           onDelete={confirmDeleteMember}
           onClose={closeDeleteModal}
         />
