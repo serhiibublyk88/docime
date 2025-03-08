@@ -27,9 +27,7 @@ export {
   selectGroupError,
 } from "./group/groupSelectors";
 
-export { testReducer, testActions } from "./test/testSlice";
-export { fetchTests } from "./test/testActions";
-export { selectTests, selectCurrentTest } from "./test/testSelectors";
+
 
 export { resultReducer, resultActions } from "./result/resultSlice";
 export { fetchResults } from "./result/resultActions";
@@ -38,3 +36,21 @@ export { selectResults } from "./result/resultSelectors";
 export { errorReducer } from "./error/errorSlice";
 export { triggerError, resetError } from "./error/errorActions";
 export { selectError } from "./error/errorSelectors";
+
+export { testsReducer, setCurrentTest } from "./tests/testsSlice";
+export {
+  fetchTests,
+  createTest,
+  updateTest,
+  deleteTest,
+  copyTest,
+  updateTestGroups,
+} from "./tests/testsActions";
+export {
+  selectAllTests,
+  selectTestsLoading,
+  selectTestsError,
+  selectCurrentTest,
+} from "./tests/testsSelectors";
+
+

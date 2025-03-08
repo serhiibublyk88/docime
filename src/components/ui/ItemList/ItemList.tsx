@@ -6,7 +6,7 @@ import styles from "./ItemList.module.css";
 
 export const ItemList: React.FC<ItemListProps> = ({
   items,
-  editItemId,
+  editItemId = null,
   editValue,
   onItemClick,
   onEdit,
@@ -23,20 +23,20 @@ export const ItemList: React.FC<ItemListProps> = ({
   }, []);
 
   const handleSave = useCallback(() => {
-    if (editValue.trim()) {
+    if (editValue?.trim() && onSave) {
       onSave();
       clearSelection();
     }
   }, [onSave, clearSelection, editValue]);
 
   const handleCancel = useCallback(() => {
-    onCancel();
+    onCancel?.();
     clearSelection();
   }, [onCancel, clearSelection]);
 
   const handleDelete = useCallback(
     (id: string) => {
-      onDelete(id);
+      onDelete?.(id);
       clearSelection();
     },
     [onDelete, clearSelection]
@@ -62,13 +62,13 @@ export const ItemList: React.FC<ItemListProps> = ({
           className={`${styles.item} ${
             editItemId === item.id ? styles.editing : ""
           } d-flex justify-content-between align-items-center list-group-item-action border-0 fs-5`}
-          onClick={() => onItemClick(item.id)}
+          onClick={() => onItemClick?.(item.id)}
         >
           {editItemId === item.id ? (
             <Form.Control
               type="text"
-              value={editValue}
-              onChange={(e) => setEditValue(e.currentTarget.value)}
+              value={editValue ?? item.name}  
+              onChange={(e) => setEditValue?.(e.currentTarget.value)}
               onKeyDown={handleKeyDown}
               autoFocus
               className={styles.editInput}
@@ -101,7 +101,7 @@ export const ItemList: React.FC<ItemListProps> = ({
                 <FaEdit
                   className={`${styles.icon} ${styles.editIcon}`}
                   title="Bearbeiten"
-                  onClick={() => onEdit(item.id, item.name)}
+                  onClick={() => onEdit?.(item.id)}
                 />
                 <FaTrash
                   className={`${styles.icon} ${styles.deleteIcon}`}

@@ -75,14 +75,34 @@ export interface Item {
 }
 
 export interface ItemListProps {
-  items: Item[];
-  editItemId: string | null;
-  editValue: string;
-  onItemClick: (id: string) => void;
-  onEdit: (id: string, name: string) => void; 
-  onSave: () => void; 
-  onCancel: () => void; 
-  onDelete: (id: string) => void; 
-  setEditValue: (value: string) => void;
+  items: {
+    id: string;
+    name: string;
+    additionalInfo?: string;
+    actions?: {
+      icon: string;
+      tooltip: string;
+      onClick: () => void;
+    }[];
+    subItems?: {
+      id: string;
+      name: string;
+      actions?: {
+        icon: string;
+        tooltip: string;
+        onClick: () => void;
+      }[];
+    }[];
+  }[];
+  onDelete?: (id: string) => void;
+  editItemId?: string | null;
+  editValue?: string;
+  onItemClick?: (id: string) => void;
+  onEdit?: (id: string) => void;
+  onSave?: () => void;
+  onCancel?: () => void;
+  setEditValue?: (value: string) => void;
 }
+
+
 

@@ -95,10 +95,11 @@ export const createGroup = (name: string) => async (dispatch: AppDispatch) => {
       createdBy: data.group.createdBy,
       createdAt: data.group.createdAt,
       membersCount: data.group.members?.length || 0,
+      members: data.group.members || [],
     };
 
     dispatch(groupsActions.addGroup(newGroup));
-  } catch (error) {
+  } catch (error) { 
     dispatch(triggerError((error as Error).message));
   }
 };

@@ -1,3 +1,4 @@
+
 // layout
 export { Header } from "./layout/Header/Header";
 export { SideNav } from "./layout/SideNav/SideNav";
@@ -7,11 +8,10 @@ export { CreatorPasswordModal } from "./ui/CreatorPasswordModal/CreatorPasswordM
 export { AlertMessage } from "./ui/AlertMessage/AlertMessage";
 export { ValidatedForm } from "./ui/ValidatedForm/ValidatedForm";
 export { GroupCreationModal } from "./ui/GroupCreationModal/GroupCreationModal";
-export { DeleteGroupModal } from "./ui/DeleteGroupModal/DeleteGroupModal";
 export { Loader } from "./ui/Loader/Loader";
 export { Carousel } from "./ui/Carousel/Carousel";
 export { ItemList } from "./ui/ItemList/ItemList";
-export {MemberDeleteModal} from "./ui/MemberDeleteModal/MemberDeleteModal"
 export {ConfirmDeleteModal} from "./ui/ConfirmDeleteModal/ConfirmDeleteModal";
+export{TestList} from "./ui/TestList/TestList";
 
 
