@@ -2,18 +2,21 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Test } from "../../types/reduxTypes";
 import {
   fetchTestsApi,
+  fetchGroupsApi,
   createTestApi,
   updateTestApi,
   deleteTestApi,
   copyTestApi,
   updateTestGroupsApi,
 } from "../../services";
-import { AxiosError } from "axios"; 
+import { AxiosError } from "axios";
 
-///  Обработчик ошибок
+///  Обработчик ошибок (улучшенная версия)
 const handleApiError = (error: unknown): string => {
-  const axiosError = error as AxiosError<{ message: string }>;
-  return axiosError.response?.data?.message || "Failed to fetch tests";
+  if (error instanceof AxiosError) {
+    return error.response?.data?.message || "Fehler beim Abrufen der Tests";
+  }
+  return "Unbekannter Fehler beim Abrufen der Tests";
 };
 
 ///  Получение списка тестов
@@ -24,6 +27,19 @@ export const fetchTests = createAsyncThunk<
 >("tests/fetchTests", async (_, { rejectWithValue }) => {
   try {
     return await fetchTestsApi();
+  } catch (error) {
+    return rejectWithValue(handleApiError(error));
+  }
+});
+
+/// ✅ **Получение всех групп (исправлено)**
+export const fetchAllGroups = createAsyncThunk<
+  { id: string; name: string }[], // ✅ Теперь ожидаем только `{ id, name }[]`
+  void,
+  { rejectValue: string }
+>("tests/fetchAllGroups", async (_, { rejectWithValue }) => {
+  try {
+    return await fetchGroupsApi(); // ✅ Теперь API уже возвращает `{ id, name }[]`
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
@@ -80,7 +96,7 @@ export const copyTest = createAsyncThunk<Test, string, { rejectValue: string }>(
   }
 );
 
-///  Обновление доступных групп (добавить/удалить группу)
+/// ✅ **Обновление доступных групп (исправлено)**
 export const updateTestGroups = createAsyncThunk<
   { testId: string; availableForGroups: { id: string; name: string }[] },
   { testId: string; groupId: string; action: "add" | "remove" },
@@ -89,8 +105,21 @@ export const updateTestGroups = createAsyncThunk<
   "tests/updateTestGroups",
   async ({ testId, groupId, action }, { rejectWithValue }) => {
     try {
-      return await updateTestGroupsApi(testId, groupId, action);
+      console.log(
+        `Sende Anfrage: Test ${testId}, Gruppe ${groupId}, Aktion: ${action}`
+      );
+
+      // 🔥 API теперь сам возвращает `{ id, name }[]`
+      const response = await updateTestGroupsApi(testId, groupId, action);
+
+      console.log(
+        `Erfolgreich aktualisiert: Test ${testId}, Gruppen:`,
+        response.availableForGroups
+      );
+
+      return response; // ✅ Теперь `availableForGroups` уже содержит `{ id, name }[]`
     } catch (error) {
+      console.error("Fehler bei der Aktualisierung der Testgruppen:", error);
       return rejectWithValue(handleApiError(error));
     }
   }

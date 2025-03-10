@@ -8,7 +8,7 @@ export const selectTestsState = (state: RootState): TestsState => state.tests;
 ///  Получаем список всех тестов
 export const selectAllTests = createSelector(
   selectTestsState,
-  (testsState) => testsState.tests || [] 
+  (testsState) => testsState.tests || []
 );
 
 ///  Получаем состояние загрузки
@@ -33,14 +33,19 @@ export const selectTestsError = createSelector(
 export const selectTestById = (testId: string) =>
   createSelector(
     selectAllTests,
-    (tests) => tests.find((test) => test.id === testId) || null 
+    (tests) => tests.find((test) => test.id === testId) || null
   );
 
 ///  Получаем тесты, доступные текущему пользователю
 export const selectTestsForUser = (userId: string) =>
   createSelector(selectAllTests, (tests) =>
-    tests.filter(
-      (test: Test) =>
-        test.availableForGroups?.some((group) => group?.id === userId) 
+    tests.filter((test: Test) =>
+      test.availableForGroups?.some((group) => group?.id === userId)
     )
   );
+
+/// ✅ Новый селектор: Получаем все группы
+export const selectAllGroups = createSelector(
+  selectTestsState,
+  (testsState) => testsState.allGroups || []
+);

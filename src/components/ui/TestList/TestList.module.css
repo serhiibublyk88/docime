@@ -3,6 +3,7 @@
   margin-bottom: 8px;
   transition: background-color 0.2s ease-in-out;
   border-radius: 5px;
+  position: relative; /* Убедимся, что дочерние элементы с absolute будут относительно testItem */
 }
 
 .testItem:hover {
@@ -117,4 +118,41 @@
 
 .checkbox:hover {
   border-color: var(--bs-light);
+}
+
+/*  Стили для списка групп (выпадающий, absolute-позиционирование) */
+.dropdownGroupList {
+  position: absolute;
+  top: 100%; /* Выпадает вниз от testItem */
+  left: 0;
+  width: 100%;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  padding: 8px;
+}
+
+/*  Анимация появления */
+.dropdownGroupList-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdownGroupList-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.dropdownGroupList-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdownGroupList-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 }

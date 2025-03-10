@@ -5,7 +5,7 @@ export { authReducer, authActions } from "./auth/authSlice";
 export { loginUser, logoutUser } from "./auth/authActions";
 export { selectUser } from "./auth/authSelectors";
 
-export { groupsReducer, groupsActions } from "./groups/groupsSlice"; 
+export { groupsReducer, groupsActions } from "./groups/groupsSlice";
 export {
   fetchGroups,
   deleteGroup,
@@ -14,7 +14,7 @@ export {
 } from "./groups/groupsActions";
 export { selectGroups } from "./groups/groupsSelectors";
 
-export { groupReducer, groupActions } from "./group/groupSlice"; 
+export { groupReducer, groupActions } from "./group/groupSlice";
 export {
   fetchGroupById,
   removeMemberFromGroup,
@@ -27,8 +27,6 @@ export {
   selectGroupError,
 } from "./group/groupSelectors";
 
-
-
 export { resultReducer, resultActions } from "./result/resultSlice";
 export { fetchResults } from "./result/resultActions";
 export { selectResults } from "./result/resultSelectors";
@@ -40,6 +38,7 @@ export { selectError } from "./error/errorSelectors";
 export { testsReducer, setCurrentTest } from "./tests/testsSlice";
 export {
   fetchTests,
+  fetchAllGroups, // ✅ Добавили получение всех групп
   createTest,
   updateTest,
   deleteTest,
@@ -48,9 +47,8 @@ export {
 } from "./tests/testsActions";
 export {
   selectAllTests,
+  selectAllGroups, // ✅ Добавили селектор всех групп
   selectTestsLoading,
   selectTestsError,
   selectCurrentTest,
 } from "./tests/testsSelectors";
-
-

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AppDispatch,
   fetchTests,
+  fetchAllGroups, // ✅ Загружаем все группы
   createTest,
   updateTest,
   deleteTest,
@@ -13,73 +14,130 @@ import {
   selectTestsLoading,
   selectTestsError,
   selectCurrentTest,
+  selectAllGroups, // ✅ Получаем группы корректно
 } from "../redux";
-
 import { Test } from "../types/reduxTypes";
-
 
 export const useTests = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  
   const tests = useSelector(selectAllTests) || [];
+  const allGroups = useSelector(selectAllGroups) || []; // ✅ Корректный селектор групп
   const loading = useSelector(selectTestsLoading);
   const error = useSelector(selectTestsError);
   const currentTest = useSelector(selectCurrentTest);
 
-  ///  Загрузка тестов при монтировании 
+  /// 🔄 **Загрузка тестов и групп при монтировании**
   useEffect(() => {
     if (tests.length === 0) {
-      dispatch(fetchTests());
+      console.warn("Lade Tests...");
+      dispatch(fetchTests())
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Abrufen der Tests:", error);
+        });
     }
-  }, [dispatch, tests.length]);
 
-  ///  Функция для принудительного обновления тестов
+    if (allGroups.length === 0) {
+      console.warn("Lade Gruppen...");
+      dispatch(fetchAllGroups())
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Abrufen der Gruppen:", error);
+        });
+    }
+  }, [dispatch, tests.length, allGroups.length]);
+
+  /// 🔄 **Принудительная загрузка тестов**
   const fetchAllTests = useCallback(() => {
-    dispatch(fetchTests());
+    console.warn("Erzwinge Test-Aktualisierung...");
+    dispatch(fetchTests())
+      .unwrap()
+      .catch((error) => {
+        console.error("Fehler beim Abrufen der Tests:", error);
+      });
   }, [dispatch]);
 
-  /// Функция для создания теста
+  /// 🔄 **Принудительная загрузка групп**
+  const fetchGroups = useCallback(() => {
+    console.warn("Erzwinge Gruppen-Aktualisierung...");
+    dispatch(fetchAllGroups())
+      .unwrap()
+      .catch((error) => {
+        console.error("Fehler beim Abrufen der Gruppen:", error);
+      });
+  }, [dispatch]);
+
+  /// ✨ **Создание нового теста**
   const createNewTest = useCallback(
     (data: Partial<Test>) => {
-      dispatch(createTest(data));
+      dispatch(createTest(data))
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Erstellen des Tests:", error);
+        });
     },
     [dispatch]
   );
 
-  /// Функция для обновления теста
+  /// ✨ **Обновление теста**
   const updateExistingTest = useCallback(
     (testId: string, data: Partial<Test>) => {
-      dispatch(updateTest({ testId, data }));
+      dispatch(updateTest({ testId, data }))
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Aktualisieren des Tests:", error);
+        });
     },
     [dispatch]
   );
 
-  /// Функция для удаления теста
+  /// ❌ **Удаление теста**
   const deleteExistingTest = useCallback(
     (testId: string) => {
-      dispatch(deleteTest(testId));
+      dispatch(deleteTest(testId))
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Löschen des Tests:", error);
+        });
     },
     [dispatch]
   );
 
-  /// Функция для копирования теста
+  /// 📑 **Копирование теста**
   const copyExistingTest = useCallback(
     (testId: string) => {
-      dispatch(copyTest(testId));
+      dispatch(copyTest(testId))
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Kopieren des Tests:", error);
+        });
     },
     [dispatch]
   );
 
-  /// Функция для обновления доступных групп
+  /// 🔄 **Обновление доступных групп**
   const updateTestGroupAccess = useCallback(
     (testId: string, groupId: string, action: "add" | "remove") => {
-      dispatch(updateTestGroups({ testId, groupId, action }));
+      if (!testId || !groupId || !["add", "remove"].includes(action)) {
+        console.warn("Ungültige Parameter für updateTestGroupAccess:", {
+          testId,
+          groupId,
+          action,
+        });
+        return;
+      }
+
+      dispatch(updateTestGroups({ testId, groupId, action }))
+        .unwrap()
+        .catch((error) => {
+          console.error("Fehler beim Aktualisieren der Testgruppen:", error);
+        });
     },
     [dispatch]
   );
 
-  ///  Функция для выбора текущего теста
+  /// 🎯 **Выбор текущего теста**
   const setSelectedTest = useCallback(
     (test: Test | null) => {
       dispatch(setCurrentTest(test));
@@ -87,13 +145,14 @@ export const useTests = () => {
     [dispatch]
   );
 
-  
   return {
     tests,
+    allGroups, // ✅ Получаем корректные группы
     loading,
     error,
     currentTest,
     fetchAllTests,
+    fetchGroups, // ✅ Отдельная загрузка групп
     createNewTest,
     updateExistingTest,
     deleteExistingTest,

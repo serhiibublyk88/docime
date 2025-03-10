@@ -65,6 +65,7 @@ export interface TestsState {
   currentTest: Test | null;
   loading: boolean;
   error: string | null;
+  allGroups: { id: string; name: string }[];
 }
 
 ///  Результат теста
