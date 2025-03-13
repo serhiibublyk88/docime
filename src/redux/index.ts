@@ -14,19 +14,6 @@ export {
 } from "./groups/groupsActions";
 export { selectGroups } from "./groups/groupsSelectors";
 
-export { groupReducer, groupActions } from "./group/groupSlice";
-export {
-  fetchGroupById,
-  removeMemberFromGroup,
-  editMemberInGroup,
-} from "./group/groupActions";
-export {
-  selectGroup,
-  selectGroupMembers,
-  selectGroupLoading,
-  selectGroupError,
-} from "./group/groupSelectors";
-
 export { resultReducer, resultActions } from "./result/resultSlice";
 export { fetchResults } from "./result/resultActions";
 export { selectResults } from "./result/resultSelectors";
@@ -38,7 +25,7 @@ export { selectError } from "./error/errorSelectors";
 export { testsReducer, setCurrentTest } from "./tests/testsSlice";
 export {
   fetchTests,
-  fetchAllGroups, // ✅ Добавили получение всех групп
+  fetchAllGroups, // ✅ Загружаем все группы из БД
   createTest,
   updateTest,
   deleteTest,
@@ -47,8 +34,9 @@ export {
 } from "./tests/testsActions";
 export {
   selectAllTests,
-  selectAllGroups, // ✅ Добавили селектор всех групп
+  selectAllGroups, // ✅ Выбираем все группы (НЕ путать с `availableForGroups`)
   selectTestsLoading,
   selectTestsError,
   selectCurrentTest,
+  selectAvailableGroupsForTest, // ✅ Получаем группы, доступные для теста
 } from "./tests/testsSelectors";

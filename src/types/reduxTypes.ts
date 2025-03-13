@@ -17,7 +17,7 @@ export interface Group {
   id: string;
   name: string;
   description?: string;
-  members: User[];
+  members: { id: string; name: string }[]; // ✅ Исправлено: Упрощенный формат
   createdBy: string;
   createdAt: string;
   groupsForCarousel?: { id: string; name: string }[];
@@ -38,25 +38,31 @@ export interface GroupsState {
 ///  Состояние одной группы
 export interface GroupState {
   group: Group | null;
-  members: User[];
+  members: { id: string; name: string }[]; // ✅ Исправлено
   groupsForCarousel: GroupCarouselItem[];
   isLoading: boolean;
   error: string | null;
 }
 
-///  Тест 
+///  Вопрос (используется в `Test`)
+export interface Question {
+  id: string;
+  text: string;
+}
+
+///  Тест
 export interface Test {
   id: string;
   title: string;
   description: string;
-  author: string;
+  author: { id: string; username: string }; // ✅ Исправлено: автор теперь объект
   timeLimit: number;
   availableForGroups: { id: string; name: string }[];
-  questions: string[];
+  questions: Question[]; // ✅ Исправлено: теперь массив объектов, а не строк
   maximumMarks: number;
   status: "active" | "inactive";
   minimumScores: Record<number, number>;
-  createdAt: string; 
+  createdAt: string;
 }
 
 ///  Состояние тестов (множественное число)
@@ -65,7 +71,7 @@ export interface TestsState {
   currentTest: Test | null;
   loading: boolean;
   error: string | null;
-  allGroups: { id: string; name: string }[];
+  allGroups: { id: string; name: string }[]; // Добавлено поле для групп
 }
 
 ///  Результат теста
@@ -77,6 +83,9 @@ export interface TestResult {
   maxScore: number;
   percentage: number;
   grade: number;
+  startTime: string | null; // ✅ Добавлено из backend
+  finishTime: string | null; // ✅ Добавлено из backend
+  timeTaken: number; // ✅ Добавлено из backend
 }
 
 ///  Состояние результатов тестов
@@ -89,7 +98,7 @@ export interface GroupResponse {
   groupDetails: Group;
   groupsForCarousel: Array<{ id: string; name: string }>;
   members: Array<{
-    _id: string;
+    id: string;
     name?: string;
     email?: string;
     role?: number;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ListGroup, Form, Button } from "react-bootstrap";
 import {
   FaEdit,
@@ -13,7 +13,7 @@ import styles from "./TestList.module.css";
 
 interface TestListProps {
   tests: Test[];
-  allGroups: { id: string; name: string }[];
+  allGroups: { id: string; name: string }[]; // ✅ Используем все группы системы
   editTestId: string | null;
   editValue: string;
   onEdit: (id: string, title: string) => void;
@@ -43,53 +43,34 @@ export const TestList: React.FC<TestListProps> = ({
   onUpdateGroups,
 }) => {
   const [dropdownTestId, setDropdownTestId] = useState<string | null>(null);
-  const [checkedGroups, setCheckedGroups] = useState<
-    Record<string, Set<string>>
-  >({});
 
-  /// 🔄 **Обновляем `checkedGroups`, когда `tests` изменяются**
-  useEffect(() => {
-    const newCheckedGroups: Record<string, Set<string>> = {};
-    tests.forEach((test) => {
-      newCheckedGroups[test.id] = new Set(
-        test.availableForGroups?.map((g) => g.id)
-      );
-    });
-    setCheckedGroups(newCheckedGroups);
+  // ✅ Оптимизированная мемоизация checkedGroups (группы, доступные для теста)
+  const checkedGroups = useMemo(() => {
+    return tests.reduce<Record<string, Set<string>>>((acc, test) => {
+      acc[test.id] = new Set(test.availableForGroups?.map((g) => g.id) || []);
+      return acc;
+    }, {});
   }, [tests]);
 
-  /// Открыть/закрыть выпадающий список групп
-  const toggleGroupDropdown = (testId: string) => {
-    setDropdownTestId(dropdownTestId === testId ? null : testId);
-  };
+  // ✅ Открыть/закрыть список групп
+  const toggleGroupDropdown = useCallback((testId: string) => {
+    console.log(`📡 [TestList] Toggle dropdown für Test ${testId}`);
+    setDropdownTestId((prev) => (prev === testId ? null : testId));
+  }, []);
 
-  /// 🔄 **Обновление `checkedGroups` + API вызов**
-  const handleGroupToggle = (testId: string, groupId: string) => {
-    setCheckedGroups((prev) => {
-      const updatedSet = new Set(prev[testId] || []);
-      const isChecked = updatedSet.has(groupId);
-
-      if (isChecked) {
-        updatedSet.delete(groupId);
-      } else {
-        updatedSet.add(groupId);
-      }
-
-      return { ...prev, [testId]: updatedSet };
-    });
-
-    // 🔥 Отправляем обновление на сервер
-    onUpdateGroups(
-      testId,
-      groupId,
-      checkedGroups[testId]?.has(groupId) ? "remove" : "add"
-    );
-  };
-
-  /// Закрытие списка
-  const handleConfirmSelection = () => {
-    setDropdownTestId(null);
-  };
+  // ✅ Обновление групп (мемоизированная функция)
+  const handleGroupToggle = useCallback(
+    (testId: string, groupId: string) => {
+      const isChecked = checkedGroups[testId]?.has(groupId) ?? false;
+      console.log(
+        `📡 [TestList] ${
+          isChecked ? "Entferne" : "Füge hinzu"
+        } Gruppe ${groupId} für Test ${testId}`
+      );
+      onUpdateGroups(testId, groupId, isChecked ? "remove" : "add");
+    },
+    [onUpdateGroups, checkedGroups]
+  );
 
   return (
     <ListGroup>
@@ -98,7 +79,7 @@ export const TestList: React.FC<TestListProps> = ({
           key={test.id}
           className={`${styles.testItem} d-flex flex-column border-0`}
         >
-          {/* Верхняя строка (Номер теста, Название, Кнопки) */}
+          {/* Верхняя строка */}
           <div
             className={`d-flex justify-content-between align-items-center fs-5 ${styles.testHeader}`}
           >
@@ -117,7 +98,7 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             )}
 
-            {/* Дата + Кнопки управления */}
+            {/* Дата + Кнопки */}
             <div className="d-flex align-items-center">
               <small className="text-muted fs-6 fw-normal me-3">
                 {test.createdAt
@@ -129,12 +110,12 @@ export const TestList: React.FC<TestListProps> = ({
                 {editTestId === test.id ? (
                   <>
                     <FaSave
-                      className={`${styles.icon} ${styles.iconSave}`}
+                      className={`${styles.icon} ${styles.iconEdit}`}
                       title="Speichern"
                       onClick={onSave}
                     />
                     <FaTimes
-                      className={`${styles.icon} ${styles.iconCancel}`}
+                      className={`${styles.icon} ${styles.iconDelete}`}
                       title="Abbrechen"
                       onClick={onCancel}
                     />
@@ -192,28 +173,34 @@ export const TestList: React.FC<TestListProps> = ({
             </ListGroup>
           </div>
 
-          {/* 🔥 Выпадающий список всех групп */}
+          {/* Выпадающий список всех групп */}
           {dropdownTestId === test.id && (
             <div className={styles.dropdownGroupList}>
               <ListGroup className="w-100">
-                {allGroups.map((group) => (
-                  <ListGroup.Item
-                    key={group.id}
-                    className="d-flex justify-content-between align-items-center border-0"
-                  >
-                    <span>{group.name}</span>
-                    <input
-                      type="checkbox"
-                      checked={checkedGroups[test.id]?.has(group.id) || false}
-                      onChange={() => handleGroupToggle(test.id, group.id)}
-                    />
+                {allGroups.length > 0 ? (
+                  allGroups.map((group) => (
+                    <ListGroup.Item
+                      key={group.id}
+                      className="d-flex justify-content-between align-items-center border-0"
+                    >
+                      <span>{group.name}</span>
+                      <Form.Check
+                        type="checkbox"
+                        checked={checkedGroups[test.id]?.has(group.id) || false}
+                        onChange={() => handleGroupToggle(test.id, group.id)}
+                      />
+                    </ListGroup.Item>
+                  ))
+                ) : (
+                  <ListGroup.Item className="text-center border-0">
+                    Keine verfügbaren Gruppen.
                   </ListGroup.Item>
-                ))}
+                )}
               </ListGroup>
               <Button
                 variant="success"
                 className="w-100 mt-2"
-                onClick={handleConfirmSelection}
+                onClick={() => setDropdownTestId(null)}
               >
                 OK
               </Button>

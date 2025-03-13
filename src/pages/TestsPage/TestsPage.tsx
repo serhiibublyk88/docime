@@ -10,40 +10,49 @@ import { useTests } from "../../hooks";
 
 export const TestsPage: React.FC = () => {
   const {
-    tests = [],
-    allGroups = [],
+    tests,
+    allGroups,
     loading,
     error,
     deleteExistingTest,
     copyExistingTest,
     updateTestGroupAccess,
     updateExistingTest,
-    fetchAllTests, // ✅ Функция загрузки тестов
-    fetchGroups, // ✅ Функция загрузки групп
+    fetchAllTests,
+    fetchGroups,
+    setSelectedTest,
+    currentTest,
   } = useTests();
 
   const [deleteTestId, setDeleteTestId] = useState<string | null>(null);
   const [editTestId, setEditTestId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
-  /// 🔄 **Оптимизированная загрузка тестов и групп при монтировании страницы**
+  /// 🔄 **Загрузка тестов при монтировании**
   useEffect(() => {
-    if (tests.length === 0) {
+    if (!tests.length && !loading) {
+      console.warn("📡 [TestsPage] Lade Tests...");
       fetchAllTests();
     }
-    if (allGroups.length === 0) {
-      fetchGroups();
-    }
-  }, [fetchAllTests, fetchGroups, tests.length, allGroups.length]);
+  }, [fetchAllTests, tests.length, loading]); // ✅ Добавили `loading`
 
-  /// ❌ **Обработчик открытия модального окна удаления**
+  /// 🔄 **Загрузка групп при изменении `currentTest`**
+  useEffect(() => {
+    if (!currentTest?.id) return; // ✅ Защита от `null`
+    console.warn(`📡 [TestsPage] Lade Gruppen für Test ${currentTest.id}...`);
+    fetchGroups(currentTest.id);
+  }, [fetchGroups, currentTest?.id]);
+
+  /// ❌ **Открытие модального окна удаления**
   const handleDeleteClick = useCallback((testId: string) => {
+    console.warn(`📡 [TestsPage] Öffne Lösch-Modal für Test ${testId}`);
     setDeleteTestId(testId);
   }, []);
 
   /// ✅ **Подтверждение удаления**
   const confirmDeleteTest = useCallback(() => {
     if (deleteTestId) {
+      console.warn(`📡 [TestsPage] Lösche Test ${deleteTestId}...`);
       deleteExistingTest(deleteTestId);
       setDeleteTestId(null);
     }
@@ -51,11 +60,13 @@ export const TestsPage: React.FC = () => {
 
   /// ❌ **Закрытие модального окна удаления**
   const closeDeleteModal = useCallback(() => {
+    console.warn("📡 [TestsPage] Schließe Lösch-Modal");
     setDeleteTestId(null);
   }, []);
 
   /// ✍️ **Начало редактирования теста**
   const handleEditClick = useCallback((testId: string, title: string) => {
+    console.warn(`📡 [TestsPage] Bearbeite Test ${testId}`);
     setEditTestId(testId);
     setEditValue(title);
   }, []);
@@ -64,11 +75,22 @@ export const TestsPage: React.FC = () => {
   const handleSaveEdit = useCallback(() => {
     const trimmedTitle = editValue.trim();
     if (editTestId && trimmedTitle) {
+      console.warn(
+        `📡 [TestsPage] Speichere Änderungen für Test ${editTestId}`
+      );
       updateExistingTest(editTestId, { title: trimmedTitle });
+
+      // 🔥 Сначала обновляем `currentTest`, если он редактируется
+      if (currentTest?.id === editTestId) {
+        console.warn(`📡 [TestsPage] Aktualisiere currentTest`);
+        setSelectedTest({ ...currentTest, title: trimmedTitle });
+      }
+
+      // ✅ Только после обновления сбрасываем `editTestId`
       setEditTestId(null);
-      setEditValue(""); // Очистка ввода
+      setEditValue("");
     }
-  }, [editTestId, editValue, updateExistingTest]);
+  }, [editTestId, editValue, updateExistingTest, currentTest, setSelectedTest]);
 
   return (
     <Container fluid>
@@ -87,7 +109,7 @@ export const TestsPage: React.FC = () => {
           ) : (
             <TestList
               tests={tests}
-              allGroups={allGroups} // ✅ Передаем актуальные группы
+              allGroups={allGroups}
               editTestId={editTestId}
               editValue={editValue}
               onEdit={handleEditClick}
@@ -109,6 +131,7 @@ export const TestsPage: React.FC = () => {
           message="Sind Sie sicher, dass Sie diesen Test löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
           onDelete={confirmDeleteTest}
           onClose={closeDeleteModal}
+          aria-label="Test löschen Modal"
         />
       )}
     </Container>
