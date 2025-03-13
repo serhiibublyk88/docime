@@ -19,7 +19,7 @@ export const TestsPage: React.FC = () => {
     updateTestGroupAccess,
     updateExistingTest,
     fetchAllTests,
-    fetchGroups,
+    fetchAllGroupsList, // ✅ Вместо `fetchGroups`
     setSelectedTest,
     currentTest,
   } = useTests();
@@ -28,20 +28,24 @@ export const TestsPage: React.FC = () => {
   const [editTestId, setEditTestId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
-  /// 🔄 **Загрузка тестов при монтировании**
+  /// 🔄 **Загрузка тестов и групп при монтировании**
   useEffect(() => {
     if (!tests.length && !loading) {
       console.warn("📡 [TestsPage] Lade Tests...");
       fetchAllTests();
     }
-  }, [fetchAllTests, tests.length, loading]); // ✅ Добавили `loading`
 
-  /// 🔄 **Загрузка групп при изменении `currentTest`**
-  useEffect(() => {
-    if (!currentTest?.id) return; // ✅ Защита от `null`
-    console.warn(`📡 [TestsPage] Lade Gruppen für Test ${currentTest.id}...`);
-    fetchGroups(currentTest.id);
-  }, [fetchGroups, currentTest?.id]);
+    if (!allGroups.length) {
+      console.warn("📡 [TestsPage] Lade alle Gruppen...");
+      fetchAllGroupsList(); // ✅ Загружаем все группы при монтировании
+    }
+  }, [
+    fetchAllTests,
+    fetchAllGroupsList,
+    tests.length,
+    allGroups.length,
+    loading,
+  ]);
 
   /// ❌ **Открытие модального окна удаления**
   const handleDeleteClick = useCallback((testId: string) => {
@@ -80,13 +84,13 @@ export const TestsPage: React.FC = () => {
       );
       updateExistingTest(editTestId, { title: trimmedTitle });
 
-      // 🔥 Сначала обновляем `currentTest`, если он редактируется
+      // 🔥 Обновляем `currentTest`, если он редактируется
       if (currentTest?.id === editTestId) {
         console.warn(`📡 [TestsPage] Aktualisiere currentTest`);
         setSelectedTest({ ...currentTest, title: trimmedTitle });
       }
 
-      // ✅ Только после обновления сбрасываем `editTestId`
+      // ✅ Сброс состояния после обновления
       setEditTestId(null);
       setEditValue("");
     }

@@ -29,12 +29,12 @@ export const useTests = () => {
   const error = useSelector(selectTestsError);
   const allGroups = useSelector(selectAllGroups);
 
-  // ✅ Исправление: Получаем доступные группы **только для выбранного теста**
+  // ✅ Доступные группы только для текущего теста
   const availableGroups = useSelector((state: RootState) =>
     selectAvailableGroupsForTest(state, currentTest?.id ?? "")
   );
 
-  // ✅ Загрузка тестов и всех групп **один раз при монтировании**
+  // ✅ Загружаем тесты и группы один раз при монтировании
   useEffect(() => {
     if (tests.length === 0) {
       dispatch(fetchTests())
@@ -51,7 +51,7 @@ export const useTests = () => {
           console.error("❌ [useTests] Fehler beim Abrufen der Gruppen:", error)
         );
     }
-  }, [dispatch, tests.length, allGroups.length]); // ✅ Добавили `tests.length` и `allGroups.length`
+  }, [dispatch, tests.length, allGroups.length]);
 
   // ✅ Принудительная загрузка тестов
   const fetchAllTests = useCallback(() => {
@@ -62,18 +62,14 @@ export const useTests = () => {
       );
   }, [dispatch]);
 
-  // ✅ Группы загружаются **только если передан testId**
-  const fetchGroups = useCallback(
-    (testId: string) => {
-      if (!testId) return;
-      dispatch(fetchAllGroups()) // 🔹 **Фикс:** Загружаем группы только если `testId` пустой
-        .unwrap()
-        .catch((error) =>
-          console.error("❌ [useTests] Fehler beim Abrufen der Gruppen:", error)
-        );
-    },
-    [dispatch]
-  );
+  // ✅ Принудительная загрузка всех групп
+  const fetchAllGroupsList = useCallback(() => {
+    dispatch(fetchAllGroups())
+      .unwrap()
+      .catch((error) =>
+        console.error("❌ [useTests] Fehler beim Abrufen der Gruppen:", error)
+      );
+  }, [dispatch]);
 
   const createNewTest = useCallback(
     (data: Partial<Test>) => {
@@ -122,7 +118,7 @@ export const useTests = () => {
     [dispatch]
   );
 
-  // ✅ Исправлено: Теперь загружаем группы **только для конкретного теста**
+  // ✅ Исправлено: Теперь загружаем `fetchTests()` после обновления групп
   const updateTestGroupAccess = useCallback(
     async (testId: string, groupId: string, action: "add" | "remove") => {
       if (!testId || !groupId || !["add", "remove"].includes(action)) {
@@ -145,8 +141,8 @@ export const useTests = () => {
           `✅ [useTests] Gruppen für Test ${testId} erfolgreich aktualisiert`
         );
 
-        // 🔹 **Фикс:** Вместо `fetchAllGroups()` загружаем **только группы для теста**
-        fetchGroups(testId);
+        // 🔹 **Фикс:** Вместо `fetchAllGroups()` загружаем `fetchTests()` для актуальности данных
+        fetchAllTests();
       } catch (error) {
         console.error(
           "❌ [useTests] Fehler beim Aktualisieren der Gruppen:",
@@ -154,7 +150,7 @@ export const useTests = () => {
         );
       }
     },
-    [dispatch, fetchGroups] // 🔹 **Исправлено:** Добавлен `fetchGroups`
+    [dispatch, fetchAllTests] // ✅ Исправлено: используем `fetchAllTests`
   );
 
   const setSelectedTest = useCallback(
@@ -172,7 +168,7 @@ export const useTests = () => {
     error,
     currentTest,
     fetchAllTests,
-    fetchGroups,
+    fetchAllGroupsList,
     createNewTest,
     updateExistingTest,
     deleteExistingTest,
