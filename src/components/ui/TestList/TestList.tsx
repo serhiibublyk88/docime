@@ -10,6 +10,7 @@ import {
   FaPlus,
   FaMinus,
 } from "react-icons/fa";
+
 import { TestListProps } from "../../../types/reduxTypes";
 import { useNavigate } from "react-router-dom";
 import styles from "./TestList.module.css";
@@ -29,17 +30,16 @@ export const TestList: React.FC<TestListProps> = ({
   selectedGroups,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [hoveredTestId, setHoveredTestId] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  /// ✅ Открыть/закрыть список групп
   const toggleGroupDropdown = (testId: string) => {
     setOpenDropdown(openDropdown === testId ? null : testId);
-    setHoveredTestId(openDropdown === testId ? null : testId);
   };
 
+  /// ✅ Подтверждение изменений (сохраняет в `applyGroupChanges`)
   const handleConfirmSelection = (testId: string) => {
     setOpenDropdown(null);
-    setHoveredTestId(null);
     const groupIds = selectedGroups[testId]?.map((g) => g.id) || [];
     applyGroupChanges(testId, groupIds);
   };
@@ -49,10 +49,9 @@ export const TestList: React.FC<TestListProps> = ({
       {tests.map((test, index) => (
         <ListGroup.Item
           key={test.id}
-          className={`${styles.testItem} ${
-            hoveredTestId === test.id ? styles.testItemHovered : ""
-          } d-flex flex-column border-0`}
+          className={`${styles.testItem} d-flex flex-column border-0`}
         >
+          {/* Верхняя строка */}
           <div
             className={`d-flex justify-content-between align-items-center fs-5 ${styles.testHeader}`}
           >
@@ -71,51 +70,55 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             )}
 
-            <div
-              className={`${styles.iconContainer} ${
-                hoveredTestId === test.id ? styles.iconContainerVisible : ""
-              }`}
-            >
-              {editTestId === test.id ? (
-                <>
-                  <FaSave
-                    className={`${styles.icon} ${styles.iconEdit}`}
-                    title="Speichern"
-                    onClick={onSave}
-                  />
-                  <FaTimes
-                    className={`${styles.icon} ${styles.iconDelete}`}
-                    title="Abbrechen"
-                    onClick={onCancel}
-                  />
-                </>
-              ) : (
-                <>
-                  <FaEdit
-                    className={`${styles.icon} ${styles.iconEdit}`}
-                    title="Bearbeiten"
-                    onClick={() => navigate("/admin/create-test")}
-                  />
-                  <FaCopy
-                    className={`${styles.icon} ${styles.iconCopy}`}
-                    title="Kopieren"
-                    onClick={() => onCopy(test.id)}
-                  />
-                  <FaTrash
-                    className={`${styles.icon} ${styles.iconDelete}`}
-                    title="Löschen"
-                    onClick={() => onDelete(test.id)}
-                  />
-                </>
-              )}
+            {/* Дата + Кнопки */}
+            <div className="d-flex align-items-center">
+              <small className="text-muted fs-6 fw-normal me-3">
+                {test.createdAt
+                  ? new Date(test.createdAt).toLocaleDateString()
+                  : "N/A"}
+              </small>
+
+              <div className={styles.iconContainer}>
+                {editTestId === test.id ? (
+                  <>
+                    <FaSave
+                      className={`${styles.icon} ${styles.iconEdit}`}
+                      title="Speichern"
+                      onClick={onSave}
+                    />
+                    <FaTimes
+                      className={`${styles.icon} ${styles.iconDelete}`}
+                      title="Abbrechen"
+                      onClick={onCancel}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <FaEdit
+                      className={`${styles.icon} ${styles.iconEdit}`}
+                      title="Bearbeiten"
+                      onClick={() => navigate("/admin/create-test")}
+                    />
+                    <FaCopy
+                      className={`${styles.icon} ${styles.iconCopy}`}
+                      title="Kopieren"
+                      onClick={() => onCopy(test.id)}
+                    />
+                    <FaTrash
+                      className={`${styles.icon} ${styles.iconDelete}`}
+                      title="Löschen"
+                      onClick={() => onDelete(test.id)}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
+          {/* Контейнер "Добавить группу" */}
           <div className="d-flex align-items-center">
             <div
-              className={`${styles.iconAddGroupContainer} ${
-                hoveredTestId === test.id ? styles.iconAddGroupVisible : ""
-              }`}
+              className={styles.iconAddGroupContainer}
               title="Gruppenzugriff hinzufügen oder entfernen"
               onClick={() => toggleGroupDropdown(test.id)}
             >
@@ -128,6 +131,7 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             </div>
 
+            {/* Список групп */}
             <ListGroup className={`${styles.groupList} w-100`}>
               {selectedGroups[test.id]?.length ? (
                 selectedGroups[test.id].map((group) => (
@@ -148,6 +152,7 @@ export const TestList: React.FC<TestListProps> = ({
             </ListGroup>
           </div>
 
+          {/* Выпадающий список всех групп */}
           {openDropdown === test.id && (
             <div className={styles.dropdownGroupList}>
               <ListGroup className="w-100">
