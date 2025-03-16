@@ -6,7 +6,7 @@ import {
   ItemList,
   Loader,
   AlertMessage,
-  ConfirmDeleteModal, 
+  ConfirmActionModal, 
 } from "../../components";
 
 export const GroupPage = () => {
@@ -70,23 +70,27 @@ export const GroupPage = () => {
               onItemClick={() => {}}
               onSave={handleSave}
               onCancel={handleCancel}
-              onEdit={handleEdit}
+               onEdit={(id, name = "") => handleEdit(id, name)} 
               onDelete={handleDeleteClick}
             />
           )}
         </Col>
       </Row>
 
+      {/* ✅ Новая модалка подтверждения удаления */}
       {deleteMemberId && (
-        <ConfirmDeleteModal
+        <ConfirmActionModal
           show={!!deleteMemberId}
           title="Mitglied entfernen"
           message={`Bist du sicher, dass du ${
             members.find((m) => m._id === deleteMemberId)?.username ||
             "dieses Mitglied"
           } aus der Gruppe entfernen möchtest?`}
-          onDelete={confirmDeleteMember}
-          onClose={closeDeleteModal}
+          confirmText="Entfernen" // 🔹 Кнопка теперь явно "Entfernen"
+          confirmVariant="danger" // 🔥 Оставляем красную кнопку
+          onConfirm={confirmDeleteMember} // 🔹 Функция удаления
+          onClose={closeDeleteModal} // 🔹 Закрытие модалки
+          aria-label="Mitglied entfernen Modal"
         />
       )}
     </Container>

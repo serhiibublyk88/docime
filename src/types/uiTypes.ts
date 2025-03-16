@@ -98,7 +98,7 @@ export interface ItemListProps {
   editItemId?: string | null;
   editValue?: string;
   onItemClick?: (id: string) => void;
-  onEdit?: (id: string) => void;
+  onEdit?: (id: string, name?: string) => void;
   onSave?: () => void;
   onCancel?: () => void;
   setEditValue?: (value: string) => void;

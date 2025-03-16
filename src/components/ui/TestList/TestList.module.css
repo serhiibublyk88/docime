@@ -3,21 +3,28 @@
   margin-bottom: 8px;
   transition: background-color 0.2s ease-in-out;
   border-radius: 5px;
-  position: relative; /* Убедимся, что дочерние элементы с absolute будут относительно testItem */
+  position: relative;
 }
 
 .testItem:hover {
   background-color: var(--bs-secondary-bg);
 }
 
-/*  Поле редактирования */
+.testItemHovered {
+  background-color: var(--bs-secondary-bg) !important;
+}
+
+.iconContainerVisible,
+.iconAddGroupVisible {
+  opacity: 1 !important;
+}
+
 .editInput {
   width: 100%;
   padding: 6px;
   font-size: 1rem;
 }
 
-/*  Контейнер для иконок */
 .iconContainer {
   display: flex;
   gap: 10px;
@@ -29,7 +36,6 @@
   opacity: 1;
 }
 
-/*  Общий стиль иконок */
 .icon {
   font-size: 1.2rem;
   cursor: pointer;
@@ -41,7 +47,7 @@
 }
 
 .iconCopy:hover {
-  color: var(--bs-info);
+  color: var(--bs-success);
 }
 
 .iconDelete:hover {
@@ -52,14 +58,12 @@
   color: var(--bs-success);
 }
 
-/*  Контейнер иконки "Добавить группу" */
 .iconAddGroupContainer {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  min-height: 100%;
   margin-right: 10px;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
@@ -69,72 +73,35 @@
   opacity: 1;
 }
 
-/*  Контейнер списка групп */
 .groupList {
   flex-grow: 1;
   margin-top: 5px;
   padding-top: 5px;
 }
 
-/*  Элементы групп (с чекбоксами) */
 .groupItem {
   padding: 4px 8px;
-  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-/* Чекбокс */
-.checkbox {
-  width: 18px;
-  height: 18px;
-  appearance: none;
-  background-color: var(--bs-body-bg);
-  border: 2px solid var(--bs-border-color);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out, border 0.2s ease-in-out;
-  opacity: 0;
 }
 
 .testItem:hover .checkbox {
   opacity: 1;
 }
 
-.checkbox:checked {
-  background-color: var(--bs-secondary);
-  border-color: var(--bs-border-color);
-}
-
-.checkbox:checked::before {
-  content: "✔";
-  color: #ffffff;
-  font-size: 12px;
-}
-
-.checkbox:hover {
-  border-color: var(--bs-light);
-}
-
-/*  Стили для списка групп (выпадающий, absolute-позиционирование) */
 .dropdownGroupList {
   position: absolute;
-  top: 100%; /* Выпадает вниз от testItem */
+  top: 100%;
   left: 0;
   width: 100%;
   background: var(--bs-body-bg);
   border: 1px solid var(--bs-border-color);
   border-radius: 5px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 10;
   padding: 8px;
 }
 
-/*  Анимация появления */
 .dropdownGroupList-enter {
   opacity: 0;
   transform: translateY(-10px);
@@ -155,4 +122,33 @@
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.combinedIcon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: white;
+  transition: color 0.2s ease-in-out;
+}
+
+.combinedIcon:hover {
+  color: var(--bs-primary);
+}
+
+.peopleIcon {
+  font-size: 1.4rem;
+}
+
+.plusMinusContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.plusIcon,
+.minusIcon {
+  font-size: 0.55rem;
 }

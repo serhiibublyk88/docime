@@ -15,7 +15,6 @@ import { AxiosError } from "axios";
 // ✅ **Обработчик ошибок**
 const handleApiError = (error: unknown): string => {
   if (error instanceof AxiosError) {
-    console.error("❌ [API Error]:", error.response?.data || error.message);
     return error.response?.data?.message || "Fehler beim Abrufen der Tests";
   }
   return "Unbekannter Fehler beim Abrufen der Tests";
@@ -28,10 +27,7 @@ export const fetchTests = createAsyncThunk<
   { rejectValue: string }
 >("tests/fetchTests", async (_, { rejectWithValue }) => {
   try {
-    console.log("📡 [THUNK] Загружаем список тестов...");
-    const tests = await fetchTestsApi();
-    console.log("✅ [THUNK] Загружены тесты:", tests);
-    return tests;
+    return await fetchTestsApi();
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
@@ -44,10 +40,7 @@ export const fetchAllGroups = createAsyncThunk<
   { rejectValue: string }
 >("tests/fetchAllGroups", async (_, { rejectWithValue }) => {
   try {
-    console.log("📡 [THUNK] Загружаем все группы...");
-    const groups = await fetchAllGroupsApi();
-    console.log("✅ [THUNK] Загружены все группы:", groups);
-    return groups;
+    return await fetchAllGroupsApi();
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
@@ -60,10 +53,7 @@ export const fetchTestGroups = createAsyncThunk<
   { rejectValue: string }
 >("tests/fetchTestGroups", async (testId, { rejectWithValue }) => {
   try {
-    console.log(`📡 [THUNK] Загружаем группы для теста ${testId}...`);
-    const groups = await fetchGroupsApi(testId);
-    console.log("✅ [THUNK] Загружены группы:", groups);
-    return groups;
+    return await fetchGroupsApi(testId);
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
@@ -76,93 +66,62 @@ export const createTest = createAsyncThunk<
   { rejectValue: string }
 >("tests/createTest", async (testData, { rejectWithValue }) => {
   try {
-    console.log("📡 [THUNK] Создаем новый тест...", testData);
-    const newTest = await createTestApi(testData);
-    console.log("✅ [THUNK] Тест создан:", newTest);
-    return newTest;
+    return await createTestApi(testData);
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
 });
 
-// ✅ **Обновление теста**
+//  **Обновление теста**
 export const updateTest = createAsyncThunk<
   Test,
   { testId: string; data: Partial<Test> },
   { rejectValue: string }
 >("tests/updateTest", async ({ testId, data }, { rejectWithValue }) => {
   try {
-    console.log(`📡 [THUNK] Обновляем тест ${testId}...`, data);
-    const updatedTest = await updateTestApi(testId, data);
-    console.log(`✅ [THUNK] Тест ${testId} обновлен:`, updatedTest);
-    return updatedTest;
+    return await updateTestApi(testId, data);
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
 });
 
-// ✅ **Удаление теста**
+//  **Удаление теста**
 export const deleteTest = createAsyncThunk<
   string,
   string,
   { rejectValue: string }
 >("tests/deleteTest", async (testId, { rejectWithValue }) => {
   try {
-    console.log(`📡 [THUNK] Удаляем тест ${testId}...`);
     await deleteTestApi(testId);
-    console.log(`✅ [THUNK] Тест ${testId} удален`);
     return testId;
   } catch (error) {
     return rejectWithValue(handleApiError(error));
   }
 });
 
-// ✅ **Копирование теста**
+//  **Копирование теста**
 export const copyTest = createAsyncThunk<Test, string, { rejectValue: string }>(
   "tests/copyTest",
   async (testId, { rejectWithValue }) => {
     try {
-      console.log(`📡 [THUNK] Копируем тест ${testId}...`);
-      const copiedTest = await copyTestApi(testId);
-      console.log(`✅ [THUNK] Тест ${testId} скопирован:`, copiedTest);
-      return copiedTest;
+      return await copyTestApi(testId);
     } catch (error) {
       return rejectWithValue(handleApiError(error));
     }
   }
 );
 
-// ✅ **Обновление доступных групп для теста**
+//  **Обновление доступных групп для теста**
 export const updateTestGroups = createAsyncThunk<
   { testId: string; availableForGroups: { id: string; name: string }[] },
-  { testId: string; groupId: string; action: "add" | "remove" },
+  { testId: string; groupIds: string[] },
   { rejectValue: string }
 >(
   "tests/updateTestGroups",
-  async ({ testId, groupId, action }, { rejectWithValue, dispatch }) => {
+  async ({ testId, groupIds }, { rejectWithValue }) => {
     try {
-      console.log(
-        `📡 [THUNK] ${
-          action === "add" ? "Добавляем" : "Удаляем"
-        } группу ${groupId} для теста ${testId}...`
-      );
-
-      const response = await updateTestGroupsApi(testId, groupId, action);
-
-      console.log(
-        `✅ [THUNK] Группы теста ${testId} обновлены:`,
-        response.availableForGroups
-      );
-
-      // ⏬ **Важно! Заново загружаем доступные группы после изменения**
-      await dispatch(fetchTestGroups(testId)).unwrap();
-
-      return response;
-    } catch (error) {
-      console.error(
-        `❌ [THUNK] Ошибка обновления групп для теста ${testId}:`,
-        error
-      );
+      return await updateTestGroupsApi(testId, groupIds);
+    } catch  {
       return rejectWithValue("Fehler beim Aktualisieren der Gruppen");
     }
   }

@@ -15,7 +15,7 @@ const initialState: TestsState = {
   currentTest: null,
   loading: false,
   error: null,
-  allGroups: [], // ✅ Список всех доступных групп
+  allGroups: [],
 };
 
 const testsSlice = createSlice({
@@ -28,7 +28,6 @@ const testsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ✅ **Получение тестов**
       .addCase(fetchTests.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -42,7 +41,6 @@ const testsSlice = createSlice({
         state.error = action.payload ?? "Fehler beim Abrufen der Tests";
       })
 
-      // ✅ **Получение всех групп (не только доступных для теста)**
       .addCase(fetchAllGroups.pending, (state) => {
         state.loading = true;
       })
@@ -58,12 +56,10 @@ const testsSlice = createSlice({
         state.error = action.payload ?? "Fehler beim Abrufen der Gruppen";
       })
 
-      // ✅ **Создание теста**
       .addCase(createTest.fulfilled, (state, action: PayloadAction<Test>) => {
         state.tests.push(action.payload);
       })
 
-      // ✅ **Обновление теста**
       .addCase(updateTest.fulfilled, (state, action: PayloadAction<Test>) => {
         state.tests = state.tests.map((test) =>
           test.id === action.payload.id ? action.payload : test
@@ -73,7 +69,6 @@ const testsSlice = createSlice({
         }
       })
 
-      // ✅ **Удаление теста**
       .addCase(deleteTest.fulfilled, (state, action: PayloadAction<string>) => {
         state.tests = state.tests.filter((test) => test.id !== action.payload);
         if (state.currentTest?.id === action.payload) {
@@ -81,12 +76,10 @@ const testsSlice = createSlice({
         }
       })
 
-      // ✅ **Копирование теста**
       .addCase(copyTest.fulfilled, (state, action: PayloadAction<Test>) => {
         state.tests.push(action.payload);
       })
 
-      // ✅ **Обновление доступных групп у теста**
       .addCase(
         updateTestGroups.fulfilled,
         (
@@ -96,32 +89,31 @@ const testsSlice = createSlice({
             availableForGroups: { id: string; name: string }[];
           }>
         ) => {
-          console.log(
-            `✅ [Slice] Группы для теста ${action.payload.testId} обновлены:`,
-            action.payload.availableForGroups
+          const uniqueGroups = Array.from(
+            new Map(
+              action.payload.availableForGroups.map((group) => [
+                group.id,
+                group,
+              ])
+            ).values()
           );
 
-          // 🔹 **Фикс: Обновляем тест в общем списке** без потери данных
           const testIndex = state.tests.findIndex(
             (test) => test.id === action.payload.testId
           );
           if (testIndex !== -1) {
-            state.tests[testIndex].availableForGroups =
-              action.payload.availableForGroups;
+            state.tests[testIndex].availableForGroups = uniqueGroups;
           }
 
-          // 🔹 **Фикс: Безопасное обновление currentTest** (если активный тест совпадает)
           if (state.currentTest?.id === action.payload.testId) {
             state.currentTest = {
               ...state.currentTest,
-              availableForGroups: action.payload.availableForGroups,
+              availableForGroups: uniqueGroups,
             };
           }
-
-          // ✅ **Фикс: После обновления групп загружаем все тесты**
-          state.loading = true;
         }
       )
+
       .addCase(updateTestGroups.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ?? "Fehler beim Aktualisieren der Gruppen";

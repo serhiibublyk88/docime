@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import {
-  ConfirmDeleteModal,
+  ConfirmActionModal,
   Loader,
   AlertMessage,
   TestList,
@@ -12,89 +12,88 @@ export const TestsPage: React.FC = () => {
   const {
     tests,
     allGroups,
+    selectedGroups,
     loading,
     error,
     deleteExistingTest,
     copyExistingTest,
-    updateTestGroupAccess,
     updateExistingTest,
     fetchAllTests,
-    fetchAllGroupsList, // ✅ Вместо `fetchGroups`
+    fetchAllGroupsList,
     setSelectedTest,
     currentTest,
+    handleGroupChange,
+    applyGroupChanges,
   } = useTests();
 
   const [deleteTestId, setDeleteTestId] = useState<string | null>(null);
+  const [copyTestId, setCopyTestId] = useState<string | null>(null);
   const [editTestId, setEditTestId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
-  /// 🔄 **Загрузка тестов и групп при монтировании**
   useEffect(() => {
-    if (!tests.length && !loading) {
-      console.warn("📡 [TestsPage] Lade Tests...");
+    if (tests.length === 0) {
       fetchAllTests();
     }
-
-    if (!allGroups.length) {
-      console.warn("📡 [TestsPage] Lade alle Gruppen...");
-      fetchAllGroupsList(); // ✅ Загружаем все группы при монтировании
+    if (allGroups.length === 0) {
+      fetchAllGroupsList();
     }
-  }, [
-    fetchAllTests,
-    fetchAllGroupsList,
-    tests.length,
-    allGroups.length,
-    loading,
-  ]);
+  }, [fetchAllTests, fetchAllGroupsList, tests.length, allGroups.length]);
 
-  /// ❌ **Открытие модального окна удаления**
   const handleDeleteClick = useCallback((testId: string) => {
-    console.warn(`📡 [TestsPage] Öffne Lösch-Modal für Test ${testId}`);
     setDeleteTestId(testId);
   }, []);
 
-  /// ✅ **Подтверждение удаления**
   const confirmDeleteTest = useCallback(() => {
     if (deleteTestId) {
-      console.warn(`📡 [TestsPage] Lösche Test ${deleteTestId}...`);
       deleteExistingTest(deleteTestId);
       setDeleteTestId(null);
     }
   }, [deleteTestId, deleteExistingTest]);
 
-  /// ❌ **Закрытие модального окна удаления**
   const closeDeleteModal = useCallback(() => {
-    console.warn("📡 [TestsPage] Schließe Lösch-Modal");
     setDeleteTestId(null);
   }, []);
 
-  /// ✍️ **Начало редактирования теста**
+  const handleCopyClick = useCallback((testId: string) => {
+    setCopyTestId(testId);
+  }, []);
+
+  const confirmCopyTest = useCallback(async () => {
+    if (copyTestId) {
+      await copyExistingTest(copyTestId);
+      setCopyTestId(null);
+    }
+  }, [copyTestId, copyExistingTest]);
+
+  const closeCopyModal = useCallback(() => {
+    setCopyTestId(null);
+  }, []);
+
   const handleEditClick = useCallback((testId: string, title: string) => {
-    console.warn(`📡 [TestsPage] Bearbeite Test ${testId}`);
     setEditTestId(testId);
     setEditValue(title);
   }, []);
 
-  /// 💾 **Сохранение изменений в тесте**
   const handleSaveEdit = useCallback(() => {
     const trimmedTitle = editValue.trim();
     if (editTestId && trimmedTitle) {
-      console.warn(
-        `📡 [TestsPage] Speichere Änderungen für Test ${editTestId}`
-      );
       updateExistingTest(editTestId, { title: trimmedTitle });
-
-      // 🔥 Обновляем `currentTest`, если он редактируется
       if (currentTest?.id === editTestId) {
-        console.warn(`📡 [TestsPage] Aktualisiere currentTest`);
         setSelectedTest({ ...currentTest, title: trimmedTitle });
       }
-
-      // ✅ Сброс состояния после обновления
       setEditTestId(null);
       setEditValue("");
     }
   }, [editTestId, editValue, updateExistingTest, currentTest, setSelectedTest]);
+
+  const handleApplyGroupChanges = useCallback(
+    (testId: string) => {
+      if (!testId || !selectedGroups[testId]) return;
+      applyGroupChanges(testId);
+    },
+    [applyGroupChanges, selectedGroups]
+  );
 
   return (
     <Container fluid>
@@ -114,6 +113,7 @@ export const TestsPage: React.FC = () => {
             <TestList
               tests={tests}
               allGroups={allGroups}
+              selectedGroups={selectedGroups}
               editTestId={editTestId}
               editValue={editValue}
               onEdit={handleEditClick}
@@ -121,21 +121,37 @@ export const TestsPage: React.FC = () => {
               onCancel={() => setEditTestId(null)}
               setEditValue={setEditValue}
               onDelete={handleDeleteClick}
-              onCopy={copyExistingTest}
-              onUpdateGroups={updateTestGroupAccess}
+              onCopy={handleCopyClick}
+              handleGroupChange={handleGroupChange}
+              applyGroupChanges={handleApplyGroupChanges}
             />
           )}
         </Col>
       </Row>
 
       {deleteTestId && (
-        <ConfirmDeleteModal
+        <ConfirmActionModal
           show={!!deleteTestId}
           title="Test löschen"
           message="Sind Sie sicher, dass Sie diesen Test löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
-          onDelete={confirmDeleteTest}
+          confirmText="Löschen"
+          confirmVariant="danger"
+          onConfirm={confirmDeleteTest}
           onClose={closeDeleteModal}
           aria-label="Test löschen Modal"
+        />
+      )}
+
+      {copyTestId && (
+        <ConfirmActionModal
+          show={!!copyTestId}
+          title="Test kopieren"
+          message="Sind Sie sicher, dass Sie diesen Test kopieren möchten?"
+          confirmText="Kopieren"
+          confirmVariant="primary"
+          onConfirm={confirmCopyTest}
+          onClose={closeCopyModal}
+          aria-label="Test kopieren Modal"
         />
       )}
     </Container>

@@ -1,8 +1,7 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppDispatch,
-  RootState,
   fetchTests,
   fetchAllGroups,
   createTest,
@@ -15,7 +14,6 @@ import {
   selectTestsLoading,
   selectTestsError,
   selectCurrentTest,
-  selectAvailableGroupsForTest,
   selectAllGroups,
 } from "../redux";
 import { Test } from "../types/reduxTypes";
@@ -29,129 +27,109 @@ export const useTests = () => {
   const error = useSelector(selectTestsError);
   const allGroups = useSelector(selectAllGroups);
 
-  // ✅ Доступные группы только для текущего теста
-  const availableGroups = useSelector((state: RootState) =>
-    selectAvailableGroupsForTest(state, currentTest?.id ?? "")
-  );
+  const [selectedGroups, setSelectedGroups] = useState<
+    Record<string, { id: string; name: string }[]>
+  >({});
 
-  // ✅ Загружаем тесты и группы один раз при монтировании
   useEffect(() => {
-    if (tests.length === 0) {
-      dispatch(fetchTests())
-        .unwrap()
-        .catch((error) =>
-          console.error("❌ [useTests] Fehler beim Abrufen der Tests:", error)
-        );
+    if (currentTest) {
+      setSelectedGroups((prev) => ({
+        ...prev,
+        [currentTest.id]: currentTest.availableForGroups.map((g) => ({
+          id: g.id,
+          name: g.name,
+        })),
+      }));
     }
+  }, [currentTest]);
 
-    if (allGroups.length === 0) {
-      dispatch(fetchAllGroups())
-        .unwrap()
-        .catch((error) =>
-          console.error("❌ [useTests] Fehler beim Abrufen der Gruppen:", error)
-        );
-    }
-  }, [dispatch, tests.length, allGroups.length]);
-
-  // ✅ Принудительная загрузка тестов
-  const fetchAllTests = useCallback(() => {
-    dispatch(fetchTests())
-      .unwrap()
-      .catch((error) =>
-        console.error("❌ [useTests] Fehler beim Abrufen der Tests:", error)
+  useEffect(() => {
+    if (tests.length) {
+      setSelectedGroups(
+        tests.reduce((acc, test) => {
+          acc[test.id] = test.availableForGroups.map((g) => ({
+            id: g.id,
+            name: g.name,
+          }));
+          return acc;
+        }, {} as Record<string, { id: string; name: string }[]>)
       );
+    }
+  }, [tests]);
+
+  const fetchAllTests = useCallback(() => {
+    dispatch(fetchTests()).catch(() => {});
   }, [dispatch]);
 
-  // ✅ Принудительная загрузка всех групп
   const fetchAllGroupsList = useCallback(() => {
-    dispatch(fetchAllGroups())
-      .unwrap()
-      .catch((error) =>
-        console.error("❌ [useTests] Fehler beim Abrufen der Gruppen:", error)
-      );
+    dispatch(fetchAllGroups()).catch(() => {});
   }, [dispatch]);
 
   const createNewTest = useCallback(
     (data: Partial<Test>) => {
-      dispatch(createTest(data))
-        .unwrap()
-        .catch((error) =>
-          console.error("❌ [useTests] Fehler beim Erstellen des Tests:", error)
-        );
+      dispatch(createTest(data)).catch(() => {});
     },
     [dispatch]
   );
 
   const updateExistingTest = useCallback(
     (testId: string, data: Partial<Test>) => {
-      dispatch(updateTest({ testId, data }))
-        .unwrap()
-        .catch((error) =>
-          console.error(
-            "❌ [useTests] Fehler beim Aktualisieren des Tests:",
-            error
-          )
-        );
+      dispatch(updateTest({ testId, data })).catch(() => {});
     },
     [dispatch]
   );
 
   const deleteExistingTest = useCallback(
     (testId: string) => {
-      dispatch(deleteTest(testId))
-        .unwrap()
-        .catch((error) =>
-          console.error("❌ [useTests] Fehler beim Löschen des Tests:", error)
-        );
+      dispatch(deleteTest(testId)).catch(() => {});
     },
     [dispatch]
   );
 
   const copyExistingTest = useCallback(
     (testId: string) => {
-      dispatch(copyTest(testId))
-        .unwrap()
-        .catch((error) =>
-          console.error("❌ [useTests] Fehler beim Kopieren des Tests:", error)
-        );
+      dispatch(copyTest(testId)).catch(() => {});
     },
     [dispatch]
   );
 
-  // ✅ Исправлено: Теперь загружаем `fetchTests()` после обновления групп
-  const updateTestGroupAccess = useCallback(
-    async (testId: string, groupId: string, action: "add" | "remove") => {
-      if (!testId || !groupId || !["add", "remove"].includes(action)) {
-        console.warn("⚠️ Ungültige Parameter für updateTestGroupAccess:", {
-          testId,
-          groupId,
-          action,
-        });
-        return;
-      }
+  const handleGroupChange = useCallback(
+    (testId: string, groupId: string) => {
+      setSelectedGroups((prev) => {
+        const updatedGroups = prev[testId] || [];
+        const group = allGroups.find((g) => g.id === groupId);
+        if (!group) return prev;
 
-      try {
-        console.log(
-          `📡 [useTests] Aktualisiere Gruppen für Test ${testId}, Aktion: ${action}`
-        );
-
-        await dispatch(updateTestGroups({ testId, groupId, action })).unwrap();
-
-        console.log(
-          `✅ [useTests] Gruppen für Test ${testId} erfolgreich aktualisiert`
-        );
-
-        // 🔹 **Фикс:** Вместо `fetchAllGroups()` загружаем `fetchTests()` для актуальности данных
-        fetchAllTests();
-      } catch (error) {
-        console.error(
-          "❌ [useTests] Fehler beim Aktualisieren der Gruppen:",
-          error
-        );
-      }
+        return {
+          ...prev,
+          [testId]: updatedGroups.some((g) => g.id === groupId)
+            ? updatedGroups.filter((g) => g.id !== groupId)
+            : [...updatedGroups, { id: group.id, name: group.name }],
+        };
+      });
     },
-    [dispatch, fetchAllTests] // ✅ Исправлено: используем `fetchAllTests`
+    [allGroups]
   );
+
+  const applyGroupChanges = useCallback(
+    async (testId: string) => {
+      if (!testId || !selectedGroups[testId]) return;
+
+      await dispatch(
+        updateTestGroups({
+          testId,
+          groupIds: selectedGroups[testId].map((g) => g.id),
+        })
+      ).unwrap();
+
+      setSelectedGroups((prev) => ({
+        ...prev,
+        [testId]: selectedGroups[testId],
+      }));
+    },
+    [dispatch, selectedGroups]
+  );
+
 
   const setSelectedTest = useCallback(
     (test: Test | null) => {
@@ -162,8 +140,8 @@ export const useTests = () => {
 
   return {
     tests,
-    availableGroups,
     allGroups,
+    selectedGroups,
     loading,
     error,
     currentTest,
@@ -173,7 +151,8 @@ export const useTests = () => {
     updateExistingTest,
     deleteExistingTest,
     copyExistingTest,
-    updateTestGroupAccess,
     setSelectedTest,
+    handleGroupChange,
+    applyGroupChanges,
   };
 };

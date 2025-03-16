@@ -1,18 +1,22 @@
 import { Modal, Button } from "react-bootstrap";
 
-interface ConfirmDeleteModalProps {
+interface ConfirmActionModalProps {
   show: boolean;
   title: string;
   message: string;
-  onDelete: () => void;
+  confirmText: string;
+  confirmVariant?: "primary" | "danger"; // 🔹 Цвет кнопки (по умолчанию красный)
+  onConfirm: () => void;
   onClose: () => void;
 }
 
-export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
+export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
   show,
   title,
   message,
-  onDelete,
+  confirmText,
+  confirmVariant = "danger", // 🔹 По умолчанию красная кнопка
+  onConfirm,
   onClose,
 }) => {
   return (
@@ -27,8 +31,8 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
         <Button variant="outline-secondary" onClick={onClose}>
           Abbrechen
         </Button>
-        <Button variant="outline-danger" onClick={onDelete}>
-          Löschen
+        <Button variant={`outline-${confirmVariant}`} onClick={onConfirm}>
+          {confirmText}
         </Button>
       </Modal.Footer>
     </Modal>

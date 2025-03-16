@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { ListGroup, Form, Button } from "react-bootstrap";
 import {
   FaEdit,
@@ -6,94 +6,42 @@ import {
   FaTimes,
   FaTrash,
   FaCopy,
-  FaUserPlus,
+  FaUserFriends,
+  FaPlus,
+  FaMinus,
 } from "react-icons/fa";
-import { Test } from "../../../types/reduxTypes";
+import { TestListProps } from "../../../types/reduxTypes";
+import { useNavigate } from "react-router-dom";
 import styles from "./TestList.module.css";
-
-interface TestListProps {
-  tests: Test[];
-  allGroups: { id: string; name: string }[];
-  editTestId: string | null;
-  editValue: string;
-  onEdit: (id: string, title: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
-  onDelete: (id: string) => void;
-  onCopy: (id: string) => void;
-  setEditValue: (value: string) => void;
-  onUpdateGroups: (
-    testId: string,
-    groupId: string,
-    action: "add" | "remove"
-  ) => void;
-}
 
 export const TestList: React.FC<TestListProps> = ({
   tests,
   allGroups,
   editTestId,
   editValue,
-  onEdit,
   onSave,
   onCancel,
   onDelete,
   onCopy,
   setEditValue,
-  onUpdateGroups,
+  handleGroupChange,
+  applyGroupChanges,
+  selectedGroups,
 }) => {
-  const [checkedGroups, setCheckedGroups] = useState<
-    Record<string, Set<string>>
-  >({});
-  const dropdownTestId = useRef<string | null>(null); // ✅ Запоминаем открытый список
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [hoveredTestId, setHoveredTestId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  /// 🔄 **Обновляем `checkedGroups`, но НЕ трогаем `dropdownTestId`**
-  useEffect(() => {
-    const newCheckedGroups: Record<string, Set<string>> = {};
-    tests.forEach((test) => {
-      newCheckedGroups[test.id] = new Set(
-        test.availableForGroups?.map((g) => g.id) || []
-      );
-    });
-    setCheckedGroups(newCheckedGroups);
-  }, [tests]);
-
-  /// ✅ Открыть/закрыть список групп (НЕ сбрасываем `dropdownTestId` при ререндере)
   const toggleGroupDropdown = (testId: string) => {
-    dropdownTestId.current = dropdownTestId.current === testId ? null : testId;
-    // ✅ Принудительно обновляем компонент (чтобы `useRef` отобразил изменение)
-    setCheckedGroups((prev) => ({ ...prev }));
+    setOpenDropdown(openDropdown === testId ? null : testId);
+    setHoveredTestId(openDropdown === testId ? null : testId);
   };
 
-  /// ✅ Обновление `checkedGroups` ЛОКАЛЬНО, отправка API через `setTimeout`
-  const handleGroupToggle = (testId: string, groupId: string) => {
-    setCheckedGroups((prev) => {
-      const updatedSet = new Set(prev[testId] || []);
-      const isChecked = updatedSet.has(groupId);
-
-      if (isChecked) {
-        updatedSet.delete(groupId);
-      } else {
-        updatedSet.add(groupId);
-      }
-
-      return { ...prev, [testId]: updatedSet };
-    });
-
-    // 🔥 Отправляем обновление на сервер (с задержкой, чтобы UI не моргал)
-    setTimeout(() => {
-      onUpdateGroups(
-        testId,
-        groupId,
-        checkedGroups[testId]?.has(groupId) ? "remove" : "add"
-      );
-    }, 300);
-  };
-
-  /// ✅ Закрытие списка только по кнопке "OK"
-  const handleConfirmSelection = () => {
-    dropdownTestId.current = null;
-    setCheckedGroups((prev) => ({ ...prev }));
+  const handleConfirmSelection = (testId: string) => {
+    setOpenDropdown(null);
+    setHoveredTestId(null);
+    const groupIds = selectedGroups[testId]?.map((g) => g.id) || [];
+    applyGroupChanges(testId, groupIds);
   };
 
   return (
@@ -101,9 +49,10 @@ export const TestList: React.FC<TestListProps> = ({
       {tests.map((test, index) => (
         <ListGroup.Item
           key={test.id}
-          className={`${styles.testItem} d-flex flex-column border-0`}
+          className={`${styles.testItem} ${
+            hoveredTestId === test.id ? styles.testItemHovered : ""
+          } d-flex flex-column border-0`}
         >
-          {/* Верхняя строка */}
           <div
             className={`d-flex justify-content-between align-items-center fs-5 ${styles.testHeader}`}
           >
@@ -122,66 +71,68 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             )}
 
-            {/* Дата + Кнопки */}
-            <div className="d-flex align-items-center">
-              <small className="text-muted fs-6 fw-normal me-3">
-                {test.createdAt
-                  ? new Date(test.createdAt).toLocaleDateString()
-                  : "N/A"}
-              </small>
-
-              <div className={styles.iconContainer}>
-                {editTestId === test.id ? (
-                  <>
-                    <FaSave
-                      className={`${styles.icon} ${styles.iconEdit}`}
-                      title="Speichern"
-                      onClick={onSave}
-                    />
-                    <FaTimes
-                      className={`${styles.icon} ${styles.iconDelete}`}
-                      title="Abbrechen"
-                      onClick={onCancel}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <FaEdit
-                      className={`${styles.icon} ${styles.iconEdit}`}
-                      title="Bearbeiten"
-                      onClick={() => onEdit(test.id, test.title)}
-                    />
-                    <FaCopy
-                      className={`${styles.icon} ${styles.iconCopy}`}
-                      title="Kopieren"
-                      onClick={() => onCopy(test.id)}
-                    />
-                    <FaTrash
-                      className={`${styles.icon} ${styles.iconDelete}`}
-                      title="Löschen"
-                      onClick={() => onDelete(test.id)}
-                    />
-                  </>
-                )}
-              </div>
+            <div
+              className={`${styles.iconContainer} ${
+                hoveredTestId === test.id ? styles.iconContainerVisible : ""
+              }`}
+            >
+              {editTestId === test.id ? (
+                <>
+                  <FaSave
+                    className={`${styles.icon} ${styles.iconEdit}`}
+                    title="Speichern"
+                    onClick={onSave}
+                  />
+                  <FaTimes
+                    className={`${styles.icon} ${styles.iconDelete}`}
+                    title="Abbrechen"
+                    onClick={onCancel}
+                  />
+                </>
+              ) : (
+                <>
+                  <FaEdit
+                    className={`${styles.icon} ${styles.iconEdit}`}
+                    title="Bearbeiten"
+                    onClick={() => navigate("/admin/create-test")}
+                  />
+                  <FaCopy
+                    className={`${styles.icon} ${styles.iconCopy}`}
+                    title="Kopieren"
+                    onClick={() => onCopy(test.id)}
+                  />
+                  <FaTrash
+                    className={`${styles.icon} ${styles.iconDelete}`}
+                    title="Löschen"
+                    onClick={() => onDelete(test.id)}
+                  />
+                </>
+              )}
             </div>
           </div>
 
-          {/* Контейнер "Добавить группу" + Список групп */}
           <div className="d-flex align-items-center">
-            <div className={styles.iconAddGroupContainer}>
-              <FaUserPlus
-                className={`${styles.icon} ${styles.iconAddGroup}`}
-                title="Gruppenzugang hinzufügen"
-                onClick={() => toggleGroupDropdown(test.id)}
-              />
+            <div
+              className={`${styles.iconAddGroupContainer} ${
+                hoveredTestId === test.id ? styles.iconAddGroupVisible : ""
+              }`}
+              title="Gruppenzugriff hinzufügen oder entfernen"
+              onClick={() => toggleGroupDropdown(test.id)}
+            >
+              <div className={styles.combinedIcon}>
+                <FaUserFriends className={styles.peopleIcon} />
+                <div className={styles.plusMinusContainer}>
+                  <FaPlus className={styles.plusIcon} />
+                  <FaMinus className={styles.minusIcon} />
+                </div>
+              </div>
             </div>
 
             <ListGroup className={`${styles.groupList} w-100`}>
-              {test.availableForGroups.length ? (
-                test.availableForGroups.map((group) => (
+              {selectedGroups[test.id]?.length ? (
+                selectedGroups[test.id].map((group) => (
                   <ListGroup.Item
-                    key={group.id}
+                    key={`${test.id}-${group.id}`}
                     className={`d-flex justify-content-between align-items-center border-0 fs-6 mt-1 ${styles.groupItem}`}
                   >
                     <span>{group.name}</span>
@@ -197,28 +148,33 @@ export const TestList: React.FC<TestListProps> = ({
             </ListGroup>
           </div>
 
-          {/* Выпадающий список всех групп */}
-          {dropdownTestId.current === test.id && (
+          {openDropdown === test.id && (
             <div className={styles.dropdownGroupList}>
               <ListGroup className="w-100">
-                {allGroups.map((group) => (
-                  <ListGroup.Item
-                    key={group.id}
-                    className="d-flex justify-content-between align-items-center border-0"
-                  >
-                    <span>{group.name}</span>
-                    <Form.Check
-                      type="checkbox"
-                      checked={checkedGroups[test.id]?.has(group.id) || false}
-                      onChange={() => handleGroupToggle(test.id, group.id)}
-                    />
-                  </ListGroup.Item>
-                ))}
+                {allGroups.map((group) => {
+                  const isChecked = selectedGroups[test.id]?.some(
+                    (g) => g.id === group.id
+                  );
+
+                  return (
+                    <ListGroup.Item
+                      key={group.id}
+                      className="d-flex justify-content-between align-items-center border-0"
+                    >
+                      <span>{group.name}</span>
+                      <Form.Check
+                        type="checkbox"
+                        checked={isChecked || false}
+                        onChange={() => handleGroupChange(test.id, group.id)}
+                      />
+                    </ListGroup.Item>
+                  );
+                })}
               </ListGroup>
               <Button
-                variant="success"
+                variant="outline-light"
                 className="w-100 mt-2"
-                onClick={handleConfirmSelection}
+                onClick={() => handleConfirmSelection(test.id)}
               >
                 OK
               </Button>

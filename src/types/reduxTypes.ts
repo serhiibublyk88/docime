@@ -17,7 +17,8 @@ export interface Group {
   id: string;
   name: string;
   description?: string;
-  members: { id: string; name: string }[]; // ✅ Исправлено: Упрощенный формат
+  // members: { id: string; name: string }[]; 
+  members: User[];
   createdBy: string;
   createdAt: string;
   groupsForCarousel?: { id: string; name: string }[];
@@ -38,10 +39,27 @@ export interface GroupsState {
 ///  Состояние одной группы
 export interface GroupState {
   group: Group | null;
-  members: { id: string; name: string }[]; // ✅ Исправлено
+  // members: { id: string; name: string }[]; 
+  members: User[];
   groupsForCarousel: GroupCarouselItem[];
   isLoading: boolean;
   error: string | null;
+}
+
+export interface TestListProps {
+  tests: Test[];
+  allGroups: { id: string; name: string }[];
+  editTestId: string | null;
+  editValue: string;
+  onEdit: (id: string, title: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  onDelete: (id: string) => void;
+  onCopy: (id: string) => void;
+  setEditValue: (value: string) => void;
+  handleGroupChange: (testId: string, groupId: string) => void;
+  applyGroupChanges: (testId: string, groupIds: string[]) => void;
+  selectedGroups: Record<string, { id: string; name: string }[]>;
 }
 
 ///  Вопрос (используется в `Test`)
@@ -55,10 +73,10 @@ export interface Test {
   id: string;
   title: string;
   description: string;
-  author: { id: string; username: string }; // ✅ Исправлено: автор теперь объект
+  author: { id: string; username: string }; 
   timeLimit: number;
   availableForGroups: { id: string; name: string }[];
-  questions: Question[]; // ✅ Исправлено: теперь массив объектов, а не строк
+  questions: Question[]; 
   maximumMarks: number;
   status: "active" | "inactive";
   minimumScores: Record<number, number>;
@@ -71,7 +89,7 @@ export interface TestsState {
   currentTest: Test | null;
   loading: boolean;
   error: string | null;
-  allGroups: { id: string; name: string }[]; // Добавлено поле для групп
+  allGroups: { id: string; name: string }[]; 
 }
 
 ///  Результат теста
@@ -83,9 +101,9 @@ export interface TestResult {
   maxScore: number;
   percentage: number;
   grade: number;
-  startTime: string | null; // ✅ Добавлено из backend
-  finishTime: string | null; // ✅ Добавлено из backend
-  timeTaken: number; // ✅ Добавлено из backend
+  startTime: string | null; 
+  finishTime: string | null; 
+  timeTaken: number; 
 }
 
 ///  Состояние результатов тестов
@@ -97,12 +115,13 @@ export interface ResultState {
 export interface GroupResponse {
   groupDetails: Group;
   groupsForCarousel: Array<{ id: string; name: string }>;
-  members: Array<{
-    id: string;
-    name?: string;
-    email?: string;
-    role?: number;
-  }>;
+  members: User[];
+  // members: Array<{
+  //   id: string;
+  //   name?: string;
+  //   email?: string;
+  //   role?: number;
+  // }>;
 }
 
 ///  Ответ от API при обновлении пользователя
