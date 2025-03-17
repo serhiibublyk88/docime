@@ -1,8 +1,8 @@
-import axios from "axios";
+import { api } from "./clientApi";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Test } from "../types/reduxTypes";
 
-const API_URL = "http://localhost:5000/api/tests";
+const API_URL = "/tests";
 
 ///  Обработчик ошибок
 const handleApiError = (error: unknown): string => {
@@ -15,9 +15,7 @@ const handleApiError = (error: unknown): string => {
 ///  Получение списка тестов
 export const fetchTestsApi = async (): Promise<Test[]> => {
   try {
-    const response = await axios.get<Test[]>(API_URL, {
-      withCredentials: true,
-    });
+    const response = await api.get<Test[]>(API_URL);
     return response.data.map((test) => ({
       id: test.id,
       title: test.title,
@@ -32,9 +30,9 @@ export const fetchTestsApi = async (): Promise<Test[]> => {
           name: group.name || "Без названия",
         })) ?? [],
       questions:
-        test.questions?.map((q: { id: string; text: string }) => ({
+        test.questions?.map((q) => ({
           id: q.id,
-          text: q.text || "Без текста",
+          text: q.text ? q.text : "Без текста",
         })) ?? [],
       maximumMarks: test.maximumMarks ?? 0,
       status: test.status || "inactive",
@@ -48,9 +46,7 @@ export const fetchTestsApi = async (): Promise<Test[]> => {
 
 ///  Создание нового теста
 export const createTestApi = async (testData: Partial<Test>): Promise<Test> => {
-  const response = await axios.post(API_URL, testData, {
-    withCredentials: true,
-  });
+  const response = await api.post(API_URL, testData);
 
   return {
     id: response.data.test.id,
@@ -85,9 +81,7 @@ export const updateTestApi = async (
   testId: string,
   data: Partial<Test>
 ): Promise<Test> => {
-  const response = await axios.put(`${API_URL}/${testId}`, data, {
-    withCredentials: true,
-  });
+  const response = await api.put(`${API_URL}/${testId}`, data);
 
   return {
     id: response.data.test.id,
@@ -119,17 +113,13 @@ export const updateTestApi = async (
 
 ///  Удаление теста
 export const deleteTestApi = async (testId: string): Promise<string> => {
-  await axios.delete(`${API_URL}/${testId}`, { withCredentials: true });
+  await api.delete(`${API_URL}/${testId}`);
   return testId;
 };
 
 ///  Копирование теста
 export const copyTestApi = async (testId: string): Promise<Test> => {
-  const response = await axios.post(
-    `${API_URL}/${testId}/copy`,
-    {},
-    { withCredentials: true }
-  );
+  const response = await api.post(`${API_URL}/${testId}/copy`, {});
 
   return {
     id: response.data.test.id,
@@ -161,9 +151,7 @@ export const copyTestApi = async (testId: string): Promise<Test> => {
 
 ///  API для получения всех групп теста
 export const fetchGroupsApi = async (testId: string) => {
-  const response = await axios.get(`${API_URL}/${testId}/available-groups`, {
-    withCredentials: true,
-  });
+  const response = await api.get(`${API_URL}/${testId}/available-groups`);
 
   return response.data.availableForGroups.map(
     (group: { id: string; name: string }) => ({
@@ -173,11 +161,9 @@ export const fetchGroupsApi = async (testId: string) => {
   );
 };
 
-///  API для получения всех групп системы 
+///  API для получения всех групп системы
 export const fetchAllGroupsApi = async () => {
-  const response = await axios.get("http://localhost:5000/api/groups", {
-    withCredentials: true,
-  });
+  const response = await api.get("/groups");
 
   return response.data.map((group: { id: string; name: string }) => ({
     id: group.id,
@@ -200,7 +186,6 @@ export const fetchAllGroups = createAsyncThunk<
 });
 
 ///  API для обновления групп теста
-
 export const updateTestGroupsApi = async (
   testId: string,
   groupIds: string[]
@@ -209,11 +194,9 @@ export const updateTestGroupsApi = async (
     throw new Error("Ungültige Parameter für updateTestGroupsApi");
   }
 
-  const response = await axios.patch(
-    `${API_URL}/${testId}/available-groups`,
-    { groupIds },
-    { withCredentials: true }
-  );
+  const response = await api.patch(`${API_URL}/${testId}/available-groups`, {
+    groupIds,
+  });
 
   return {
     testId,

@@ -1,4 +1,4 @@
-import { api } from "./сlientApi";
+import { api } from "./clientApi";
 import { Group } from "../types/apiTypes";
 
 export const groupApi = {

@@ -5,6 +5,7 @@ import { testsReducer } from "./tests/testsSlice";
 import { groupsReducer } from "./groups/groupsSlice";
 import { groupReducer } from "./group/groupSlice";
 import { resultReducer } from "./result/resultSlice";
+import { questionsReducer } from "./questions/questionsSlice"; 
 
 export const store = configureStore({
   reducer: {
@@ -14,8 +15,9 @@ export const store = configureStore({
     groups: groupsReducer,
     group: groupReducer,
     result: resultReducer,
+    questions: questionsReducer, 
   },
 });
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof store.getState>; 
 export type AppDispatch = typeof store.dispatch;

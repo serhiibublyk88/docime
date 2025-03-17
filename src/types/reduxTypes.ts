@@ -1,4 +1,4 @@
-///  Пользователь
+/// **Пользователь**
 export interface User {
   _id: string;
   username: string;
@@ -7,17 +7,16 @@ export interface User {
   token?: string;
 }
 
-///  Состояние аутентификации
+/// **Состояние аутентификации**
 export interface AuthState {
   user: User | null;
 }
 
-///  Группа
+/// **Группа**
 export interface Group {
   id: string;
   name: string;
   description?: string;
-  // members: { id: string; name: string }[]; 
   members: User[];
   createdBy: string;
   createdAt: string;
@@ -25,74 +24,74 @@ export interface Group {
   membersCount?: number;
 }
 
-///  Элемент карусели групп
+/// **Элемент карусели групп**
 export interface GroupCarouselItem {
   id: string;
   name: string;
 }
 
-///  Состояние всех групп
+/// **Состояние всех групп**
 export interface GroupsState {
   groups: Group[];
 }
 
-///  Состояние одной группы
+/// **Состояние одной группы**
 export interface GroupState {
   group: Group | null;
-  // members: { id: string; name: string }[]; 
   members: User[];
-  groupsForCarousel: GroupCarouselItem[];
+  groupsForCarousel: { id: string; name: string }[];
   isLoading: boolean;
   error: string | null;
 }
 
-export interface TestListProps {
-  tests: Test[];
-  allGroups: { id: string; name: string }[];
-  editTestId: string | null;
-  editValue: string;
-  onEdit: (id: string, title: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
-  onDelete: (id: string) => void;
-  onCopy: (id: string) => void;
-  setEditValue: (value: string) => void;
-  handleGroupChange: (testId: string, groupId: string) => void;
-  applyGroupChanges: (testId: string, groupIds: string[]) => void;
-  selectedGroups: Record<string, { id: string; name: string }[]>;
+/// **Ответ**
+export interface Answer {
+  id: string;
+  text: string;
+  score: number;
 }
 
-///  Вопрос (используется в `Test`)
+/// **Вопрос**
 export interface Question {
   id: string;
   text: string;
+  type: "single" | "multiple" | "number" | "text";
+  image?: File | string; // Файл или URL-строка
+  answers: Answer[];
 }
 
-///  Тест
+/// **Состояние вопросов**
+export interface QuestionsState {
+  questions: Question[];
+  loading: boolean;
+  error: string | null;
+}
+
+/// **Тест**
 export interface Test {
   id: string;
   title: string;
   description: string;
-  author: { id: string; username: string }; 
+  author: { id: string; username: string };
   timeLimit: number;
   availableForGroups: { id: string; name: string }[];
-  questions: Question[]; 
+  questions: Question[];
   maximumMarks: number;
   status: "active" | "inactive";
   minimumScores: Record<number, number>;
   createdAt: string;
 }
 
-///  Состояние тестов (множественное число)
+/// **Состояние тестов**
 export interface TestsState {
   tests: Test[];
   currentTest: Test | null;
   loading: boolean;
   error: string | null;
-  allGroups: { id: string; name: string }[]; 
+  allGroups: { id: string; name: string }[];
 }
 
-///  Результат теста
+/// **Результат теста**
 export interface TestResult {
   id: string;
   testId: string;
@@ -101,30 +100,24 @@ export interface TestResult {
   maxScore: number;
   percentage: number;
   grade: number;
-  startTime: string | null; 
-  finishTime: string | null; 
-  timeTaken: number; 
+  startTime: string | null;
+  finishTime: string | null;
+  timeTaken: number;
 }
 
-///  Состояние результатов тестов
+/// **Состояние результатов тестов**
 export interface ResultState {
   results: TestResult[];
 }
 
-///  Ответ от API при получении группы
+/// **Ответ от API при получении группы**
 export interface GroupResponse {
   groupDetails: Group;
-  groupsForCarousel: Array<{ id: string; name: string }>;
+  groupsForCarousel: { id: string; name: string }[];
   members: User[];
-  // members: Array<{
-  //   id: string;
-  //   name?: string;
-  //   email?: string;
-  //   role?: number;
-  // }>;
 }
 
-///  Ответ от API при обновлении пользователя
+/// **Ответ от API при обновлении пользователя**
 export interface UpdatedUserResponse {
   _id: string;
   username?: string;
@@ -132,7 +125,7 @@ export interface UpdatedUserResponse {
   role?: number;
 }
 
-///  Типы экшенов Redux для тестов
+/// **Типы экшенов Redux для тестов**
 export enum TestsActionTypes {
   FETCH_TESTS_REQUEST = "tests/fetchTestsRequest",
   FETCH_TESTS_SUCCESS = "tests/fetchTestsSuccess",
@@ -144,4 +137,19 @@ export enum TestsActionTypes {
   COPY_TEST_SUCCESS = "tests/copyTestSuccess",
 
   UPDATE_TEST_GROUPS_SUCCESS = "tests/updateTestGroupsSuccess",
+}
+
+/// **Типы экшенов Redux для вопросов**
+export enum QuestionsActionTypes {
+  FETCH_QUESTIONS_REQUEST = "questions/fetchQuestionsRequest",
+  FETCH_QUESTIONS_SUCCESS = "questions/fetchQuestionsSuccess",
+  FETCH_QUESTIONS_FAILURE = "questions/fetchQuestionsFailure",
+
+  CREATE_QUESTION_SUCCESS = "questions/createQuestionSuccess",
+  UPDATE_QUESTION_SUCCESS = "questions/updateQuestionSuccess",
+  DELETE_QUESTION_SUCCESS = "questions/deleteQuestionSuccess",
+
+  ADD_ANSWER_SUCCESS = "questions/addAnswerSuccess",
+  UPDATE_ANSWER_SUCCESS = "questions/updateAnswerSuccess",
+  DELETE_ANSWER_SUCCESS = "questions/deleteAnswerSuccess",
 }
