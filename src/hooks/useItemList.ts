@@ -2,12 +2,12 @@ import { useState, useCallback } from "react";
 
 export const useItemList = () => {
   const [editItemId, setEditItemId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState<string>("");
+  const [editValue, setEditValue] = useState<string | null>(null); // ✅ Теперь допускает null
 
   const resetSelection = useCallback(() => {
     setTimeout(() => {
       setEditItemId(null);
-      setEditValue("");
+      setEditValue(null); // ✅ Сбрасываем в null
     }, 50);
 
     if (document.activeElement instanceof HTMLElement) {
@@ -17,11 +17,11 @@ export const useItemList = () => {
 
   const handleEditClick = useCallback((id: string, name: string) => {
     setEditItemId(id);
-    setEditValue(name);
+    setEditValue(name ?? ""); // ✅ Если name вдруг undefined, ставим ""
   }, []);
 
   const handleSaveClick = useCallback(() => {
-    if (!editItemId || !editValue.trim()) return;
+    if (!editItemId || !editValue?.trim()) return;
     resetSelection();
   }, [editItemId, editValue, resetSelection]);
 

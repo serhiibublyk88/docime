@@ -96,7 +96,7 @@ export interface ItemListProps {
   }[];
   onDelete?: (id: string) => void;
   editItemId?: string | null;
-  editValue?: string;
+  editValue?: string | null; // ✅ Исправлено
   onItemClick?: (id: string) => void;
   onEdit?: (id: string, name?: string) => void;
   onSave?: () => void;

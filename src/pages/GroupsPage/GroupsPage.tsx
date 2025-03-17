@@ -6,7 +6,7 @@ import {
   ItemList,
 } from "../../components";
 import { useGroups } from "../../hooks";
-
+ 
 export const GroupsPage: React.FC = () => {
   const {
     isLoading,
@@ -51,7 +51,10 @@ export const GroupsPage: React.FC = () => {
               editItemId={editItemId}
               editValue={editValue}
               onItemClick={handleItemClick}
-              onEdit={(id) => handleEditClick(id, "")}
+              onEdit={(id) => {
+                const group = groups.find((g) => g.id === id);
+                handleEditClick(id, group?.name ?? ""); // ✅ Передаем реальное имя группы
+              }}
               onSave={handleSaveClick}
               onCancel={handleCancel}
               onDelete={handleDeleteClick}

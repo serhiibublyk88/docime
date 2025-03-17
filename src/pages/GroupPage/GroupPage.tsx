@@ -70,7 +70,10 @@ export const GroupPage = () => {
               onItemClick={() => {}}
               onSave={handleSave}
               onCancel={handleCancel}
-               onEdit={(id, name = "") => handleEdit(id, name)} 
+              onEdit={(id) => {
+                const member = members.find((m) => m._id === id);
+                handleEdit(id, member?.username ?? "Unbekannter Benutzer");
+              }}
               onDelete={handleDeleteClick}
             />
           )}

@@ -67,7 +67,11 @@ export const ItemList: React.FC<ItemListProps> = ({
           {editItemId === item.id ? (
             <Form.Control
               type="text"
-              value={editValue ?? item.name}  
+              value={
+                editValue !== null && editValue !== undefined
+                  ? editValue
+                  : item.name
+              }
               onChange={(e) => setEditValue?.(e.currentTarget.value)}
               onKeyDown={handleKeyDown}
               autoFocus
