@@ -37,6 +37,9 @@ export const useSideNav = (): SideNavHook => {
       localStorage.getItem("rightMenuOpen") === "true"
   );
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [openQuestionType, setOpenQuestionType] = useState<
+    "single" | "multiple" | "number" | "text" | null
+  >(null);
   const [shouldShowRightBurger, setShouldShowRightBurger] = useState(false);
 
   useEffect(() => {
@@ -118,6 +121,13 @@ export const useSideNav = (): SideNavHook => {
   const toggleLeftMenu = useCallback(() => toggleMenu("left"), [toggleMenu]);
   const toggleRightMenu = useCallback(() => toggleMenu("right"), [toggleMenu]);
 
+  const openQuestionModal = useCallback(
+    (type: "single" | "multiple" | "number" | "text") => {
+      setOpenQuestionType(type);
+    },
+    []
+  );
+
   const handleAddClick = useCallback(
     (path: string) => {
       navigate(path);
@@ -171,30 +181,34 @@ export const useSideNav = (): SideNavHook => {
     return [
       {
         label: "Einzelauswahl",
-        path: "#single",
+        path: "",
         icon: <FaCheck />,
         addIcon: <FaPlus />,
+        onAddClick: () => openQuestionModal("single"),
       },
       {
         label: "Mehrfachauswahl",
-        path: "#multiple",
+        path: "",
         icon: <FaList />,
         addIcon: <FaPlus />,
+        onAddClick: () => openQuestionModal("multiple"),
       },
       {
         label: "Zahleneingabe",
-        path: "#number",
+        path: "",
         icon: <FaHashtag />,
         addIcon: <FaPlus />,
+        onAddClick: () => openQuestionModal("number"),
       },
       {
         label: "Texteingabe",
-        path: "#text",
+        path: "",
         icon: <FaFont />,
         addIcon: <FaPlus />,
+        onAddClick: () => openQuestionModal("text"),
       },
     ];
-  }, [location.pathname]);
+  }, [location.pathname, openQuestionModal]); // ✅ Добавляем openQuestionModal в зависимости
 
   return {
     isMobile,
@@ -209,5 +223,7 @@ export const useSideNav = (): SideNavHook => {
     setIsGroupModalOpen,
     shouldShowBurgers: isMobile,
     shouldShowRightBurger,
+    openQuestionType,
+    setOpenQuestionType,
   };
 };

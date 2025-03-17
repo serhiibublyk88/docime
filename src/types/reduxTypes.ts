@@ -44,6 +44,9 @@ export interface GroupState {
   error: string | null;
 }
 
+/// **Тип вопроса**
+export type QuestionType = "single" | "multiple" | "number" | "text";
+
 /// **Ответ**
 export interface Answer {
   id: string;
@@ -55,9 +58,10 @@ export interface Answer {
 export interface Question {
   id: string;
   text: string;
-  type: "single" | "multiple" | "number" | "text";
-  image?: File | string; // Файл или URL-строка
+  type: QuestionType;
+  image?: File | string; // Файл (при загрузке) или URL-строка (при редактировании)
   answers: Answer[];
+  percentageError?: number; // 🔹 Для TEXT_INPUT (по бэку)
 }
 
 /// **Состояние вопросов**
@@ -65,6 +69,7 @@ export interface QuestionsState {
   questions: Question[];
   loading: boolean;
   error: string | null;
+  selectedQuestion?: Question | null; // 🔹 Для редактирования вопросов
 }
 
 /// **Тест**

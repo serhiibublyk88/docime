@@ -1,6 +1,10 @@
-import { SideNav, Header, GroupCreationModal } from "../components";
+import {
+  SideNav,
+  Header,
+  GroupCreationModal,
+  QuestionModal,
+} from "../components";
 import { useSideNav } from "../hooks";
-
 
 export const SideNavController: React.FC = () => {
   const sideNav = useSideNav();
@@ -36,6 +40,19 @@ export const SideNavController: React.FC = () => {
         <GroupCreationModal
           show={sideNav.isGroupModalOpen}
           onClose={() => sideNav.setIsGroupModalOpen(false)}
+        />
+      )}
+
+      {/* 🔹 Подключаем модалку для создания вопросов */}
+      {sideNav.openQuestionType && (
+        <QuestionModal
+          isOpen={!!sideNav.openQuestionType}
+          onClose={() => sideNav.setOpenQuestionType(null)}
+          onSave={(questionData) => {
+            console.log("Сохраненный вопрос:", questionData);
+            sideNav.setOpenQuestionType(null);
+          }}
+          questionType={sideNav.openQuestionType}
         />
       )}
     </>

@@ -26,7 +26,6 @@ export interface RegisterHook extends AuthForm {
 
 export interface SideNavHook {
   isMobile: boolean;
-
   isLeftMenuOpen: boolean;
   isRightMenuOpen: boolean;
   setIsLeftMenuOpen: (event?: React.MouseEvent) => void;
@@ -34,14 +33,17 @@ export interface SideNavHook {
 
   leftMenuItems: MenuItem[];
   rightMenuItems: MenuItem[];
-  user: { role: number } | null;
+  user: { role: number } | null; // ❗ Оставляем только `role`, как у тебя сейчас
 
   isGroupModalOpen: boolean;
   setIsGroupModalOpen: (isOpen: boolean) => void;
 
   shouldShowBurgers: boolean;
   shouldShowRightBurger: boolean;
-  // isBackdropVisible: boolean;
+
+  openQuestionType: "single" | "multiple" | "number" | "text" | null; // ✅ Добавлено!
+  setOpenQuestionType: React.Dispatch<React.SetStateAction<"number" | "single" | "multiple" | "text" | null>>;
+
 }
 
 

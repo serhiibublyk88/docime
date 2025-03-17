@@ -27,15 +27,17 @@ export const SideNav = ({
   const handleClick = (
     e: React.MouseEvent,
     path: string,
-    onAddClick?: () => void
+    onAddClick?: () => void,
+    isPlusIcon?: boolean // ✅ Добавляем флаг
   ) => {
-    if (onAddClick) {
-      e.stopPropagation();
+    e.stopPropagation();
+
+    if (onAddClick && isPlusIcon) {
       onAddClick();
       if (isMobile && position === "left" && path === "/admin/tests") {
         onClose();
       }
-    } else {
+    } else if (path) {
       navigate(path);
       if (isMobile) onClose();
     }
@@ -62,12 +64,16 @@ export const SideNav = ({
       <div className="d-flex flex-column pt-3">
         {items.map(({ label, path, icon, addIcon, onAddClick }) => (
           <div
-            key={path}
+            key={path || label}
             className={`d-flex align-items-center p-3 ${styles.navItem} ${
-              location.pathname === path ? styles.active : ""
+              position === "left" && location.pathname === path
+                ? styles.active
+                : ""
             }`}
             onClick={
-              position === "right" ? undefined : (e) => handleClick(e, path)
+              position === "right" && onAddClick
+                ? undefined
+                : (e) => handleClick(e, path)
             }
           >
             {position === "left" ? (
@@ -77,13 +83,18 @@ export const SideNav = ({
                     {icon}
                   </span>
                 )}
-                <button className="d-flex align-items-center border-0 bg-transparent p-0 flex-grow-1">
+                {/* ✅ Клик по кнопке ведёт на страницу */}
+                <button
+                  className="d-flex align-items-center border-0 bg-transparent p-0 flex-grow-1"
+                  onClick={(e) => handleClick(e, path)}
+                >
                   <span className="text-start">{label}</span>
                 </button>
+                {/* ✅ Клик по плюсик вызывает `onAddClick` */}
                 {addIcon && (
                   <span
                     className="ms-auto add-icon"
-                    onClick={(e) => handleClick(e, path, onAddClick)}
+                    onClick={(e) => handleClick(e, path, onAddClick, true)}
                   >
                     {addIcon}
                   </span>
@@ -94,7 +105,7 @@ export const SideNav = ({
                 {addIcon && (
                   <span
                     className="me-3 add-icon"
-                    onClick={(e) => handleClick(e, path, onAddClick)}
+                    onClick={(e) => handleClick(e, path, onAddClick, true)}
                   >
                     {addIcon}
                   </span>
