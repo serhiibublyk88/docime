@@ -12,7 +12,7 @@ const handleApiError = (error: unknown): string => {
   return "Unbekannter Fehler beim Abrufen der Tests";
 };
 
-///  Получение списка тестов
+/// **Получение списка тестов**
 export const fetchTestsApi = async (): Promise<Test[]> => {
   try {
     const response = await api.get<Test[]>(API_URL);
@@ -33,6 +33,8 @@ export const fetchTestsApi = async (): Promise<Test[]> => {
         test.questions?.map((q) => ({
           id: q.id,
           text: q.text ? q.text : "Без текста",
+          type: q.type || "single-choice", // ✅ Добавили type (по умолчанию "single-choice")
+          answers: q.answers || [], // ✅ Добавили пустой массив для answers, если его нет
         })) ?? [],
       maximumMarks: test.maximumMarks ?? 0,
       status: test.status || "inactive",
@@ -40,11 +42,12 @@ export const fetchTestsApi = async (): Promise<Test[]> => {
       createdAt: test.createdAt || new Date().toISOString(),
     }));
   } catch {
-    throw new Error("Fehler beim Laden von Tests");
+    throw new Error("Fehler beim Laden von Tests"); // Ошибка при загрузке тестов
   }
 };
 
-///  Создание нового теста
+
+// ///  Создание нового теста
 export const createTestApi = async (testData: Partial<Test>): Promise<Test> => {
   const response = await api.post(API_URL, testData);
 

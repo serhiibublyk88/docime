@@ -96,6 +96,13 @@ export interface TestsState {
   allGroups: { id: string; name: string }[];
 }
 
+export interface TestState {
+  tests: Test[];
+  selectedTest: Test | null;
+  loading: boolean;
+  error: string | null;
+}
+
 /// **Результат теста**
 export interface TestResult {
   id: string;
@@ -129,6 +136,8 @@ export interface UpdatedUserResponse {
   email?: string;
   role?: number;
 }
+
+
 
 /// **Типы экшенов Redux для тестов**
 export enum TestsActionTypes {

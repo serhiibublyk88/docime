@@ -6,6 +6,7 @@ import { groupsReducer } from "./groups/groupsSlice";
 import { groupReducer } from "./group/groupSlice";
 import { resultReducer } from "./result/resultSlice";
 import { questionsReducer } from "./questions/questionsSlice"; 
+import { testReducer } from "./test/testSlice"; 
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     groups: groupsReducer,
     group: groupReducer,
     result: resultReducer,
-    questions: questionsReducer, 
+    questions: questionsReducer,
+    test: testReducer,
   },
 });
 
