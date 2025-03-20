@@ -5,7 +5,7 @@ import {
   createTest,
   updateTest,
   deleteTest,
-  duplicateTest, 
+  duplicateTest,
 } from "../../services/testApi";
 import { Test } from "../../types/reduxTypes";
 
@@ -14,7 +14,7 @@ export const getTests = createAsyncThunk<Test[], void>(
   "tests/getAll",
   async (_, { rejectWithValue }) => {
     try {
-      return await fetchTests();
+      return await fetchTests({ credentials: "include" });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Fehler beim Laden der Tests"
@@ -28,7 +28,7 @@ export const getTestById = createAsyncThunk<Test, string>(
   "tests/getById",
   async (testId, { rejectWithValue }) => {
     try {
-      return await fetchTestById(testId);
+      return await fetchTestById(testId, { credentials: "include" });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Fehler beim Laden des Tests"
@@ -42,7 +42,7 @@ export const addTest = createAsyncThunk<Test, Omit<Test, "id" | "createdAt">>(
   "tests/add",
   async (testData, { rejectWithValue }) => {
     try {
-      return await createTest(testData);
+      return await createTest(testData, { credentials: "include" });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error
@@ -59,7 +59,7 @@ export const editTest = createAsyncThunk<
   { testId: string; testData: Partial<Test> }
 >("tests/edit", async ({ testId, testData }, { rejectWithValue }) => {
   try {
-    return await updateTest(testId, testData);
+    return await updateTest(testId, testData, { credentials: "include" });
   } catch (error) {
     return rejectWithValue(
       error instanceof Error
@@ -74,7 +74,7 @@ export const removeTest = createAsyncThunk<void, string>(
   "tests/remove",
   async (testId, { rejectWithValue }) => {
     try {
-      await deleteTest(testId);
+      await deleteTest(testId, { credentials: "include" });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Fehler beim Löschen des Tests"
@@ -84,11 +84,11 @@ export const removeTest = createAsyncThunk<void, string>(
 );
 
 /** Копировать тест */
-export const copyTest = createAsyncThunk<Test, string>(
+export const duplicatTest = createAsyncThunk<Test, string>(
   "tests/copy",
   async (testId, { rejectWithValue }) => {
     try {
-      return await duplicateTest(testId); 
+      return await duplicateTest(testId, { credentials: "include" });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error

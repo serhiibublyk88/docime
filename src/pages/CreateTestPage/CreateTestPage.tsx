@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -9,29 +9,46 @@ import {
   selectTestError,
 } from "../../redux/test/testSelectors";
 import { addTest, editTest } from "../../redux/test/testActions";
+import { selectUser } from "../../redux/auth/authSelectors";
 import {
   Loader,
   AlertMessage,
   ItemList,
-  QuestionModal,
+  ConfirmActionModal,
 } from "../../components";
 import { Test, Question } from "../../types/reduxTypes";
+import { SideNavController } from "../../controllers";
 
 export const CreateTestPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const selectedTest = useSelector(selectSelectedTest);
   const loading = useSelector(selectTestLoading);
   const error = useSelector(selectTestError);
+  const user = useSelector(selectUser);
 
   const [testTitle, setTestTitle] = useState("");
   const [testDescription, setTestDescription] = useState("");
   const [testTimeLimit, setTestTimeLimit] = useState<number>(0);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [showQuestionModal, setShowQuestionModal] = useState(false);
-  const [activeQuestionType, setActiveQuestionType] = useState<
-    Question["type"] | null
-  >(null); // ✅ Храним активный тип вопроса
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // ✅ Используем `useMemo`, чтобы избежать лишней зависимости в `useEffect`
+  const defaultMinimumScores = useMemo(
+    () => ({
+      1: 95,
+      2: 80,
+      3: 70,
+      4: 50,
+      5: 0, // ✅ Оставляем 0 для оценки 5
+    }),
+    []
+  );
+
+  // 🔹 Состояние `minimumScores`
+  const [minimumScores, setMinimumScores] =
+    useState<Record<number, number>>(defaultMinimumScores);
 
   useEffect(() => {
     if (selectedTest) {
@@ -39,26 +56,41 @@ export const CreateTestPage = () => {
       setTestDescription(selectedTest.description);
       setTestTimeLimit(selectedTest.timeLimit);
       setQuestions(selectedTest.questions);
+      setMinimumScores(selectedTest.minimumScores || defaultMinimumScores);
     }
-  }, [selectedTest]);
+  }, [selectedTest, defaultMinimumScores]);
+
+  // 🔹 Автоматический расчёт максимального балла
+  const maximumMarks = questions.reduce(
+    (sum, q) => sum + q.answers.reduce((s, a) => s + a.score, 0),
+    0
+  );
 
   const handleSaveTest = () => {
-    if (!testTitle.trim() || !testDescription.trim() || questions.length === 0)
+    if (
+      !testTitle.trim() ||
+      !testDescription.trim() ||
+      questions.length === 0 ||
+      Object.values(minimumScores).some((score) => score < 0 || score > 100) ||
+      !user
+    )
       return;
 
-    const testData: Omit<Test, "id" | "createdAt"> = {
+    const testData: Omit<Test, "id" | "createdAt"> & {
+      userId: string;
+      role: number;
+    } = {
       title: testTitle,
       description: testDescription,
       timeLimit: testTimeLimit,
       availableForGroups: [],
       questions,
-      maximumMarks: questions.reduce(
-        (sum, q) => sum + q.answers.reduce((s, a) => s + a.score, 0),
-        0
-      ),
+      maximumMarks,
       status: "inactive",
-      minimumScores: {},
-      author: { id: "user-id", username: "current-user" },
+      minimumScores,
+      author: { id: user._id, username: user.username },
+      userId: user._id,
+      role: user.role,
     };
 
     if (selectedTest) {
@@ -67,28 +99,28 @@ export const CreateTestPage = () => {
       dispatch(addTest(testData));
     }
 
-    navigate("/tests");
+    navigate("/admin/tests");
   };
 
-  const handleOpenQuestionModal = (type: Question["type"]) => {
-    setActiveQuestionType(type); // ✅ Запоминаем тип вопроса
-    setShowQuestionModal(true);
-  };
-
-  const handleAddQuestion = (questionData: Omit<Question, "id">) => {
-    const newQuestion: Question = {
-      id: (questions.length + 1).toString(),
-      ...questionData,
-    };
-    setQuestions([...questions, newQuestion]);
-  };
-
-  const handleDeleteQuestion = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id));
+  // 🔹 Функция для обновления минимального процента сдачи
+  const handleMinimumScoreChange = (grade: number, value: number) => {
+    setMinimumScores((prevScores) => ({
+      ...prevScores,
+      [grade]: value,
+    }));
   };
 
   return (
     <Container fluid>
+      <SideNavController
+        onAddQuestion={(questionData) => {
+          setQuestions([
+            ...questions,
+            { id: (questions.length + 1).toString(), ...questionData },
+          ]);
+        }}
+      />
+
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
           <h2 className="mb-3 text-center">Test erstellen</h2>
@@ -138,7 +170,9 @@ export const CreateTestPage = () => {
                 onEdit={() => {}}
                 onSave={() => {}}
                 onCancel={() => {}}
-                onDelete={handleDeleteQuestion}
+                onDelete={(id) =>
+                  setQuestions(questions.filter((q) => q.id !== id))
+                }
               />
             ) : (
               <p className="text-center text-muted">
@@ -146,42 +180,42 @@ export const CreateTestPage = () => {
               </p>
             )}
 
-            <h5 className="mt-4">Fragentypen</h5>
-            <div className="d-flex gap-2 flex-wrap">
-              <Button
-                variant="outline-primary"
-                onClick={() => handleOpenQuestionModal("single")}
-              >
-                Einzelauswahl hinzufügen
-              </Button>
-              <Button
-                variant="outline-primary"
-                onClick={() => handleOpenQuestionModal("multiple")}
-              >
-                Mehrfachauswahl hinzufügen
-              </Button>
-              <Button
-                variant="outline-primary"
-                onClick={() => handleOpenQuestionModal("number")}
-              >
-                Zahleneingabe hinzufügen
-              </Button>
-              <Button
-                variant="outline-primary"
-                onClick={() => handleOpenQuestionModal("text")}
-              >
-                Texteingabe hinzufügen
-              </Button>
-            </div>
+            {/* 🔹 Блок "Настройки оценки теста" */}
+            <h5 className="mt-4">Einstellungen für Testergebnisse</h5>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Maximale Punktzahl</Form.Label>
+              <Form.Control type="number" value={maximumMarks} disabled />
+            </Form.Group>
+
+            {[1, 2, 3, 4, 5].map((grade) => (
+              <Form.Group className="mb-3" key={grade}>
+                <Form.Label>Mindestprozentsatz für Note {grade}</Form.Label>
+                <Form.Control
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={minimumScores[grade] || 0}
+                  onChange={(e) =>
+                    handleMinimumScoreChange(grade, Number(e.target.value))
+                  }
+                />
+              </Form.Group>
+            ))}
 
             <div className="d-flex justify-content-between mt-4">
-              <Button variant="secondary" onClick={() => navigate("/tests")}>
+              <Button
+                variant="secondary"
+                onClick={() => navigate("/admin/tests")}
+              >
                 Abbrechen
               </Button>
               <Button
                 variant="primary"
-                onClick={handleSaveTest}
-                disabled={questions.length === 0}
+                onClick={() => setShowConfirmModal(true)}
+                disabled={Object.values(minimumScores).some(
+                  (score) => score < 0 || score > 100
+                )}
               >
                 Test speichern
               </Button>
@@ -190,14 +224,19 @@ export const CreateTestPage = () => {
         </Col>
       </Row>
 
-      {showQuestionModal && activeQuestionType && (
-        <QuestionModal
-          isOpen={showQuestionModal}
-          onClose={() => setShowQuestionModal(false)}
-          onSave={handleAddQuestion}
-          questionType={activeQuestionType}
-        />
-      )}
+      {/* 🔹 Модалка подтверждения */}
+      <ConfirmActionModal
+        show={showConfirmModal}
+        title="Test speichern"
+        message="Sie haben alle Fragen hinzugefügt. Möchten Sie die Testeinstellungen abschließen?"
+        confirmText="Speichern"
+        confirmVariant="primary"
+        onConfirm={() => {
+          handleSaveTest();
+          setShowConfirmModal(false);
+        }}
+        onClose={() => setShowConfirmModal(false)}
+      />
     </Container>
   );
 };

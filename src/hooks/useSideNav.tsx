@@ -21,8 +21,11 @@ import {
 } from "react-icons/fa";
 import { MenuItem } from "../types/uiTypes";
 import { SideNavHook } from "../types/hookTypes";
+import { Question } from "../types/reduxTypes"; // ✅ Импортируем тип вопросов
 
-export const useSideNav = (): SideNavHook => {
+export const useSideNav = (
+  onAddQuestion: (question: Omit<Question, "id">) => void // ✅ Добавляем параметр в хук
+): SideNavHook => {
   const { user } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const navigate = useNavigate();
@@ -128,6 +131,15 @@ export const useSideNav = (): SideNavHook => {
     []
   );
 
+  // ✅ Передаём `onAddQuestion` в `openQuestionModal`
+  const handleSaveQuestion = useCallback(
+    (question: Omit<Question, "id">) => {
+      onAddQuestion(question);
+      setOpenQuestionType(null); // Закрываем модалку после добавления вопроса
+    },
+    [onAddQuestion]
+  );
+
   const handleAddClick = useCallback(
     (path: string) => {
       navigate(path);
@@ -208,7 +220,7 @@ export const useSideNav = (): SideNavHook => {
         onAddClick: () => openQuestionModal("text"),
       },
     ];
-  }, [location.pathname, openQuestionModal]); // ✅ Добавляем openQuestionModal в зависимости
+  }, [location.pathname, openQuestionModal]);
 
   return {
     isMobile,
@@ -225,5 +237,6 @@ export const useSideNav = (): SideNavHook => {
     shouldShowRightBurger,
     openQuestionType,
     setOpenQuestionType,
+    handleSaveQuestion, // ✅ Передаём `handleSaveQuestion`
   };
 };

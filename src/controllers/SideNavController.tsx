@@ -5,9 +5,18 @@ import {
   QuestionModal,
 } from "../components";
 import { useSideNav } from "../hooks";
+import { Question } from "../types/reduxTypes";
 
-export const SideNavController: React.FC = () => {
-  const sideNav = useSideNav();
+// ✅ Добавляем тип для пропсов
+interface SideNavControllerProps {
+  onAddQuestion: (question: Omit<Question, "id">) => void;
+}
+
+// ✅ Теперь `SideNavController` принимает `onAddQuestion`
+export const SideNavController: React.FC<SideNavControllerProps> = ({
+  onAddQuestion,
+}) => {
+  const sideNav = useSideNav(onAddQuestion); // ✅ Передаём `onAddQuestion` в `useSideNav`
 
   return (
     <>
@@ -48,11 +57,8 @@ export const SideNavController: React.FC = () => {
         <QuestionModal
           isOpen={!!sideNav.openQuestionType}
           onClose={() => sideNav.setOpenQuestionType(null)}
-          onSave={(questionData) => {
-            console.log("Сохраненный вопрос:", questionData);
-            sideNav.setOpenQuestionType(null);
-          }}
-          questionType={sideNav.openQuestionType}
+          onSave={sideNav.handleSaveQuestion} // ✅ Теперь передаём `handleSaveQuestion`
+          type={sideNav.openQuestionType}
         />
       )}
     </>

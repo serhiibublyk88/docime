@@ -1,7 +1,6 @@
 export { store } from "./store";
 export type { RootState, AppDispatch } from "./store";
 
-
 /// **Аутентификация**
 export { authReducer, authActions } from "./auth/authSlice";
 export { loginUser, logoutUser } from "./auth/authActions";
@@ -31,7 +30,7 @@ export { selectError } from "./error/errorSelectors";
 export { testsReducer, setCurrentTest } from "./tests/testsSlice";
 export {
   fetchTests,
-  fetchAllGroups, 
+  fetchAllGroups,
   createTest,
   updateTest,
   deleteTest,
@@ -44,7 +43,7 @@ export {
   selectTestsLoading,
   selectTestsError,
   selectCurrentTest,
-  selectAvailableGroupsForTest, 
+  selectAvailableGroupsForTest,
 } from "./tests/testsSelectors";
 
 /// **Вопросы**
@@ -64,3 +63,21 @@ export {
   selectQuestionsError,
   selectQuestionById,
 } from "./questions/questionsSelectors";
+
+/// **Одиночный тест Test
+export { testReducer, clearSelectedTest } from "./test/testSlice";
+export {
+  getTests,
+  getTestById,
+  addTest,
+  editTest,
+  removeTest,
+  duplicatTest,
+} from "./test/testActions";
+export {
+  selectTests,
+  selectTestCount,
+  selectSelectedTest,
+  selectTestLoading,
+  selectTestError,
+} from "./test/testSelectors";

@@ -6,7 +6,7 @@ import {
   addTest,
   editTest,
   removeTest,
-  copyTest,
+  duplicatTest,
 } from "./testActions";
 
 const initialState: TestState = {
@@ -105,15 +105,15 @@ export const testSlice = createSlice({
       })
 
       // ✅ Копирование теста
-      .addCase(copyTest.pending, (state) => {
+      .addCase(duplicatTest.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(copyTest.fulfilled, (state, { payload }) => {
+      .addCase(duplicatTest.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.tests.push(payload);
       })
-      .addCase(copyTest.rejected, (state, { payload }) => {
+      .addCase(duplicatTest.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload as string;
       });

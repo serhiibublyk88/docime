@@ -1,5 +1,6 @@
 //hookTypes.ts
 import { MenuItem } from "./uiTypes";
+import { Question } from './reduxTypes';
 
 export interface AuthForm {
   error: string | undefined;
@@ -42,8 +43,11 @@ export interface SideNavHook {
   shouldShowRightBurger: boolean;
 
   openQuestionType: "single" | "multiple" | "number" | "text" | null; // ✅ Добавлено!
-  setOpenQuestionType: React.Dispatch<React.SetStateAction<"number" | "single" | "multiple" | "text" | null>>;
+  setOpenQuestionType: React.Dispatch<
+    React.SetStateAction<"number" | "single" | "multiple" | "text" | null>
+  >;
 
+  handleSaveQuestion: (question: Omit<Question, "id">) => void; // ✅ Добавлено!
 }
 
 

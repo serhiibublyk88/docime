@@ -2,10 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectError, resetError } from "./redux";
 import { useAppDispatch } from "./hooks";
-import { AlertMessage} from "./components";
+import { AlertMessage } from "./components";
 import { ProtectedRoute, GuestOnlyRoute } from "./routes";
 import { SideNavController } from "./controllers";
 import { roles } from "./constants";
+import { useState } from "react";
+import { Question } from "./types/reduxTypes";
 
 import {
   HomePage,
@@ -23,10 +25,21 @@ import {
   AccessDeniedPage,
 } from "./pages";
 
-
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const error = useSelector(selectError);
+
+  // ✅ Добавляем состояние для вопросов (чтобы передавать в SideNavController)
+  const [questions, setQuestions] = useState<Question[]>([]);
+
+  // ✅ Функция добавления вопроса (она пойдёт в SideNavController)
+  const handleAddQuestion = (questionData: Omit<Question, "id">) => {
+    const newQuestion: Question = {
+      id: (questions.length + 1).toString(),
+      ...questionData,
+    };
+    setQuestions([...questions, newQuestion]);
+  };
 
   return (
     <>
@@ -39,7 +52,9 @@ export const App: React.FC = () => {
       )}
 
       <BrowserRouter>
-        <SideNavController />
+        {/* ✅ Теперь передаём `onAddQuestion` в `SideNavController` */}
+        <SideNavController onAddQuestion={handleAddQuestion} />
+
         <div className="container-fluid" style={{ marginTop: "60px" }}>
           <Routes>
             <Route path="/" element={<HomePage />} />

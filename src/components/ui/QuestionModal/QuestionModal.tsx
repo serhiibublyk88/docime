@@ -6,11 +6,11 @@ interface QuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (questionData: Omit<Question, "id">) => void;
-  questionType: "single" | "multiple" | "number" | "text";
+  type: "single" | "multiple" | "number" | "text";
   initialData?: Question | null;
 }
 
-const questionTypeLabels: Record<QuestionModalProps["questionType"], string> = {
+const questionTypeLabels: Record<QuestionModalProps["type"], string> = {
   single: "Einzelauswahl",
   multiple: "Mehrfachauswahl",
   number: "Zahleneingabe",
@@ -21,12 +21,13 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  questionType,
+  type,
   initialData,
 }) => {
   const [text, setText] = useState<string>("");
   const [image, setImage] = useState<File | string | undefined>(undefined);
   const [answers, setAnswers] = useState<Answer[]>([]);
+  const [correctTextAnswer, setCorrectTextAnswer] = useState<string>(""); // ✅ Поле правильного ответа для TEXT_INPUT
   const [percentageError, setPercentageError] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,12 +37,16 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
       setImage(initialData.image || undefined);
       setAnswers(initialData.answers);
       setPercentageError(initialData.percentageError || 0);
+      setCorrectTextAnswer(
+        initialData.type === "text" ? initialData.answers[0]?.text || "" : ""
+      );
     } else {
       setText("");
       setImage(undefined);
       setPercentageError(0);
+      setCorrectTextAnswer("");
       setAnswers(
-        questionType === "single" || questionType === "multiple"
+        type === "single" || type === "multiple"
           ? [
               { id: "1", text: "", score: 0 },
               { id: "2", text: "", score: 0 },
@@ -49,7 +54,7 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
           : [{ id: "1", text: "", score: 1 }]
       );
     }
-  }, [initialData, questionType]);
+  }, [initialData, type]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,12 +76,13 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
       )
     );
 
-    if (questionType === "single" && field === "score" && Number(value) > 0) {
+    if (type === "single" && field === "score" && Number(value) > 0) {
       setAnswers((prev) =>
-        prev.map((answer, i) => ({
-          ...answer,
-          score: i === index ? Number(value) : 0,
-        }))
+        prev.map((answer, i) =>
+          i === index
+            ? { ...answer, score: Number(value) }
+            : { ...answer, score: 0 }
+        )
       );
     }
   };
@@ -89,11 +95,7 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
   };
 
   const handleRemoveAnswer = (index: number) => {
-    if (
-      (questionType === "number" || questionType === "text") &&
-      answers.length <= 1
-    )
-      return;
+    if ((type === "number" || type === "text") && answers.length <= 1) return;
     setAnswers((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -103,20 +105,27 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
       return;
     }
 
-    if (
-      (questionType === "single" || questionType === "multiple") &&
-      answers.length < 2
-    ) {
+    if ((type === "single" || type === "multiple") && answers.length < 2) {
       setError("Mindestens zwei Antwortoptionen erforderlich.");
       return;
     }
 
-    if (questionType === "text" && !percentageError) {
-      setPercentageError(0);
+    if (type === "text" && !correctTextAnswer.trim()) {
+      setError("Geben Sie die richtige Antwort für den Texteingabe-Frage ein.");
+      return;
     }
 
     setError(null);
-    onSave({ text, type: questionType, image, answers, percentageError });
+    onSave({
+      text,
+      type,
+      image,
+      answers:
+        type === "text"
+          ? [{ id: "1", text: correctTextAnswer, score: 1 }]
+          : answers,
+      percentageError: type === "text" ? percentageError : undefined,
+    });
     onClose();
   };
 
@@ -125,8 +134,8 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
       <Modal.Header closeButton>
         <Modal.Title>
           {initialData
-            ? `${questionTypeLabels[questionType]} bearbeiten`
-            : `Neue Frage: ${questionTypeLabels[questionType]}`}
+            ? `${questionTypeLabels[type]} bearbeiten`
+            : `Neue Frage: ${questionTypeLabels[type]}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -147,13 +156,9 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
             <Form.Control type="file" onChange={handleImageChange} />
           </Form.Group>
 
-          {(questionType === "single" || questionType === "multiple") && (
+          {(type === "single" || type === "multiple") && (
             <div className="mt-3">
               <Form.Label>Antworten</Form.Label>
-              <div className="d-flex mb-2">
-                <div className="flex-grow-1">Antwort</div>
-                <div style={{ width: "80px", textAlign: "center" }}>Punkte</div>
-              </div>
               {answers.map((answer, index) => (
                 <div key={index} className="d-flex gap-2 mb-2">
                   <Form.Control
@@ -186,7 +191,7 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
             </div>
           )}
 
-          {questionType === "number" && (
+          {type === "number" && (
             <Form.Group controlId="numberAnswer" className="mt-3">
               <Form.Label>Richtige Antwort (Zahl)</Form.Label>
               <Form.Control
@@ -199,20 +204,18 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
             </Form.Group>
           )}
 
-          {questionType === "text" && (
+          {type === "text" && (
             <>
-              <Form.Group controlId="textAnswer" className="mt-3">
+              <Form.Group controlId="textCorrectAnswer" className="mt-3">
                 <Form.Label>Richtige Antwort</Form.Label>
                 <Form.Control
                   type="text"
-                  value={answers[0]?.text || ""}
-                  onChange={(e) =>
-                    setAnswers([{ id: "1", text: e.target.value, score: 1 }])
-                  }
+                  value={correctTextAnswer}
+                  onChange={(e) => setCorrectTextAnswer(e.target.value)}
                 />
               </Form.Group>
-              <Form.Group controlId="percentageError" className="mt-3">
-                <Form.Label>Fehlertoleranz (%)</Form.Label>
+              <Form.Group controlId="textErrorMargin" className="mt-3">
+                <Form.Label>Akzeptable Fehlerquote (%)</Form.Label>
                 <Form.Control
                   type="number"
                   min={0}
