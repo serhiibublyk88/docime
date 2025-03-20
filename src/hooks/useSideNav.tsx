@@ -36,7 +36,7 @@ export const useSideNav = (
   );
   const [isRightMenuOpen, setIsRightMenuOpen] = useState(
     window.innerWidth >= 1199 &&
-      location.pathname === "/admin/create-test" &&
+      location.pathname === "/admin/tests/create" &&
       localStorage.getItem("rightMenuOpen") === "true"
   );
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
@@ -52,7 +52,7 @@ export const useSideNav = (
 
       if (!newIsMobile) {
         setIsLeftMenuOpen(true);
-        if (location.pathname === "/admin/create-test") {
+        if (location.pathname === "/admin/tests/create") {
           setIsRightMenuOpen(true);
         }
       } else {
@@ -66,7 +66,7 @@ export const useSideNav = (
   }, [location.pathname]);
 
   useLayoutEffect(() => {
-    if (isMobile && location.pathname === "/admin/create-test") {
+    if (isMobile && location.pathname === "/admin/tests/create") {
       setIsLeftMenuOpen(false);
       setIsRightMenuOpen(false);
       setTimeout(() => setShouldShowRightBurger(true), 50);
@@ -74,7 +74,7 @@ export const useSideNav = (
   }, [location.pathname, isMobile]);
 
   useEffect(() => {
-    if (location.pathname !== "/admin/create-test") {
+    if (location.pathname !== "/admin/tests/create") {
       setIsRightMenuOpen(false);
       setShouldShowRightBurger(false);
       localStorage.removeItem("rightMenuOpen");
@@ -102,7 +102,7 @@ export const useSideNav = (
         }
       } else {
         if (menu === "right") {
-          if (location.pathname === "/admin/create-test") {
+          if (location.pathname === "/admin/tests/create") {
             setIsRightMenuOpen(true);
             localStorage.setItem("rightMenuOpen", "true");
           } else {
@@ -143,7 +143,7 @@ export const useSideNav = (
   const handleAddClick = useCallback(
     (path: string) => {
       navigate(path);
-      if (path === "/admin/create-test") {
+      if (path === "/admin/tests/create") {
         if (!isMobile) {
           setIsRightMenuOpen(true);
           localStorage.setItem("rightMenuOpen", "true");
@@ -172,7 +172,7 @@ export const useSideNav = (
           path: "/admin/tests",
           icon: <FaFileAlt />,
           addIcon: <FaPlus />,
-          onAddClick: () => handleAddClick("/admin/create-test"),
+          onAddClick: () => handleAddClick("/admin/tests/create"),
         },
         { label: "Ergebnisse", path: "/admin/results", icon: <FaChartBar /> },
       ];
@@ -189,7 +189,7 @@ export const useSideNav = (
   }, [user, handleAddClick]);
 
   const rightMenuItems = useMemo<MenuItem[]>(() => {
-    if (location.pathname !== "/admin/create-test") return [];
+    if (location.pathname !== "/admin/tests/create") return [];
     return [
       {
         label: "Einzelauswahl",

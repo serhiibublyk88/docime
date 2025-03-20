@@ -13,3 +13,4 @@ export { ItemList } from "./ui/ItemList/ItemList";
 export { ConfirmActionModal } from "./ui/ConfirmActionModal/ConfirmActionModal";
 export { TestList } from "./ui/TestList/TestList";
 export { QuestionModal } from "./ui/QuestionModal/QuestionModal";
+export { QuestionList } from "./ui/QuestionList/QuestionList";

@@ -97,7 +97,7 @@ export const TestList: React.FC<TestListProps> = ({
                     <FaEdit
                       className={`${styles.icon} ${styles.iconEdit}`}
                       title="Bearbeiten"
-                      onClick={() => navigate("/admin/create-test")}
+                      onClick={() => navigate("/admin/tests/create")}
                     />
                     <FaCopy
                       className={`${styles.icon} ${styles.iconCopy}`}

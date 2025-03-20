@@ -13,7 +13,7 @@ import { selectUser } from "../../redux/auth/authSelectors";
 import {
   Loader,
   AlertMessage,
-  ItemList,
+  QuestionList,
   ConfirmActionModal,
 } from "../../components";
 import { Test, Question } from "../../types/reduxTypes";
@@ -34,19 +34,19 @@ export const CreateTestPage = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // ✅ Используем `useMemo`, чтобы избежать лишней зависимости в `useEffect`
+  
   const defaultMinimumScores = useMemo(
     () => ({
       1: 95,
       2: 80,
       3: 70,
       4: 50,
-      5: 0, // ✅ Оставляем 0 для оценки 5
+      5: 0, 
     }),
     []
   );
 
-  // 🔹 Состояние `minimumScores`
+  
   const [minimumScores, setMinimumScores] =
     useState<Record<number, number>>(defaultMinimumScores);
 
@@ -60,7 +60,7 @@ export const CreateTestPage = () => {
     }
   }, [selectedTest, defaultMinimumScores]);
 
-  // 🔹 Автоматический расчёт максимального балла
+  
   const maximumMarks = questions.reduce(
     (sum, q) => sum + q.answers.reduce((s, a) => s + a.score, 0),
     0
@@ -99,10 +99,10 @@ export const CreateTestPage = () => {
       dispatch(addTest(testData));
     }
 
-    navigate("/admin/tests");
+    navigate("/admin/tests/create");
   };
 
-  // 🔹 Функция для обновления минимального процента сдачи
+  
   const handleMinimumScoreChange = (grade: number, value: number) => {
     setMinimumScores((prevScores) => ({
       ...prevScores,
@@ -158,20 +158,18 @@ export const CreateTestPage = () => {
               />
             </Form.Group>
 
-            <h5 className="mt-4">Fragen</h5>
+            <h3 className=" text-center mt-5 mb-3">Fragen:</h3>
 
             {questions.length > 0 ? (
-              <ItemList
-                items={questions.map((q, index) => ({
-                  id: q.id,
-                  name: `${index + 1}. ${q.text}`,
-                }))}
-                onItemClick={() => {}}
-                onEdit={() => {}}
-                onSave={() => {}}
-                onCancel={() => {}}
+              <QuestionList
+                questions={questions}
+                onSave={(id, updatedQuestion) => {
+                  setQuestions((prev) =>
+                    prev.map((q) => (q.id === id ? updatedQuestion : q))
+                  );
+                }}
                 onDelete={(id) =>
-                  setQuestions(questions.filter((q) => q.id !== id))
+                  setQuestions((prev) => prev.filter((q) => q.id !== id))
                 }
               />
             ) : (
@@ -180,7 +178,6 @@ export const CreateTestPage = () => {
               </p>
             )}
 
-            {/* 🔹 Блок "Настройки оценки теста" */}
             <h5 className="mt-4">Einstellungen für Testergebnisse</h5>
 
             <Form.Group className="mb-3">
@@ -206,7 +203,7 @@ export const CreateTestPage = () => {
             <div className="d-flex justify-content-between mt-4">
               <Button
                 variant="secondary"
-                onClick={() => navigate("/admin/tests")}
+                onClick={() => navigate("/admin/tests/create")}
               >
                 Abbrechen
               </Button>
@@ -224,7 +221,6 @@ export const CreateTestPage = () => {
         </Col>
       </Row>
 
-      {/* 🔹 Модалка подтверждения */}
       <ConfirmActionModal
         show={showConfirmModal}
         title="Test speichern"

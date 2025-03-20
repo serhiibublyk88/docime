@@ -52,6 +52,8 @@ export const createTest = async (
   }
 };
 
+
+
 /** Обновить тест */
 export const updateTest = async (
   testId: string,
@@ -59,10 +61,29 @@ export const updateTest = async (
   options = {}
 ): Promise<Test> => {
   try {
-    const { data } = await api.put<Test>(`/tests/${testId}`, testData, {
+    const payload: Partial<Test> = {
+      ...testData,
+      questions: testData.questions
+        ? testData.questions.map((q) => ({
+            id: q.id, 
+            text: q.text,
+            type: q.type,
+            image: q.image ?? undefined,
+            answers: q.answers.map((a) => ({
+              id: a.id ?? crypto.randomUUID(), 
+              text: a.text,
+              score: a.score,
+            })),
+            percentageError: q.percentageError ?? undefined,
+          }))
+        : [], 
+    };
+
+    const { data } = await api.put<Test>(`/tests/${testId}`, payload, {
       withCredentials: true,
       ...options,
     });
+
     return data;
   } catch (error: unknown) {
     throw new Error(
@@ -72,6 +93,7 @@ export const updateTest = async (
     );
   }
 };
+
 
 /** Удалить тест */
 export const deleteTest = async (

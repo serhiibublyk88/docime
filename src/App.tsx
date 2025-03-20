@@ -74,7 +74,9 @@ export const App: React.FC = () => {
               <Route path="/admin/groups" element={<GroupsPage />} />
               <Route path="/admin/groups/:id" element={<GroupPage />} />
               <Route path="/admin/tests" element={<TestsPage />} />
-              <Route path="/admin/create-test" element={<CreateTestPage />} />
+              <Route path="/admin/tests/create" element={<CreateTestPage />} />
+              <Route path="/admin/tests/:testId/edit" element={<CreateTestPage />}
+              />
               <Route path="/admin/results" element={<ManageResultsPage />} />
             </Route>
             <Route path="/access-denied" element={<AccessDeniedPage />} />

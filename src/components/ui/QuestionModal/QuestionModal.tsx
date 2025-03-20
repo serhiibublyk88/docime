@@ -27,7 +27,7 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
   const [text, setText] = useState<string>("");
   const [image, setImage] = useState<File | string | undefined>(undefined);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [correctTextAnswer, setCorrectTextAnswer] = useState<string>(""); // ✅ Поле правильного ответа для TEXT_INPUT
+  const [correctTextAnswer, setCorrectTextAnswer] = useState<string>("");
   const [percentageError, setPercentageError] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -121,8 +121,14 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
       type,
       image,
       answers:
-        type === "text"
-          ? [{ id: "1", text: correctTextAnswer, score: 1 }]
+        type === "text" || type === "number"
+          ? [
+              {
+                id: "1",
+                text: correctTextAnswer,
+                score: answers[0]?.score || 1,
+              },
+            ]
           : answers,
       percentageError: type === "text" ? percentageError : undefined,
     });
@@ -191,40 +197,48 @@ export const QuestionModal: React.FC<QuestionModalProps> = ({
             </div>
           )}
 
-          {type === "number" && (
-            <Form.Group controlId="numberAnswer" className="mt-3">
-              <Form.Label>Richtige Antwort (Zahl)</Form.Label>
-              <Form.Control
-                type="number"
-                value={answers[0]?.text || ""}
-                onChange={(e) =>
-                  setAnswers([{ id: "1", text: e.target.value, score: 1 }])
-                }
-              />
-            </Form.Group>
-          )}
-
-          {type === "text" && (
+          {(type === "number" || type === "text") && (
             <>
               <Form.Group controlId="textCorrectAnswer" className="mt-3">
                 <Form.Label>Richtige Antwort</Form.Label>
                 <Form.Control
-                  type="text"
+                  type={type === "number" ? "number" : "text"}
                   value={correctTextAnswer}
                   onChange={(e) => setCorrectTextAnswer(e.target.value)}
                 />
               </Form.Group>
-              <Form.Group controlId="textErrorMargin" className="mt-3">
-                <Form.Label>Akzeptable Fehlerquote (%)</Form.Label>
+
+              <Form.Group controlId="score" className="mt-3">
+                <Form.Label>Punkte</Form.Label>
                 <Form.Control
                   type="number"
                   min={0}
-                  max={100}
-                  value={percentageError}
-                  onChange={(e) => setPercentageError(Number(e.target.value))}
+                  value={answers[0]?.score || 1}
+                  onChange={(e) =>
+                    setAnswers([
+                      {
+                        id: "1",
+                        text: correctTextAnswer,
+                        score: Number(e.target.value),
+                      },
+                    ])
+                  }
                 />
               </Form.Group>
             </>
+          )}
+
+          {type === "text" && (
+            <Form.Group controlId="textErrorMargin" className="mt-3">
+              <Form.Label>Akzeptable Fehlerquote (%)</Form.Label>
+              <Form.Control
+                type="number"
+                min={0}
+                max={100}
+                value={percentageError}
+                onChange={(e) => setPercentageError(Number(e.target.value))}
+              />
+            </Form.Group>
           )}
         </Form>
       </Modal.Body>
