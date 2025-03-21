@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppDispatch,
-  fetchTests,
+  getTests, // ✅ заменили fetchTests на getTests
   fetchAllGroups,
   createTest,
   updateTest,
@@ -10,7 +10,8 @@ import {
   copyTest,
   updateTestGroups,
   setCurrentTest,
-  selectAllTests,
+  changeTestStatus,
+  selectAllTest, // ✅ заменили selectAllTests на selectAllTest
   selectTestsLoading,
   selectTestsError,
   selectCurrentTest,
@@ -21,7 +22,7 @@ import { Test } from "../types/reduxTypes";
 export const useTests = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const tests = useSelector(selectAllTests);
+  const tests = useSelector(selectAllTest);
   const currentTest = useSelector(selectCurrentTest);
   const loading = useSelector(selectTestsLoading);
   const error = useSelector(selectTestsError);
@@ -58,7 +59,7 @@ export const useTests = () => {
   }, [tests]);
 
   const fetchAllTests = useCallback(() => {
-    dispatch(fetchTests()).catch(() => {});
+    dispatch(getTests()).catch(() => {}); // ✅ заменили fetchTests на getTests
   }, [dispatch]);
 
   const fetchAllGroupsList = useCallback(() => {
@@ -130,6 +131,13 @@ export const useTests = () => {
     [dispatch, selectedGroups]
   );
 
+  const toggleTestStatus = useCallback(
+    (testId: string, currentStatus: "active" | "inactive") => {
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      dispatch(changeTestStatus({ testId, status: newStatus }));
+    },
+    [dispatch]
+  );
 
   const setSelectedTest = useCallback(
     (test: Test | null) => {
@@ -154,5 +162,6 @@ export const useTests = () => {
     setSelectedTest,
     handleGroupChange,
     applyGroupChanges,
+    toggleTestStatus,
   };
 };

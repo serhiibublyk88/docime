@@ -28,6 +28,10 @@ interface TestListProps {
   handleGroupChange: (testId: string, groupId: string) => void;
   applyGroupChanges: (testId: string, groupIds: string[]) => void;
   selectedGroups: Record<string, Group[]>;
+  onToggleStatus: (
+    testId: string,
+    currentStatus: "active" | "inactive"
+  ) => void;
 }
 
 export const TestList: React.FC<TestListProps> = ({
@@ -44,9 +48,10 @@ export const TestList: React.FC<TestListProps> = ({
   handleGroupChange,
   applyGroupChanges,
   selectedGroups,
+  onToggleStatus,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const navigate = useNavigate(); // ✅ Теперь `navigate` используется
+  const navigate = useNavigate();
 
   const toggleGroupDropdown = (testId: string) => {
     setOpenDropdown((prev) => (prev === testId ? null : testId));
@@ -65,7 +70,7 @@ export const TestList: React.FC<TestListProps> = ({
           key={test.id}
           className={`${styles.testItem} d-flex flex-column border-0`}
         >
-          {/* 🔹 Верхняя строка: Название теста + Дата + Кнопки */}
+          {/* Верхняя строка: Название теста + Дата + Кнопки */}
           <div
             className={`d-flex justify-content-between align-items-center fs-5 ${styles.testHeader}`}
           >
@@ -84,14 +89,26 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             )}
 
-            {/* 🔹 Дата + Кнопки управления */}
-            <div className="d-flex align-items-center">
-              <small className="text-muted fs-6 fw-normal me-3">
+            <div className="d-flex align-items-center gap-3">
+              {/*  Дата */}
+              <small className="text-muted fs-6 fw-normal">
                 {test.createdAt
                   ? new Date(test.createdAt).toLocaleDateString()
                   : "N/A"}
               </small>
 
+              {/*  Статус */}
+              <div className="d-flex align-items-center">
+                <span className="fs-6 ms-3 me-1">Active:</span>
+                <Form.Check
+                  type="switch"
+                  id={`status-switch-${test.id}`}
+                  checked={test.status === "active"}
+                  onChange={() => onToggleStatus(test.id, test.status)}
+                />
+              </div>
+
+              {/*  Иконки управления */}
               <div className={styles.iconContainer}>
                 {editTestId === test.id ? (
                   <>
@@ -113,7 +130,7 @@ export const TestList: React.FC<TestListProps> = ({
                       title="Bearbeiten"
                       onClick={() => {
                         onEdit(test.id, test.title);
-                        navigate(`/admin/tests/${test.id}/edit`); // ✅ Теперь `navigate` используется!
+                        navigate(`/admin/tests/${test.id}/edit`);
                       }}
                     />
                     <FaCopy
@@ -132,7 +149,7 @@ export const TestList: React.FC<TestListProps> = ({
             </div>
           </div>
 
-          {/* 🔹 Контейнер "Добавить группу" */}
+          {/*  Контейнер "Добавить группу" */}
           <div className="d-flex align-items-center">
             <div
               className={styles.iconAddGroupContainer}
@@ -148,7 +165,7 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             </div>
 
-            {/* 🔹 Список групп с доступом */}
+            {/*  Список групп с доступом */}
             <ListGroup className={`${styles.groupList} w-100`}>
               {selectedGroups[test.id]?.length ? (
                 selectedGroups[test.id].map((group) => (
@@ -169,7 +186,7 @@ export const TestList: React.FC<TestListProps> = ({
             </ListGroup>
           </div>
 
-          {/* 🔹 Выпадающий список всех групп */}
+          {/*  Выпадающий список всех групп */}
           {openDropdown === test.id && (
             <div className={styles.dropdownGroupList}>
               <ListGroup className="w-100">

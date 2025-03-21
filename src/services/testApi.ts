@@ -109,3 +109,13 @@ export const duplicateTest = async (
     );
   }
 };
+//Test status
+export const updateTestStatus = async (
+  testId: string,
+  newStatus: "active" | "inactive"
+): Promise<Test> => {
+  const response = await api.patch(`/tests/${testId}/status`, {
+    status: newStatus,
+  });
+  return response.data.test;
+};

@@ -1,7 +1,7 @@
 import { RootState } from "../store";
 import { Test } from "../../types/reduxTypes";
 
-export const selectTests = (state: RootState): Test[] => state.test.tests;
+export const selectAllTest = (state: RootState): Test[] => state.test.tests;
 
 export const selectTestById = (state: RootState, testId: string): Test | null =>
   state.test.tests.find((test) => test.id === testId) || null;

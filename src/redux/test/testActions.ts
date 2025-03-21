@@ -6,8 +6,10 @@ import {
   updateTest,
   deleteTest,
   duplicateTest,
+  updateTestStatus,
 } from "../../services/testApi";
 import { Test, TestPayload } from "../../types/reduxTypes";
+import { setError } from "../error/errorSlice";
 
 /** Получить все тесты */
 export const getTests = createAsyncThunk<Test[], void>(
@@ -98,3 +100,22 @@ export const duplicatTest = createAsyncThunk<Test, string>(
     }
   }
 );
+
+/** Изменить статус теста */
+export const changeTestStatus = createAsyncThunk<
+  Test, 
+  { testId: string; status: "active" | "inactive" }, 
+  { rejectValue: string }
+>("tests/changeStatus", async ({ testId, status }, { dispatch, rejectWithValue }) => {
+  try {
+    
+    return await updateTestStatus(testId, status);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Fehler beim Ändern des Status";
+    dispatch(setError(message));
+    return rejectWithValue(message);
+  }
+});

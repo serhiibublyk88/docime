@@ -7,6 +7,7 @@ import {
   editTest,
   removeTest,
   duplicatTest,
+  changeTestStatus,
 } from "./testActions";
 
 const initialState: TestState = {
@@ -26,7 +27,7 @@ export const testSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ✅ Получение всех тестов
+      //  Получение всех тестов
       .addCase(getTests.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -40,7 +41,7 @@ export const testSlice = createSlice({
         state.error = payload as string;
       })
 
-      // ✅ Получение теста по ID
+      //  Получение теста по ID
       .addCase(getTestById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -54,7 +55,7 @@ export const testSlice = createSlice({
         state.error = payload as string;
       })
 
-      // ✅ Создание нового теста
+      //  Создание нового теста
       .addCase(addTest.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -68,20 +69,17 @@ export const testSlice = createSlice({
         state.error = payload as string;
       })
 
-      // ✅ Обновление теста
+      //  Обновление теста
       .addCase(editTest.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(editTest.fulfilled, (state, { payload }) => {
         state.loading = false;
-
-        // 🔄 Обновляем в общем списке
         state.tests = state.tests.map((test) =>
           test.id === payload.id ? payload : test
         );
 
-        // 🔄 Обновляем выбранный тест, если он открыт
         if (state.selectedTest?.id === payload.id) {
           state.selectedTest = payload;
         }
@@ -91,7 +89,7 @@ export const testSlice = createSlice({
         state.error = payload as string;
       })
 
-      // ✅ Удаление теста
+      //  Удаление теста
       .addCase(removeTest.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -108,7 +106,7 @@ export const testSlice = createSlice({
         state.error = payload as string;
       })
 
-      // ✅ Копирование теста
+      //  Копирование теста
       .addCase(duplicatTest.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -120,7 +118,23 @@ export const testSlice = createSlice({
       .addCase(duplicatTest.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload as string;
+      })
+
+      //  Изменение статуса теста
+      .addCase(changeTestStatus.fulfilled, (state, { payload }) => {
+        const updatedTests = state.tests.map((test) =>
+          test.id === payload.id ? { ...test, status: payload.status } : test
+        );
+        state.tests = updatedTests;
+
+        if (state.selectedTest?.id === payload.id) {
+          state.selectedTest = {
+            ...state.selectedTest,
+            status: payload.status,
+          };
+        }
       });
+
   },
 });
 

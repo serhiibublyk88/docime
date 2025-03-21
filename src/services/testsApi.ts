@@ -33,8 +33,8 @@ export const fetchTestsApi = async (): Promise<Test[]> => {
         test.questions?.map((q) => ({
           id: q.id,
           text: q.text ? q.text : "Без текста",
-          type: q.type || "single-choice", // ✅ Добавили type (по умолчанию "single-choice")
-          answers: q.answers || [], // ✅ Добавили пустой массив для answers, если его нет
+          type: q.type || "single-choice", 
+          answers: q.answers || [], 
         })) ?? [],
       maximumMarks: test.maximumMarks ?? 0,
       status: test.status || "inactive",
@@ -42,7 +42,7 @@ export const fetchTestsApi = async (): Promise<Test[]> => {
       createdAt: test.createdAt || new Date().toISOString(),
     }));
   } catch {
-    throw new Error("Fehler beim Laden von Tests"); // Ошибка при загрузке тестов
+    throw new Error("Fehler beim Laden von Tests"); 
   }
 };
 

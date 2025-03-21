@@ -1,5 +1,5 @@
 export { AccessDeniedPage } from "./AccessDeniedPage/AccessDeniedPage";
-export { AdminDashboard } from "./AdminDashboard/AdminDashboard";
+export {AvailableTests } from "./AvailableTests/AvailableTests";
 export { GroupsPage } from "./GroupsPage/GroupsPage";
 export { HomePage } from "./HomePage/HomePage";
 export { LoginPage } from "./LoginPage/LoginPage";

@@ -16,7 +16,7 @@ import {
   TestsPage,
   TestPage,
   ResultsPage,
-  AdminDashboard,
+  AvailableTests,
   GroupsPage,
   GroupPage,
   CreateTestPage,
@@ -29,10 +29,10 @@ export const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const error = useSelector(selectError);
 
-  // ✅ Добавляем состояние для вопросов (чтобы передавать в SideNavController)
+  
   const [questions, setQuestions] = useState<Question[]>([]);
 
-  // ✅ Функция добавления вопроса (она пойдёт в SideNavController)
+  
   const handleAddQuestion = (questionData: Omit<Question, "id">) => {
     const newQuestion: Question = {
       id: (questions.length + 1).toString(),
@@ -52,7 +52,7 @@ export const App: React.FC = () => {
       )}
 
       <BrowserRouter>
-        {/* ✅ Теперь передаём `onAddQuestion` в `SideNavController` */}
+        
         <SideNavController onAddQuestion={handleAddQuestion} />
 
         <div className="container-fluid" style={{ marginTop: "60px" }}>
@@ -63,19 +63,21 @@ export const App: React.FC = () => {
               <Route path="/register" element={<RegisterPage />} />
             </Route>
             <Route element={<ProtectedRoute requiredRole={roles.USER} />}>
-              <Route path="/tests" element={<TestsPage />} />
+              <Route path="/tests" element={<AvailableTests />} />
               <Route path="/test/:id" element={<TestPage />} />
               <Route path="/results" element={<ResultsPage />} />
             </Route>
             <Route
               element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}
             >
-              <Route path="/admin" element={<AdminDashboard />} />
+              
               <Route path="/admin/groups" element={<GroupsPage />} />
               <Route path="/admin/groups/:id" element={<GroupPage />} />
               <Route path="/admin/tests" element={<TestsPage />} />
               <Route path="/admin/tests/create" element={<CreateTestPage />} />
-              <Route path="/admin/tests/:testId/edit" element={<CreateTestPage />}
+              <Route
+                path="/admin/tests/:testId/edit"
+                element={<CreateTestPage />}
               />
               <Route path="/admin/results" element={<ManageResultsPage />} />
             </Route>

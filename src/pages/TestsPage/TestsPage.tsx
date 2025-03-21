@@ -7,7 +7,9 @@ import {
   TestList,
 } from "../../components";
 import { useTests } from "../../hooks";
-import { Group } from "../../types/reduxTypes"; // ✅ Импортируем `Group`
+import { Group } from "../../types/reduxTypes";
+import { useAppDispatch } from "../../hooks";
+import { changeTestStatus } from "../../redux/test/testActions";
 
 export const TestsPage: React.FC = () => {
   const {
@@ -27,6 +29,8 @@ export const TestsPage: React.FC = () => {
     applyGroupChanges,
   } = useTests();
 
+  const dispatch = useAppDispatch();
+
   const [deleteTestId, setDeleteTestId] = useState<string | null>(null);
   const [copyTestId, setCopyTestId] = useState<string | null>(null);
   const [editTestId, setEditTestId] = useState<string | null>(null);
@@ -37,19 +41,17 @@ export const TestsPage: React.FC = () => {
     if (allGroups.length === 0) fetchAllGroupsList();
   }, [fetchAllTests, fetchAllGroupsList, tests.length, allGroups.length]);
 
-  // ✅ Приведение `allGroups` к `Group[]`
   const convertedAllGroups: Group[] = useMemo(
     () =>
       allGroups.map((g) => ({
         ...g,
-        members: [], // ❗ Добавляем недостающие свойства
+        members: [],
         createdBy: "",
         createdAt: "",
       })),
     [allGroups]
   );
 
-  // ✅ Приведение `selectedGroups` к `Record<string, Group[]>`
   const convertedSelectedGroups: Record<string, Group[]> = useMemo(
     () =>
       Object.fromEntries(
@@ -122,6 +124,14 @@ export const TestsPage: React.FC = () => {
     [applyGroupChanges, selectedGroups]
   );
 
+  const handleToggleStatus = useCallback(
+    (testId: string, currentStatus: "active" | "inactive") => {
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      dispatch(changeTestStatus({ testId, status: newStatus }));
+    },
+    [dispatch]
+  );
+
   return (
     <Container fluid>
       <Row className="align-items-start">
@@ -137,8 +147,8 @@ export const TestsPage: React.FC = () => {
           ) : (
             <TestList
               tests={tests}
-              allGroups={convertedAllGroups} // ✅ Теперь передаем правильный формат
-              selectedGroups={convertedSelectedGroups} // ✅ Теперь передаем правильный формат
+              allGroups={convertedAllGroups}
+              selectedGroups={convertedSelectedGroups}
               editTestId={editTestId}
               editValue={editValue}
               onEdit={handleEditClick}
@@ -149,6 +159,7 @@ export const TestsPage: React.FC = () => {
               onCopy={handleCopyClick}
               handleGroupChange={handleGroupChange}
               applyGroupChanges={handleApplyGroupChanges}
+              onToggleStatus={handleToggleStatus} 
             />
           )}
         </Col>

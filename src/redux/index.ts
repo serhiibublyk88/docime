@@ -73,9 +73,10 @@ export {
   editTest,
   removeTest,
   duplicatTest,
+  changeTestStatus,
 } from "./test/testActions";
 export {
-  selectTests,
+  selectAllTest,
   selectTestCount,
   selectSelectedTest,
   selectTestLoading,
