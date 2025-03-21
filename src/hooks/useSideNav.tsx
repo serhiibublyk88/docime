@@ -21,24 +21,24 @@ import {
 } from "react-icons/fa";
 import { MenuItem } from "../types/uiTypes";
 import { SideNavHook } from "../types/hookTypes";
-import { Question } from "../types/reduxTypes"; // ✅ Импортируем тип вопросов
+import { Question } from "../types/reduxTypes";
 
 export const useSideNav = (
-  onAddQuestion: (question: Omit<Question, "id">) => void // ✅ Добавляем параметр в хук
+  onAddQuestion: (question: Omit<Question, "id">) => void
 ): SideNavHook => {
   const { user } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isCreateOrEditTestPage =
+    location.pathname === "/admin/tests/create" ||
+    /^\/admin\/tests\/[^/]+\/edit$/.test(location.pathname);
+
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1199);
   const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(
     window.innerWidth >= 1199 && !!user?.role
   );
-  const [isRightMenuOpen, setIsRightMenuOpen] = useState(
-    window.innerWidth >= 1199 &&
-      location.pathname === "/admin/tests/create" &&
-      localStorage.getItem("rightMenuOpen") === "true"
-  );
+  const [isRightMenuOpen, setIsRightMenuOpen] = useState(false);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [openQuestionType, setOpenQuestionType] = useState<
     "single" | "multiple" | "number" | "text" | null
@@ -52,7 +52,7 @@ export const useSideNav = (
 
       if (!newIsMobile) {
         setIsLeftMenuOpen(true);
-        if (location.pathname === "/admin/tests/create") {
+        if (isCreateOrEditTestPage) {
           setIsRightMenuOpen(true);
         }
       } else {
@@ -62,24 +62,34 @@ export const useSideNav = (
     };
 
     window.addEventListener("resize", handleResize);
+
+    // ✅ Вызов при первом монтировании
+    handleResize();
+
     return () => window.removeEventListener("resize", handleResize);
-  }, [location.pathname]);
+  }, [isCreateOrEditTestPage]);
 
   useLayoutEffect(() => {
-    if (isMobile && location.pathname === "/admin/tests/create") {
+    if (isMobile && isCreateOrEditTestPage) {
       setIsLeftMenuOpen(false);
       setIsRightMenuOpen(false);
       setTimeout(() => setShouldShowRightBurger(true), 50);
     }
-  }, [location.pathname, isMobile]);
+  }, [isCreateOrEditTestPage, isMobile]);
+
+  useLayoutEffect(() => {
+    if (!isMobile && isCreateOrEditTestPage) {
+      setShouldShowRightBurger(true);
+    }
+  }, [isMobile, isCreateOrEditTestPage]);
 
   useEffect(() => {
-    if (location.pathname !== "/admin/tests/create") {
+    if (!isCreateOrEditTestPage) {
       setIsRightMenuOpen(false);
       setShouldShowRightBurger(false);
       localStorage.removeItem("rightMenuOpen");
     }
-  }, [location.pathname]);
+  }, [isCreateOrEditTestPage]);
 
   useEffect(() => {
     if (user?.role !== undefined) {
@@ -102,7 +112,7 @@ export const useSideNav = (
         }
       } else {
         if (menu === "right") {
-          if (location.pathname === "/admin/tests/create") {
+          if (isCreateOrEditTestPage) {
             setIsRightMenuOpen(true);
             localStorage.setItem("rightMenuOpen", "true");
           } else {
@@ -114,7 +124,7 @@ export const useSideNav = (
     },
     [
       isMobile,
-      location.pathname,
+      isCreateOrEditTestPage,
       setIsLeftMenuOpen,
       setIsRightMenuOpen,
       isRightMenuOpen,
@@ -131,11 +141,10 @@ export const useSideNav = (
     []
   );
 
-  // ✅ Передаём `onAddQuestion` в `openQuestionModal`
   const handleSaveQuestion = useCallback(
     (question: Omit<Question, "id">) => {
       onAddQuestion(question);
-      setOpenQuestionType(null); // Закрываем модалку после добавления вопроса
+      setOpenQuestionType(null);
     },
     [onAddQuestion]
   );
@@ -143,7 +152,11 @@ export const useSideNav = (
   const handleAddClick = useCallback(
     (path: string) => {
       navigate(path);
-      if (path === "/admin/tests/create") {
+      const isTargetCreateOrEdit =
+        path === "/admin/tests/create" ||
+        /^\/admin\/tests\/[^/]+\/edit$/.test(path);
+
+      if (isTargetCreateOrEdit) {
         if (!isMobile) {
           setIsRightMenuOpen(true);
           localStorage.setItem("rightMenuOpen", "true");
@@ -189,7 +202,7 @@ export const useSideNav = (
   }, [user, handleAddClick]);
 
   const rightMenuItems = useMemo<MenuItem[]>(() => {
-    if (location.pathname !== "/admin/tests/create") return [];
+    if (!isCreateOrEditTestPage) return [];
     return [
       {
         label: "Einzelauswahl",
@@ -220,7 +233,7 @@ export const useSideNav = (
         onAddClick: () => openQuestionModal("text"),
       },
     ];
-  }, [location.pathname, openQuestionModal]);
+  }, [isCreateOrEditTestPage, openQuestionModal]);
 
   return {
     isMobile,
@@ -237,6 +250,6 @@ export const useSideNav = (
     shouldShowRightBurger,
     openQuestionType,
     setOpenQuestionType,
-    handleSaveQuestion, // ✅ Передаём `handleSaveQuestion`
+    handleSaveQuestion,
   };
 };
