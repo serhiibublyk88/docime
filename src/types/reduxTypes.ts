@@ -12,6 +12,12 @@ export interface AuthState {
   user: User | null;
 }
 
+export interface BasicGroup {
+  id: string;
+  name: string;
+}
+
+
 /// **Группа**
 export interface Group {
   id: string;
@@ -86,6 +92,19 @@ export interface Test {
   minimumScores: Record<number, number>;
   createdAt: string;
 }
+
+export interface TestPayload {
+  title: string;
+  description: string;
+  timeLimit: number;
+  availableForGroups?: string[];
+  questions: string[];
+  maximumMarks: number;
+  status: "active" | "inactive";
+  minimumScores: Record<number, number>;
+  author?: string; 
+}
+
 
 /// **Состояние тестов**
 export interface TestsState {

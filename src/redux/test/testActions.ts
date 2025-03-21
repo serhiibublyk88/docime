@@ -7,7 +7,7 @@ import {
   deleteTest,
   duplicateTest,
 } from "../../services/testApi";
-import { Test } from "../../types/reduxTypes";
+import { Test, TestPayload } from "../../types/reduxTypes";
 
 /** Получить все тесты */
 export const getTests = createAsyncThunk<Test[], void>(
@@ -38,7 +38,7 @@ export const getTestById = createAsyncThunk<Test, string>(
 );
 
 /** Создать новый тест */
-export const addTest = createAsyncThunk<Test, Omit<Test, "id" | "createdAt">>(
+export const addTest = createAsyncThunk<Test, TestPayload>(
   "tests/add",
   async (testData, { rejectWithValue }) => {
     try {
@@ -56,7 +56,7 @@ export const addTest = createAsyncThunk<Test, Omit<Test, "id" | "createdAt">>(
 /** Обновить тест */
 export const editTest = createAsyncThunk<
   Test,
-  { testId: string; testData: Partial<Test> }
+  { testId: string; testData: Partial<TestPayload> }
 >("tests/edit", async ({ testId, testData }, { rejectWithValue }) => {
   try {
     return await updateTest(testId, testData, { credentials: "include" });

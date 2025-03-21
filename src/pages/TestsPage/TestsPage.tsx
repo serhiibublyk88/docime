@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import {
   ConfirmActionModal,
@@ -7,6 +7,7 @@ import {
   TestList,
 } from "../../components";
 import { useTests } from "../../hooks";
+import { Group } from "../../types/reduxTypes"; // ✅ Импортируем `Group`
 
 export const TestsPage: React.FC = () => {
   const {
@@ -32,13 +33,38 @@ export const TestsPage: React.FC = () => {
   const [editValue, setEditValue] = useState<string>("");
 
   useEffect(() => {
-    if (tests.length === 0) {
-      fetchAllTests();
-    }
-    if (allGroups.length === 0) {
-      fetchAllGroupsList();
-    }
+    if (tests.length === 0) fetchAllTests();
+    if (allGroups.length === 0) fetchAllGroupsList();
   }, [fetchAllTests, fetchAllGroupsList, tests.length, allGroups.length]);
+
+  // ✅ Приведение `allGroups` к `Group[]`
+  const convertedAllGroups: Group[] = useMemo(
+    () =>
+      allGroups.map((g) => ({
+        ...g,
+        members: [], // ❗ Добавляем недостающие свойства
+        createdBy: "",
+        createdAt: "",
+      })),
+    [allGroups]
+  );
+
+  // ✅ Приведение `selectedGroups` к `Record<string, Group[]>`
+  const convertedSelectedGroups: Record<string, Group[]> = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(selectedGroups).map(([testId, groups]) => [
+          testId,
+          groups.map((g) => ({
+            ...g,
+            members: [],
+            createdBy: "",
+            createdAt: "",
+          })),
+        ])
+      ),
+    [selectedGroups]
+  );
 
   const handleDeleteClick = useCallback((testId: string) => {
     setDeleteTestId(testId);
@@ -89,8 +115,9 @@ export const TestsPage: React.FC = () => {
 
   const handleApplyGroupChanges = useCallback(
     (testId: string) => {
-      if (!testId || !selectedGroups[testId]) return;
-      applyGroupChanges(testId);
+      if (testId && selectedGroups[testId]) {
+        applyGroupChanges(testId);
+      }
     },
     [applyGroupChanges, selectedGroups]
   );
@@ -99,9 +126,7 @@ export const TestsPage: React.FC = () => {
     <Container fluid>
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
-          <h2 className="mb-3 text-center" aria-label="Überschrift für Tests">
-            Tests:
-          </h2>
+          <h2 className="mb-3 text-center">Tests:</h2>
 
           {loading ? (
             <Loader size="md" />
@@ -112,8 +137,8 @@ export const TestsPage: React.FC = () => {
           ) : (
             <TestList
               tests={tests}
-              allGroups={allGroups}
-              selectedGroups={selectedGroups}
+              allGroups={convertedAllGroups} // ✅ Теперь передаем правильный формат
+              selectedGroups={convertedSelectedGroups} // ✅ Теперь передаем правильный формат
               editTestId={editTestId}
               editValue={editValue}
               onEdit={handleEditClick}
@@ -131,27 +156,25 @@ export const TestsPage: React.FC = () => {
 
       {deleteTestId && (
         <ConfirmActionModal
-          show={!!deleteTestId}
+          show
           title="Test löschen"
           message="Sind Sie sicher, dass Sie diesen Test löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
           confirmText="Löschen"
           confirmVariant="danger"
           onConfirm={confirmDeleteTest}
           onClose={closeDeleteModal}
-          aria-label="Test löschen Modal"
         />
       )}
 
       {copyTestId && (
         <ConfirmActionModal
-          show={!!copyTestId}
+          show
           title="Test kopieren"
           message="Sind Sie sicher, dass Sie diesen Test kopieren möchten?"
           confirmText="Kopieren"
           confirmVariant="primary"
           onConfirm={confirmCopyTest}
           onClose={closeCopyModal}
-          aria-label="Test kopieren Modal"
         />
       )}
     </Container>

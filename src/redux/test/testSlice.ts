@@ -75,9 +75,13 @@ export const testSlice = createSlice({
       })
       .addCase(editTest.fulfilled, (state, { payload }) => {
         state.loading = false;
+
+        // 🔄 Обновляем в общем списке
         state.tests = state.tests.map((test) =>
           test.id === payload.id ? payload : test
         );
+
+        // 🔄 Обновляем выбранный тест, если он открыт
         if (state.selectedTest?.id === payload.id) {
           state.selectedTest = payload;
         }
@@ -87,7 +91,7 @@ export const testSlice = createSlice({
         state.error = payload as string;
       })
 
-      // ✅ Удаление теста (исправлено `payload`)
+      // ✅ Удаление теста
       .addCase(removeTest.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -120,6 +124,5 @@ export const testSlice = createSlice({
   },
 });
 
-// ✅ **Именованный экспорт (не default)**
 export const { clearSelectedTest } = testSlice.actions;
 export const testReducer = testSlice.reducer;

@@ -1,16 +1,22 @@
 import { RootState } from "../store";
+import { Test } from "../../types/reduxTypes";
 
-/**  Получить список всех тестов */
-export const selectTests = (state: RootState) => state.test.tests;
+export const selectTests = (state: RootState): Test[] => state.test.tests;
 
-/**  Получить выбранный тест */
-export const selectSelectedTest = (state: RootState) => state.test.selectedTest;
+export const selectTestById = (state: RootState, testId: string): Test | null =>
+  state.test.tests.find((test) => test.id === testId) || null;
 
-/**  Получить статус загрузки */
-export const selectTestLoading = (state: RootState) => state.test.loading;
+export const selectSelectedTest = (state: RootState): Test | null =>
+  state.test.selectedTest;
 
-/**  Получить ошибку при работе с тестами */
-export const selectTestError = (state: RootState) => state.test.error;
+export const selectTestQuestions = (state: RootState) =>
+  state.test.selectedTest?.questions ?? [];
 
-/**  Получить количество тестов */
-export const selectTestCount = (state: RootState) => state.test.tests.length;
+export const selectTestLoading = (state: RootState): boolean =>
+  state.test.loading;
+
+export const selectTestError = (state: RootState): string | null =>
+  state.test.error;
+
+export const selectTestCount = (state: RootState): number =>
+  state.test.tests.length;

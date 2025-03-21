@@ -1,5 +1,5 @@
 import { api } from "./clientApi";
-import { Test } from "../types/reduxTypes";
+import { Test, TestPayload } from "../types/reduxTypes";
 
 /** Получить все тесты */
 export const fetchTests = async (options = {}): Promise<Test[]> => {
@@ -36,7 +36,7 @@ export const fetchTestById = async (
 
 /** Создать новый тест */
 export const createTest = async (
-  test: Omit<Test, "id" | "createdAt">,
+  test: TestPayload,
   options = {}
 ): Promise<Test> => {
   try {
@@ -44,6 +44,7 @@ export const createTest = async (
       withCredentials: true,
       ...options,
     });
+
     return data;
   } catch (error: unknown) {
     throw new Error(
@@ -52,34 +53,14 @@ export const createTest = async (
   }
 };
 
-
-
 /** Обновить тест */
 export const updateTest = async (
   testId: string,
-  testData: Partial<Test>,
+  testData: Partial<TestPayload>,
   options = {}
 ): Promise<Test> => {
   try {
-    const payload: Partial<Test> = {
-      ...testData,
-      questions: testData.questions
-        ? testData.questions.map((q) => ({
-            id: q.id, 
-            text: q.text,
-            type: q.type,
-            image: q.image ?? undefined,
-            answers: q.answers.map((a) => ({
-              id: a.id ?? crypto.randomUUID(), 
-              text: a.text,
-              score: a.score,
-            })),
-            percentageError: q.percentageError ?? undefined,
-          }))
-        : [], 
-    };
-
-    const { data } = await api.put<Test>(`/tests/${testId}`, payload, {
+    const { data } = await api.put<Test>(`/tests/${testId}`, testData, {
       withCredentials: true,
       ...options,
     });
@@ -93,7 +74,6 @@ export const updateTest = async (
     );
   }
 };
-
 
 /** Удалить тест */
 export const deleteTest = async (

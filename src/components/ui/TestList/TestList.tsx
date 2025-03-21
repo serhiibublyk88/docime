@@ -10,16 +10,32 @@ import {
   FaPlus,
   FaMinus,
 } from "react-icons/fa";
-
-import { TestListProps } from "../../../types/reduxTypes";
 import { useNavigate } from "react-router-dom";
+import { Test, Group } from "../../../types/reduxTypes";
 import styles from "./TestList.module.css";
+
+interface TestListProps {
+  tests: Test[];
+  allGroups: Group[];
+  editTestId: string | null;
+  editValue: string;
+  onEdit: (testId: string, title: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  onDelete: (testId: string) => void;
+  onCopy: (testId: string) => void;
+  setEditValue: (value: string) => void;
+  handleGroupChange: (testId: string, groupId: string) => void;
+  applyGroupChanges: (testId: string, groupIds: string[]) => void;
+  selectedGroups: Record<string, Group[]>;
+}
 
 export const TestList: React.FC<TestListProps> = ({
   tests,
   allGroups,
   editTestId,
   editValue,
+  onEdit,
   onSave,
   onCancel,
   onDelete,
@@ -30,14 +46,12 @@ export const TestList: React.FC<TestListProps> = ({
   selectedGroups,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // ✅ Теперь `navigate` используется
 
-  /// ✅ Открыть/закрыть список групп
   const toggleGroupDropdown = (testId: string) => {
-    setOpenDropdown(openDropdown === testId ? null : testId);
+    setOpenDropdown((prev) => (prev === testId ? null : testId));
   };
 
-  /// ✅ Подтверждение изменений (сохраняет в `applyGroupChanges`)
   const handleConfirmSelection = (testId: string) => {
     setOpenDropdown(null);
     const groupIds = selectedGroups[testId]?.map((g) => g.id) || [];
@@ -51,7 +65,7 @@ export const TestList: React.FC<TestListProps> = ({
           key={test.id}
           className={`${styles.testItem} d-flex flex-column border-0`}
         >
-          {/* Верхняя строка */}
+          {/* 🔹 Верхняя строка: Название теста + Дата + Кнопки */}
           <div
             className={`d-flex justify-content-between align-items-center fs-5 ${styles.testHeader}`}
           >
@@ -70,7 +84,7 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             )}
 
-            {/* Дата + Кнопки */}
+            {/* 🔹 Дата + Кнопки управления */}
             <div className="d-flex align-items-center">
               <small className="text-muted fs-6 fw-normal me-3">
                 {test.createdAt
@@ -97,7 +111,10 @@ export const TestList: React.FC<TestListProps> = ({
                     <FaEdit
                       className={`${styles.icon} ${styles.iconEdit}`}
                       title="Bearbeiten"
-                      onClick={() => navigate("/admin/tests/create")}
+                      onClick={() => {
+                        onEdit(test.id, test.title);
+                        navigate(`/admin/tests/${test.id}/edit`); // ✅ Теперь `navigate` используется!
+                      }}
                     />
                     <FaCopy
                       className={`${styles.icon} ${styles.iconCopy}`}
@@ -115,7 +132,7 @@ export const TestList: React.FC<TestListProps> = ({
             </div>
           </div>
 
-          {/* Контейнер "Добавить группу" */}
+          {/* 🔹 Контейнер "Добавить группу" */}
           <div className="d-flex align-items-center">
             <div
               className={styles.iconAddGroupContainer}
@@ -131,7 +148,7 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             </div>
 
-            {/* Список групп */}
+            {/* 🔹 Список групп с доступом */}
             <ListGroup className={`${styles.groupList} w-100`}>
               {selectedGroups[test.id]?.length ? (
                 selectedGroups[test.id].map((group) => (
@@ -152,7 +169,7 @@ export const TestList: React.FC<TestListProps> = ({
             </ListGroup>
           </div>
 
-          {/* Выпадающий список всех групп */}
+          {/* 🔹 Выпадающий список всех групп */}
           {openDropdown === test.id && (
             <div className={styles.dropdownGroupList}>
               <ListGroup className="w-100">
@@ -169,7 +186,7 @@ export const TestList: React.FC<TestListProps> = ({
                       <span>{group.name}</span>
                       <Form.Check
                         type="checkbox"
-                        checked={isChecked || false}
+                        checked={!!isChecked}
                         onChange={() => handleGroupChange(test.id, group.id)}
                       />
                     </ListGroup.Item>
