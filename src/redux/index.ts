@@ -82,3 +82,12 @@ export {
   selectTestLoading,
   selectTestError,
 } from "./test/testSelectors";
+
+/// **Пользователь**
+export { userReducer } from "./user/userSlice";
+export { fetchAvailableTests } from "./user/userActions";
+export {
+  selectAvailableTests,
+  selectUserLoading,
+  selectUserError,
+} from "./user/userSelectors";

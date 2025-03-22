@@ -25,3 +25,9 @@ export interface Group {
   members?: { id: string; username: string }[]; 
 }
  
+
+export type AvailableTest = {
+  _id: string;
+  title: string;
+  status: "active" | "inactive";
+};
