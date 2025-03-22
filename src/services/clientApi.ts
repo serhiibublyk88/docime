@@ -6,13 +6,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // ✅ Глобальная настройка для отправки куки
-});
-
-// 🔹 Автоматически добавляем `credentials: "include"` ко всем запросам
-api.interceptors.request.use((config) => {
-  config.withCredentials = true; // ✅ Теперь все запросы передают куки автоматически
-  return config;
+  withCredentials: true,
 });
 
 api.interceptors.response.use(
@@ -24,7 +18,7 @@ api.interceptors.response.use(
       if (status === 401) {
         const storedUser = JSON.parse(localStorage.getItem("user") || "null");
         if (!storedUser) {
-          store.dispatch(authActions.logout()); // ✅ Безопасный выход из системы при 401
+          store.dispatch(authActions.logout());
         }
       }
     }

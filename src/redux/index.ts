@@ -91,3 +91,18 @@ export {
   selectUserLoading,
   selectUserError,
 } from "./user/userSelectors";
+
+/// **Прохождение теста (попытки)**
+export { testAttemptReducer } from "./testAttempt/testAttemptSlice";
+export {
+  fetchCreateTestAttempt,
+  fetchSubmitTestAttempt,
+  fetchGetTestAttempt,
+} from "./testAttempt/testAttemptActions";
+export {
+  selectAttemptId,
+  selectAttemptQuestions,
+  selectTestResult,
+  selectAttemptLoading,
+  selectAttemptError,
+} from "./testAttempt/testAttemptSelectors";
