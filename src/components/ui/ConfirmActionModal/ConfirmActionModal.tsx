@@ -5,7 +5,7 @@ interface ConfirmActionModalProps {
   title: string;
   message: string;
   confirmText: string;
-  confirmVariant?: "primary" | "danger"; // 🔹 Цвет кнопки (по умолчанию красный)
+  confirmVariant?: "primary" | "danger" | "success"; 
   onConfirm: () => void;
   onClose: () => void;
 }
@@ -15,7 +15,7 @@ export const ConfirmActionModal: React.FC<ConfirmActionModalProps> = ({
   title,
   message,
   confirmText,
-  confirmVariant = "danger", // 🔹 По умолчанию красная кнопка
+  confirmVariant = "danger", 
   onConfirm,
   onClose,
 }) => {

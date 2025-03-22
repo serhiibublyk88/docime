@@ -64,25 +64,43 @@ export const ItemList: React.FC<ItemListProps> = ({
           } d-flex justify-content-between align-items-center list-group-item-action border-0 fs-5`}
           onClick={() => onItemClick?.(item.id)}
         >
-          {editItemId === item.id ? (
-            <Form.Control
-              type="text"
-              value={
-                editValue !== null && editValue !== undefined
-                  ? editValue
-                  : item.name
-              }
-              onChange={(e) => setEditValue?.(e.currentTarget.value)}
-              onKeyDown={handleKeyDown}
-              autoFocus
-              className={styles.editInput}
-            />
-          ) : (
-            <span>
-              {index + 1}. {item.name}
+          {/* ✅ Название / поле ввода */}
+          <div className="d-flex align-items-center flex-grow-1">
+            {editItemId === item.id ? (
+              <Form.Control
+                type="text"
+                value={
+                  editValue !== null && editValue !== undefined
+                    ? editValue
+                    : item.name
+                }
+                onChange={(e) => setEditValue?.(e.currentTarget.value)}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                className={styles.editInput}
+              />
+            ) : (
+              <span>
+                {index + 1}. {item.name}
+              </span>
+            )}
+          </div>
+
+          {/* ✅ Кастомная иконка — всегда видимая */}
+          {item.icon && (
+            <span
+              className={`text-${item.iconColor ?? "secondary"} icon ms-3`}
+              title={item.iconTitle}
+              onClick={(e) => {
+                e.stopPropagation();
+                item.onIconClick?.();
+              }}
+            >
+              {item.icon}
             </span>
           )}
 
+          {/* ✅ Контейнер для редактирования и удаления */}
           <div
             className={styles.iconContainer}
             onClick={(e) => e.stopPropagation()}
@@ -101,18 +119,20 @@ export const ItemList: React.FC<ItemListProps> = ({
                 />
               </>
             ) : (
-              <>
-                <FaEdit
-                  className={`${styles.icon} ${styles.editIcon}`}
-                  title="Bearbeiten"
-                  onClick={() => onEdit?.(item.id)}
-                />
-                <FaTrash
-                  className={`${styles.icon} ${styles.deleteIcon}`}
-                  title="Löschen"
-                  onClick={() => handleDelete(item.id)}
-                />
-              </>
+              !item.icon && (
+                <>
+                  <FaEdit
+                    className={`${styles.icon} ${styles.editIcon}`}
+                    title="Bearbeiten"
+                    onClick={() => onEdit?.(item.id)}
+                  />
+                  <FaTrash
+                    className={`${styles.icon} ${styles.deleteIcon}`}
+                    title="Löschen"
+                    onClick={() => handleDelete(item.id)}
+                  />
+                </>
+              )
             )}
           </div>
         </ListGroup.Item>

@@ -79,6 +79,10 @@ export interface ItemListProps {
     id: string;
     name: string;
     additionalInfo?: string;
+    icon?: React.ReactNode; //  добавлено
+    iconTitle?: string; //  добавлено
+    iconColor?: "primary" | "secondary" | "success" | "danger"; //  добавлено
+    onIconClick?: () => void; //  добавлено
     actions?: {
       icon: string;
       tooltip: string;
@@ -96,13 +100,14 @@ export interface ItemListProps {
   }[];
   onDelete?: (id: string) => void;
   editItemId?: string | null;
-  editValue?: string | null; // ✅ Исправлено
+  editValue?: string | null;
   onItemClick?: (id: string) => void;
   onEdit?: (id: string, name?: string) => void;
   onSave?: () => void;
   onCancel?: () => void;
   setEditValue?: (value: string) => void;
 }
+
 
 
 
