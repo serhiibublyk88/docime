@@ -91,3 +91,13 @@ export interface TestResult {
   _id: string;
   questions?: AnsweredQuestion[]; // только в getTestAttempt
 }
+
+export interface UserTestResult {
+  testTitle: string;
+  startTime: string; 
+  timeTaken: number; 
+  maximumMarks: number;
+  obtainedMarks: number;
+  percentageScore: number;
+  grade: string;
+}

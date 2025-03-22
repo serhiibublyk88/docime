@@ -85,12 +85,17 @@ export {
 
 /// **Пользователь**
 export { userReducer } from "./user/userSlice";
-export { fetchAvailableTests } from "./user/userActions";
+export {
+  fetchAvailableTests,
+  fetchUserTestResults,
+} from "./user/userActions";
 export {
   selectAvailableTests,
+  selectUserTestResults,
   selectUserLoading,
   selectUserError,
 } from "./user/userSelectors";
+
 
 /// **Прохождение теста (попытки)**
 export { testAttemptReducer } from "./testAttempt/testAttemptSlice";
