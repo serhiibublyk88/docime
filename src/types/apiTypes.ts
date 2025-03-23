@@ -101,3 +101,24 @@ export interface UserTestResult {
   percentageScore: number;
   grade: string;
 }
+
+
+
+export interface TestResultsForCreator {
+  testId: string;
+  testName: string;
+  groups: {
+    groupId: string;
+    groupName: string;
+    participants: {
+      userId: string;
+      hasPassed: boolean;
+      startTime: string | null;
+      timeTaken: number | null;
+      maximumMarks: number;
+      obtainedMarks: number;
+      percentageScore: number;
+      grade: string | null;
+    }[];
+  }[];
+}

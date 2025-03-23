@@ -111,3 +111,14 @@ export {
   selectAttemptLoading,
   selectAttemptError,
 } from "./testAttempt/testAttemptSelectors";
+
+
+/// **Результаты тестов для создателя**
+export { testResultsReducer } from "./testResults/testResultsSlice";
+export { fetchTestResultsForCreator } from "./testResults/testResultsActions";
+export {
+  selectTestResults,
+  selectTestResultsLoading,
+  selectTestResultsError,
+} from "./testResults/testResultsSelectors";
+

@@ -10,7 +10,9 @@ import { resultReducer } from "./result/resultSlice";
 import { questionsReducer } from "./questions/questionsSlice";
 import { testReducer } from "./test/testSlice";
 import { userReducer } from "./user/userSlice";
-import { testAttemptReducer } from "./testAttempt/testAttemptSlice"; 
+import { testAttemptReducer } from "./testAttempt/testAttemptSlice";
+import { testResultsReducer } from "./testResults/testResultsSlice";
+ 
 
 export const store = configureStore({
   reducer: {
@@ -23,7 +25,8 @@ export const store = configureStore({
     questions: questionsReducer,
     test: testReducer,
     user: userReducer,
-    testAttempt: testAttemptReducer, 
+    testAttempt: testAttemptReducer,
+    testResults: testResultsReducer,
   },
 });
 

@@ -103,3 +103,20 @@ body {
   
 }
 
+/* Для WebKit-браузеров (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar {
+    width: 12px; 
+}
+ 
+::-webkit-scrollbar-track {
+    background: #222; 
+}
+ 
+::-webkit-scrollbar-thumb {
+    background: #444; 
+    border-radius: 5px; 
+}
+ 
+::-webkit-scrollbar-thumb:hover {
+    background: #666; 
+}
