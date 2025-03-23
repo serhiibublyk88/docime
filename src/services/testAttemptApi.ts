@@ -1,13 +1,15 @@
 // src/services/testAttemptApi.ts
+
 import { api } from "./clientApi";
 import { Question, TestResult } from "../types/apiTypes";
 
 // Создание попытки
 export const createTestAttempt = async (
   testId: string
-): Promise<{ attemptId: string; questions: Question[] }> => {
+): Promise<{ attemptId: string; questions: Question[]; timeLimit: number }> => {
   const response = await api.post(`/users/tests/${testId}/attempts`);
-  return response.data.data;
+  const { attemptId, questions, timeLimit } = response.data.data;
+  return { attemptId, questions, timeLimit };
 };
 
 // Завершение попытки

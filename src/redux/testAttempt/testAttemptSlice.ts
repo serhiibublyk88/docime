@@ -14,6 +14,7 @@ interface TestAttemptState {
   result: TestResult | null;
   loading: boolean;
   error: string | null;
+  timeLimit: number;
 }
 
 const initialState: TestAttemptState = {
@@ -22,6 +23,7 @@ const initialState: TestAttemptState = {
   result: null,
   loading: false,
   error: null,
+  timeLimit: 0,
 };
 
 const slice = createSlice({
@@ -39,11 +41,13 @@ const slice = createSlice({
         state.attemptId = null;
         state.questions = [];
         state.result = null;
+        state.timeLimit = 0;
       })
       .addCase(fetchCreateTestAttempt.fulfilled, (state, action) => {
         state.loading = false;
         state.attemptId = action.payload.attemptId;
         state.questions = action.payload.questions;
+        state.timeLimit = action.payload.timeLimit;
       })
       .addCase(fetchCreateTestAttempt.rejected, (state, action) => {
         state.loading = false;

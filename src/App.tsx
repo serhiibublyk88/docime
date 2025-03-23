@@ -23,6 +23,7 @@ import {
   ManageResultsPage,
   NotFoundPage,
   AccessDeniedPage,
+  TestAttemptPage,
 } from "./pages";
 
 export const App: React.FC = () => {
@@ -52,7 +53,6 @@ export const App: React.FC = () => {
       )}
 
       <BrowserRouter>
-        
         <SideNavController onAddQuestion={handleAddQuestion} />
 
         <div className="container-fluid" style={{ marginTop: "60px" }}>
@@ -65,12 +65,12 @@ export const App: React.FC = () => {
             <Route element={<ProtectedRoute requiredRole={roles.USER} />}>
               <Route path="/tests" element={<AvailableTests />} />
               <Route path="/test/:id" element={<TestPage />} />
+              <Route path="/test/:id/attempt" element={<TestAttemptPage />} />
               <Route path="/results" element={<ResultsPage />} />
             </Route>
             <Route
               element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}
             >
-              
               <Route path="/admin/groups" element={<GroupsPage />} />
               <Route path="/admin/groups/:id" element={<GroupPage />} />
               <Route path="/admin/tests" element={<TestsPage />} />

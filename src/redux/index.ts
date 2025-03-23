@@ -110,6 +110,7 @@ export {
   selectTestResult,
   selectAttemptLoading,
   selectAttemptError,
+  selectAttemptTimeLimit,
 } from "./testAttempt/testAttemptSelectors";
 
 

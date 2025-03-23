@@ -10,7 +10,7 @@ import { Question, TestResult } from "../../types/apiTypes";
 
 // Создание попытки
 export const fetchCreateTestAttempt = createAsyncThunk<
-  { attemptId: string; questions: Question[] },
+  { attemptId: string; questions: Question[]; timeLimit: number },
   string
 >("testAttempt/fetchCreateTestAttempt", async (testId, thunkAPI) => {
   try {

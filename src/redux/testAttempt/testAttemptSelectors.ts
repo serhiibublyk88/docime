@@ -17,3 +17,7 @@ export const selectAttemptLoading = (state: RootState) =>
 
 // Получить ошибку (если есть)
 export const selectAttemptError = (state: RootState) => state.testAttempt.error;
+
+//  Новый селектор — получить ограничение по времени
+export const selectAttemptTimeLimit = (state: RootState) =>
+  state.testAttempt.timeLimit;

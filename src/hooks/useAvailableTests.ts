@@ -33,7 +33,7 @@ export const useAvailableTests = () => {
 
   const startTest = useCallback(() => {
     if (confirmTestId) {
-      navigate(`/tests/${confirmTestId}`);
+      navigate(`/test/${confirmTestId}/attempt`);
     }
   }, [confirmTestId, navigate]);
 
