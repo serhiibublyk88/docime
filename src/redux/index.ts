@@ -29,12 +29,12 @@ export { selectError } from "./error/errorSelectors";
 /// **Тесты**
 export { testsReducer, setCurrentTest } from "./tests/testsSlice";
 export {
-  fetchTests,
+  
   fetchAllGroups,
-  createTest,
-  updateTest,
-  deleteTest,
-  copyTest,
+  // createTest,
+  // updateTest,
+  // deleteTest,
+  // copyTest,
   updateTestGroups,
 } from "./tests/testsActions";
 export {
@@ -45,24 +45,6 @@ export {
   selectCurrentTest,
   selectAvailableGroupsForTest,
 } from "./tests/testsSelectors";
-
-/// **Вопросы**
-export { questionsReducer } from "./questions/questionsSlice";
-export {
-  fetchQuestions,
-  createQuestion,
-  updateQuestion,
-  deleteQuestion,
-  addAnswer,
-  updateAnswer,
-  deleteAnswer,
-} from "./questions/questionsActions";
-export {
-  selectQuestions,
-  selectQuestionsLoading,
-  selectQuestionsError,
-  selectQuestionById,
-} from "./questions/questionsSelectors";
 
 /// **Одиночный тест Test
 export { testReducer, clearSelectedTest } from "./test/testSlice";
@@ -82,6 +64,39 @@ export {
   selectTestLoading,
   selectTestError,
 } from "./test/testSelectors";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// **Вопросы**
+export { questionsReducer } from "./questions/questionsSlice";
+export {
+  fetchQuestions,
+  createQuestion,
+  updateQuestion,
+  deleteQuestion,
+  addAnswer,
+  updateAnswer,
+  deleteAnswer,
+} from "./questions/questionsActions";
+export {
+  selectQuestions,
+  selectQuestionsLoading,
+  selectQuestionsError,
+  selectQuestionById,
+} from "./questions/questionsSelectors";
+
+
 
 /// **Пользователь**
 export { userReducer } from "./user/userSlice";

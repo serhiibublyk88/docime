@@ -16,7 +16,7 @@ import {
   QuestionList,
   ConfirmActionModal,
 } from "../../components";
-import {  TestPayload, Question } from "../../types/reduxTypes";
+import { TestPayload, Question, QuestionPayload } from "../../types/reduxTypes";
 
 import { SideNavController } from "../../controllers";
 import { getTestById } from "../../redux";
@@ -72,48 +72,67 @@ export const CreateTestPage = () => {
     0
   );
 
-const handleSaveTest = async () => {
-  if (
-    !testTitle.trim() ||
-    !testDescription.trim() ||
-    questions.length === 0 ||
-    Object.values(minimumScores).some((score) => score < 0 || score > 100) ||
-    !user
-  ) {
-    return;
-  }
-
-  const payload: TestPayload = {
-    title: testTitle,
-    description: testDescription,
-    timeLimit: testTimeLimit,
-    ...(testId ? {} : { availableForGroups: [] }),
-    questions: questions.map((q) => q.id), // ✅ string[]
-    maximumMarks: questions.reduce(
-      (sum, q) => sum + q.answers.reduce((s, a) => s + a.score, 0),
-      0
-    ),
-    status: "inactive",
-    minimumScores,
-    author: user._id,
-  };
-
-  try {
-    if (testId) {
-      await dispatch(editTest({ testId, testData: payload })).unwrap();
-    } else {
-      await dispatch(addTest(payload)).unwrap();
+  const handleSaveTest = async () => {
+    if (
+      !testTitle.trim() ||
+      !testDescription.trim() ||
+      questions.length === 0 ||
+      Object.values(minimumScores).some((score) => score < 0 || score > 100) ||
+      !user
+    ) {
+      return;
     }
 
-    setShowConfirmModal(false);
-    navigate("/admin/tests");
-  } catch (error) {
-    console.error("❌ Ошибка при сохранении:", error);
-  }
-};
+    // 🔐 Безопасный кастинг типа questionType
+    const toQuestionType = (type: string): QuestionPayload["questionType"] => {
+      switch (type) {
+        case "single":
+        case "multiple":
+        case "number":
+        case "text":
+          return type;
+        default:
+          return "single";
+      }
+    };
 
+    const questionPayloads: QuestionPayload[] = questions.map((q) => ({
+      questionText: q.text,
+      questionType: toQuestionType(q.type),
+      imageUrl: typeof q.image === "string" ? q.image : null,
+      percentageError: q.percentageError,
+      answers: q.answers.map((a) => ({
+        text: a.text,
+        score: a.score,
+        isCorrect: a.score > 0, // для single/multiple, можно адаптировать
+      })),
+    }));
 
+    const payload: TestPayload = {
+      title: testTitle,
+      description: testDescription,
+      timeLimit: testTimeLimit,
+      ...(testId ? {} : { availableForGroups: [] }),
+      questions: questionPayloads,
+      maximumMarks,
+      status: "inactive",
+      minimumScores,
+      author: user._id,
+    };
 
+    try {
+      if (testId) {
+        await dispatch(editTest({ testId, testData: payload })).unwrap();
+      } else {
+        await dispatch(addTest(payload)).unwrap();
+      }
+
+      setShowConfirmModal(false);
+      navigate("/admin/tests");
+    } catch (error) {
+      console.error("❌ Ошибка при сохранении:", error);
+    }
+  };
 
   const handleMinimumScoreChange = (grade: number, value: number) => {
     setMinimumScores((prevScores) => ({

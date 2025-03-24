@@ -23,7 +23,7 @@ interface TestListProps {
   onSave: () => void;
   onCancel: () => void;
   onDelete: (testId: string) => void;
-  onCopy: (testId: string) => void;
+  onCopy: (testId: string) => Promise<Test | undefined>;
   setEditValue: (value: string) => void;
   handleGroupChange: (testId: string, groupId: string) => void;
   applyGroupChanges: (testId: string, groupIds: string[]) => void;
@@ -39,7 +39,6 @@ export const TestList: React.FC<TestListProps> = ({
   allGroups,
   editTestId,
   editValue,
-  onEdit,
   onSave,
   onCancel,
   onDelete,
@@ -65,12 +64,12 @@ export const TestList: React.FC<TestListProps> = ({
 
   return (
     <ListGroup>
-      {tests.map((test, index) => (
+      {tests.map((test) => (
         <ListGroup.Item
           key={test.id}
           className={`${styles.testItem} d-flex flex-column border-0`}
         >
-          {/* Верхняя строка: Название теста + Дата + Кнопки */}
+          {/* Верхняя строка */}
           <div
             className={`d-flex justify-content-between align-items-center fs-5 ${styles.testHeader}`}
           >
@@ -84,20 +83,17 @@ export const TestList: React.FC<TestListProps> = ({
               />
             ) : (
               <div className="d-flex align-items-center">
-                <span className="me-3">{index + 1}.</span>
-                <span className="me-3">{test.title}</span>
+                <span className="me-3">{test.title || "Unbenannter Test"}</span>
               </div>
             )}
 
             <div className="d-flex align-items-center gap-3">
-              {/*  Дата */}
               <small className="text-muted fs-6 fw-normal">
                 {test.createdAt
                   ? new Date(test.createdAt).toLocaleDateString()
                   : "N/A"}
               </small>
 
-              {/*  Статус */}
               <div className="d-flex align-items-center">
                 <span className="fs-6 ms-3 me-1">Active:</span>
                 <Form.Check
@@ -108,7 +104,6 @@ export const TestList: React.FC<TestListProps> = ({
                 />
               </div>
 
-              {/*  Иконки управления */}
               <div className={styles.iconContainer}>
                 {editTestId === test.id ? (
                   <>
@@ -129,14 +124,15 @@ export const TestList: React.FC<TestListProps> = ({
                       className={`${styles.icon} ${styles.iconEdit}`}
                       title="Bearbeiten"
                       onClick={() => {
-                        onEdit(test.id, test.title);
                         navigate(`/admin/tests/${test.id}/edit`);
                       }}
                     />
                     <FaCopy
                       className={`${styles.icon} ${styles.iconCopy}`}
                       title="Kopieren"
-                      onClick={() => onCopy(test.id)}
+                      onClick={async () => {
+                        await onCopy(test.id);
+                      }}
                     />
                     <FaTrash
                       className={`${styles.icon} ${styles.iconDelete}`}
@@ -149,7 +145,7 @@ export const TestList: React.FC<TestListProps> = ({
             </div>
           </div>
 
-          {/*  Контейнер "Добавить группу" */}
+          {/* Группы (доступ) */}
           <div className="d-flex align-items-center">
             <div
               className={styles.iconAddGroupContainer}
@@ -165,12 +161,11 @@ export const TestList: React.FC<TestListProps> = ({
               </div>
             </div>
 
-            {/*  Список групп с доступом */}
             <ListGroup className={`${styles.groupList} w-100`}>
-              {selectedGroups[test.id]?.length ? (
-                selectedGroups[test.id].map((group) => (
+              {(selectedGroups[test.id] ?? []).length > 0 ? (
+                selectedGroups[test.id]!.map((group) => (
                   <ListGroup.Item
-                    key={`${test.id}-${group.id}`}
+                    key={`selected-${test.id}-${group.id}`}
                     className={`d-flex justify-content-between align-items-center border-0 fs-6 mt-1 ${styles.groupItem}`}
                   >
                     <span>{group.name}</span>
@@ -186,7 +181,7 @@ export const TestList: React.FC<TestListProps> = ({
             </ListGroup>
           </div>
 
-          {/*  Выпадающий список всех групп */}
+          {/* Выпадающий список всех групп */}
           {openDropdown === test.id && (
             <div className={styles.dropdownGroupList}>
               <ListGroup className="w-100">
@@ -197,7 +192,7 @@ export const TestList: React.FC<TestListProps> = ({
 
                   return (
                     <ListGroup.Item
-                      key={group.id}
+                      key={`dropdown-${test.id}-${group.id}`}
                       className="d-flex justify-content-between align-items-center border-0"
                     >
                       <span>{group.name}</span>

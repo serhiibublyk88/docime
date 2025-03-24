@@ -1,3 +1,4 @@
+
 /// **Пользователь**
 export interface User {
   _id: string;
@@ -16,7 +17,6 @@ export interface BasicGroup {
   id: string;
   name: string;
 }
-
 
 /// **Группа**
 export interface Group {
@@ -92,17 +92,30 @@ export interface Test {
   minimumScores: Record<number, number>;
   createdAt: string;
 }
+export interface AnswerPayload {
+  text: string;
+  score: number;
+  isCorrect?: boolean; // не обязателен, особенно для типов 'text' и 'numeric'
+}
+
+export interface QuestionPayload {
+  questionText: string;
+  questionType: "single" | "multiple" | "number" | "text";
+  imageUrl?: string | null;
+  percentageError?: number; // только для текстовых
+  answers: AnswerPayload[];
+}
 
 export interface TestPayload {
   title: string;
   description: string;
   timeLimit: number;
-  availableForGroups?: string[];
-  questions: string[];
+  availableForGroups?: string[]; // список ID групп
+  questions: QuestionPayload[]; // теперь это полноценные объекты
   maximumMarks: number;
   status: "active" | "inactive";
   minimumScores: Record<number, number>;
-  author?: string; 
+  author?: string;
 }
 
 
@@ -155,8 +168,6 @@ export interface UpdatedUserResponse {
   email?: string;
   role?: number;
 }
-
-
 
 /// **Типы экшенов Redux для тестов**
 export enum TestsActionTypes {

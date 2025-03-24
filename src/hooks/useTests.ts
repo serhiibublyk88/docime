@@ -2,30 +2,46 @@ import { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppDispatch,
-  getTests, // ✅ заменили fetchTests на getTests
+  getTests,
   fetchAllGroups,
-  createTest,
-  updateTest,
-  deleteTest,
-  copyTest,
+  addTest,
+  editTest,
+  removeTest,
+  duplicatTest,
   updateTestGroups,
   setCurrentTest,
   changeTestStatus,
-  selectAllTest, // ✅ заменили selectAllTests на selectAllTest
-  selectTestsLoading,
-  selectTestsError,
-  selectCurrentTest,
+  selectAllTest,
+  selectTestLoading,
+  selectTestError,
+  selectSelectedTest,
   selectAllGroups,
 } from "../redux";
-import { Test } from "../types/reduxTypes";
+import { Test, TestPayload, QuestionType } from "../types/reduxTypes";
+
+// ✅ Маппер типов с бэка (string) в QuestionType
+const mapBackendToFrontendType = (type: string): QuestionType => {
+  switch (type) {
+    case "single-choice":
+      return "single";
+    case "multiple-choice":
+      return "multiple";
+    case "number-input":
+      return "number";
+    case "text-input":
+      return "text";
+    default:
+      return "single";
+  }
+};
 
 export const useTests = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const tests = useSelector(selectAllTest);
-  const currentTest = useSelector(selectCurrentTest);
-  const loading = useSelector(selectTestsLoading);
-  const error = useSelector(selectTestsError);
+  const currentTest = useSelector(selectSelectedTest);
+  const loading = useSelector(selectTestLoading);
+  const error = useSelector(selectTestError);
   const allGroups = useSelector(selectAllGroups);
 
   const [selectedGroups, setSelectedGroups] = useState<
@@ -47,19 +63,20 @@ export const useTests = () => {
   useEffect(() => {
     if (tests.length) {
       setSelectedGroups(
-        tests.reduce((acc, test) => {
-          acc[test.id] = test.availableForGroups.map((g) => ({
-            id: g.id,
-            name: g.name,
-          }));
-          return acc;
-        }, {} as Record<string, { id: string; name: string }[]>)
-      );
+  tests.reduce((acc, test) => {
+    acc[test.id] = (test.availableForGroups ?? []).map((g) => ({
+      id: g.id,
+      name: g.name,
+    }));
+    return acc;
+  }, {} as Record<string, { id: string; name: string }[]>)
+);
+
     }
   }, [tests]);
 
   const fetchAllTests = useCallback(() => {
-    dispatch(getTests()).catch(() => {}); // ✅ заменили fetchTests на getTests
+    dispatch(getTests()).catch(() => {});
   }, [dispatch]);
 
   const fetchAllGroupsList = useCallback(() => {
@@ -67,29 +84,44 @@ export const useTests = () => {
   }, [dispatch]);
 
   const createNewTest = useCallback(
-    (data: Partial<Test>) => {
-      dispatch(createTest(data)).catch(() => {});
+    (data: TestPayload) => {
+      dispatch(addTest(data)).catch(() => {});
     },
     [dispatch]
   );
 
   const updateExistingTest = useCallback(
-    (testId: string, data: Partial<Test>) => {
-      dispatch(updateTest({ testId, data })).catch(() => {});
+    (testId: string, data: TestPayload) => {
+      dispatch(editTest({ testId, testData: data })).catch(() => {});
     },
     [dispatch]
   );
 
   const deleteExistingTest = useCallback(
     (testId: string) => {
-      dispatch(deleteTest(testId)).catch(() => {});
+      dispatch(removeTest(testId)).catch(() => {});
     },
     [dispatch]
   );
 
   const copyExistingTest = useCallback(
-    (testId: string) => {
-      dispatch(copyTest(testId)).catch(() => {});
+    async (testId: string): Promise<Test | undefined> => {
+      try {
+        const copied = await dispatch(duplicatTest(testId)).unwrap();
+        if (!copied?.questions) return copied;
+
+        const mapped: Test = {
+          ...copied,
+          questions: copied.questions.map((q) => ({
+            ...q,
+            type: mapBackendToFrontendType(q.type),
+          })),
+        };
+
+        return mapped;
+      } catch {
+        return undefined;
+      }
     },
     [dispatch]
   );
@@ -141,7 +173,18 @@ export const useTests = () => {
 
   const setSelectedTest = useCallback(
     (test: Test | null) => {
-      dispatch(setCurrentTest(test));
+      if (test && test.questions) {
+        const mappedTest: Test = {
+          ...test,
+          questions: test.questions.map((q) => ({
+            ...q,
+            type: mapBackendToFrontendType(q.type),
+          })),
+        };
+        dispatch(setCurrentTest(mappedTest));
+      } else {
+        dispatch(setCurrentTest(test));
+      }
     },
     [dispatch]
   );

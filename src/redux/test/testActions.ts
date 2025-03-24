@@ -3,7 +3,7 @@ import {
   fetchTests,
   fetchTestById,
   createTest,
-  updateTest,
+  updateTest, 
   deleteTest,
   duplicateTest,
   updateTestStatus,
@@ -44,7 +44,7 @@ export const addTest = createAsyncThunk<Test, TestPayload>(
   "tests/add",
   async (testData, { rejectWithValue }) => {
     try {
-      return await createTest(testData, { credentials: "include" });
+      return await createTest(testData, { withCredentials: true });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error
@@ -58,10 +58,10 @@ export const addTest = createAsyncThunk<Test, TestPayload>(
 /** Обновить тест */
 export const editTest = createAsyncThunk<
   Test,
-  { testId: string; testData: Partial<TestPayload> }
+  { testId: string; testData: TestPayload }
 >("tests/edit", async ({ testId, testData }, { rejectWithValue }) => {
   try {
-    return await updateTest(testId, testData, { credentials: "include" });
+    return await updateTest(testId, testData, { withCredentials: true });
   } catch (error) {
     return rejectWithValue(
       error instanceof Error
@@ -76,7 +76,7 @@ export const removeTest = createAsyncThunk<void, string>(
   "tests/remove",
   async (testId, { rejectWithValue }) => {
     try {
-      await deleteTest(testId, { credentials: "include" });
+      await deleteTest(testId, { withCredentials: true });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Fehler beim Löschen des Tests"
@@ -90,7 +90,7 @@ export const duplicatTest = createAsyncThunk<Test, string>(
   "tests/copy",
   async (testId, { rejectWithValue }) => {
     try {
-      return await duplicateTest(testId, { credentials: "include" });
+      return await duplicateTest(testId, { withCredentials: true });
     } catch (error) {
       return rejectWithValue(
         error instanceof Error

@@ -1,13 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Test } from "../../types/reduxTypes";
+// import { Test } from "../../types/reduxTypes";
 import {
-  fetchTestsApi,
+  
   fetchGroupsApi,
   fetchAllGroupsApi,
-  createTestApi,
-  updateTestApi,
-  deleteTestApi,
-  copyTestApi,
+  // createTestApi,
+  // updateTestApi,
+  // deleteTestApi,
+  // copyTestApi,
   updateTestGroupsApi,
 } from "../../services/testsApi";
 import { AxiosError } from "axios";
@@ -20,18 +20,7 @@ const handleApiError = (error: unknown): string => {
   return "Unbekannter Fehler beim Abrufen der Tests";
 };
 
-// ✅ **Получение списка тестов**
-export const fetchTests = createAsyncThunk<
-  Test[],
-  void,
-  { rejectValue: string }
->("tests/fetchTests", async (_, { rejectWithValue }) => {
-  try {
-    return await fetchTestsApi();
-  } catch (error) {
-    return rejectWithValue(handleApiError(error));
-  }
-});
+
 
 // ✅ **Получение всех групп в системе**
 export const fetchAllGroups = createAsyncThunk<
@@ -59,57 +48,57 @@ export const fetchTestGroups = createAsyncThunk<
   }
 });
 
-// ✅ **Создание нового теста**
-export const createTest = createAsyncThunk<
-  Test,
-  Partial<Test>,
-  { rejectValue: string }
->("tests/createTest", async (testData, { rejectWithValue }) => {
-  try {
-    return await createTestApi(testData);
-  } catch (error) {
-    return rejectWithValue(handleApiError(error));
-  }
-});
+// // ✅ **Создание нового теста**
+// export const createTest = createAsyncThunk<
+//   Test,
+//   Partial<Test>,
+//   { rejectValue: string }
+// >("tests/createTest", async (testData, { rejectWithValue }) => {
+//   try {
+//     return await createTestApi(testData);
+//   } catch (error) {
+//     return rejectWithValue(handleApiError(error));
+//   }
+// });
 
-//  **Обновление теста**
-export const updateTest = createAsyncThunk<
-  Test,
-  { testId: string; data: Partial<Test> },
-  { rejectValue: string }
->("tests/updateTest", async ({ testId, data }, { rejectWithValue }) => {
-  try {
-    return await updateTestApi(testId, data);
-  } catch (error) {
-    return rejectWithValue(handleApiError(error));
-  }
-});
+// //  **Обновление теста**
+// export const updateTest = createAsyncThunk<
+//   Test,
+//   { testId: string; data: Partial<Test> },
+//   { rejectValue: string }
+// >("tests/updateTest", async ({ testId, data }, { rejectWithValue }) => {
+//   try {
+//     return await updateTestApi(testId, data);
+//   } catch (error) {
+//     return rejectWithValue(handleApiError(error));
+//   }
+// });
 
-//  **Удаление теста**
-export const deleteTest = createAsyncThunk<
-  string,
-  string,
-  { rejectValue: string }
->("tests/deleteTest", async (testId, { rejectWithValue }) => {
-  try {
-    await deleteTestApi(testId);
-    return testId;
-  } catch (error) {
-    return rejectWithValue(handleApiError(error));
-  }
-});
+// //  **Удаление теста**
+// export const deleteTest = createAsyncThunk<
+//   string,
+//   string,
+//   { rejectValue: string }
+// >("tests/deleteTest", async (testId, { rejectWithValue }) => {
+//   try {
+//     await deleteTestApi(testId);
+//     return testId;
+//   } catch (error) {
+//     return rejectWithValue(handleApiError(error));
+//   }
+// });
 
-//  **Копирование теста**
-export const copyTest = createAsyncThunk<Test, string, { rejectValue: string }>(
-  "tests/copyTest",
-  async (testId, { rejectWithValue }) => {
-    try {
-      return await copyTestApi(testId);
-    } catch (error) {
-      return rejectWithValue(handleApiError(error));
-    }
-  }
-);
+// //  **Копирование теста**
+// export const copyTest = createAsyncThunk<Test, string, { rejectValue: string }>(
+//   "tests/copyTest",
+//   async (testId, { rejectWithValue }) => {
+//     try {
+//       return await copyTestApi(testId);
+//     } catch (error) {
+//       return rejectWithValue(handleApiError(error));
+//     }
+//   }
+// );
 
 //  **Обновление доступных групп для теста**
 export const updateTestGroups = createAsyncThunk<

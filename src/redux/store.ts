@@ -20,7 +20,7 @@ export const store = configureStore({
     auth: authReducer,
     tests: testsReducer,
     groups: groupsReducer,
-    group: groupReducer,
+    group: groupReducer, 
     result: resultReducer,
     questions: questionsReducer,
     test: testReducer,

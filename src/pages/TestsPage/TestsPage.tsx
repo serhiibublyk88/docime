@@ -6,10 +6,9 @@ import {
   AlertMessage,
   TestList,
 } from "../../components";
-import { useTests } from "../../hooks";
-import { Group } from "../../types/reduxTypes";
-import { useAppDispatch } from "../../hooks";
-import { changeTestStatus } from "../../redux/test/testActions";
+import { useTests, useAppDispatch } from "../../hooks";
+import { Group, QuestionPayload, Test } from "../../types/reduxTypes";
+import { changeTestStatus } from "../../redux";
 
 export const TestsPage: React.FC = () => {
   const {
@@ -23,10 +22,10 @@ export const TestsPage: React.FC = () => {
     updateExistingTest,
     fetchAllTests,
     fetchAllGroupsList,
-    setSelectedTest,
     currentTest,
     handleGroupChange,
     applyGroupChanges,
+    setSelectedTest,
   } = useTests();
 
   const dispatch = useAppDispatch();
@@ -83,16 +82,28 @@ export const TestsPage: React.FC = () => {
     setDeleteTestId(null);
   }, []);
 
-  const handleCopyClick = useCallback((testId: string) => {
-    setCopyTestId(testId);
-  }, []);
-
   const confirmCopyTest = useCallback(async () => {
     if (copyTestId) {
-      await copyExistingTest(copyTestId);
-      setCopyTestId(null);
+      console.log("📦 Начинаем копирование теста с id:", copyTestId);
+      try {
+        const copiedTest = await copyExistingTest(copyTestId);
+        console.log("✅ Копированный тест:", copiedTest);
+
+        setSelectedTest(null);
+
+        if (copiedTest?.id) {
+          console.log("🔄 Обновляем список тестов...");
+          await fetchAllTests();
+          console.log("✅ Список тестов обновлён");
+        }
+      } catch (err) {
+        console.error("❌ Ошибка при копировании теста:", err);
+      } finally {
+        setCopyTestId(null);
+        console.log("📦 Завершили копирование, закрыли модалку");
+      }
     }
-  }, [copyTestId, copyExistingTest]);
+  }, [copyTestId, copyExistingTest, fetchAllTests, setSelectedTest]);
 
   const closeCopyModal = useCallback(() => {
     setCopyTestId(null);
@@ -105,15 +116,43 @@ export const TestsPage: React.FC = () => {
 
   const handleSaveEdit = useCallback(() => {
     const trimmedTitle = editValue.trim();
-    if (editTestId && trimmedTitle) {
-      updateExistingTest(editTestId, { title: trimmedTitle });
-      if (currentTest?.id === editTestId) {
-        setSelectedTest({ ...currentTest, title: trimmedTitle });
-      }
+    if (editTestId && trimmedTitle && currentTest) {
+      const toQuestionType = (
+        type: string
+      ): QuestionPayload["questionType"] => {
+        if (["single", "multiple", "number", "text"].includes(type)) {
+          return type as QuestionPayload["questionType"];
+        }
+        return "single";
+      };
+
+      const questionPayloads = currentTest.questions.map((q) => ({
+        questionText: q.text,
+        questionType: toQuestionType(q.type),
+        imageUrl: typeof q.image === "string" ? q.image : null,
+        percentageError: q.percentageError,
+        answers: q.answers.map((a) => ({
+          text: a.text,
+          score: a.score,
+          isCorrect: a.score > 0,
+        })),
+      }));
+
+      updateExistingTest(editTestId, {
+        title: trimmedTitle,
+        description: currentTest.description,
+        timeLimit: currentTest.timeLimit,
+        questions: questionPayloads,
+        maximumMarks: currentTest.maximumMarks,
+        minimumScores: currentTest.minimumScores,
+        availableForGroups: currentTest.availableForGroups.map((g) => g.id),
+        status: currentTest.status,
+      });
+
       setEditTestId(null);
       setEditValue("");
     }
-  }, [editTestId, editValue, updateExistingTest, currentTest, setSelectedTest]);
+  }, [editTestId, editValue, updateExistingTest, currentTest]);
 
   const handleApplyGroupChanges = useCallback(
     (testId: string) => {
@@ -130,6 +169,21 @@ export const TestsPage: React.FC = () => {
       dispatch(changeTestStatus({ testId, status: newStatus }));
     },
     [dispatch]
+  );
+
+  const handleCopyAndReturn = useCallback(
+    async (testId: string): Promise<Test | undefined> => {
+      try {
+        const copiedTest = await copyExistingTest(testId);
+        if (copiedTest?.id) {
+          await fetchAllTests();
+        }
+        return copiedTest;
+      } catch {
+        return undefined;
+      }
+    },
+    [copyExistingTest, fetchAllTests]
   );
 
   return (
@@ -156,10 +210,10 @@ export const TestsPage: React.FC = () => {
               onCancel={() => setEditTestId(null)}
               setEditValue={setEditValue}
               onDelete={handleDeleteClick}
-              onCopy={handleCopyClick}
+              onCopy={handleCopyAndReturn}
               handleGroupChange={handleGroupChange}
               applyGroupChanges={handleApplyGroupChanges}
-              onToggleStatus={handleToggleStatus} 
+              onToggleStatus={handleToggleStatus}
             />
           )}
         </Col>

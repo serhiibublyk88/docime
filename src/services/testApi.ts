@@ -1,5 +1,6 @@
 import { api } from "./clientApi";
 import { Test, TestPayload } from "../types/reduxTypes";
+import { AxiosError } from "axios";
 
 /** Получить все тесты */
 export const fetchTests = async (options = {}): Promise<Test[]> => {
@@ -11,7 +12,7 @@ export const fetchTests = async (options = {}): Promise<Test[]> => {
     return data;
   } catch (error: unknown) {
     throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Laden von Tests"
+      error instanceof Error ? error.message : "Fehler beim Laden von Tests" 
     );
   }
 };
@@ -47,16 +48,15 @@ export const createTest = async (
 
     return data;
   } catch (error: unknown) {
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Erstellen des Tests"
-    );
+    const err = error as AxiosError;
+    throw new Error(err.message || "Fehler beim Erstellen des Tests");
   }
 };
 
 /** Обновить тест */
 export const updateTest = async (
   testId: string,
-  testData: Partial<TestPayload>,
+  testData: TestPayload,
   options = {}
 ): Promise<Test> => {
   try {
@@ -67,11 +67,8 @@ export const updateTest = async (
 
     return data;
   } catch (error: unknown) {
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : "Fehler beim Aktualisieren des Tests"
-    );
+    const err = error as AxiosError;
+    throw new Error(err.message || "Fehler beim Aktualisieren des Tests");
   }
 };
 
@@ -86,9 +83,8 @@ export const deleteTest = async (
       ...options,
     });
   } catch (error: unknown) {
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Löschen des Tests"
-    );
+    const err = error as AxiosError;
+    throw new Error(err.message || "Fehler beim Löschen des Tests");
   }
 };
 
@@ -98,15 +94,15 @@ export const duplicateTest = async (
   options = {}
 ): Promise<Test> => {
   try {
-    const { data } = await api.post<Test>(`/tests/${testId}/copy`, null, {
+    const { data } = await api.post<Test>(`/tests/${testId}/copy`, {}, {
       withCredentials: true,
       ...options,
     });
+
     return data;
   } catch (error: unknown) {
-    throw new Error(
-      error instanceof Error ? error.message : "Fehler beim Kopieren des Tests"
-    );
+    const err = error as AxiosError;
+    throw new Error(err.message || "Fehler beim Kopieren des Tests");
   }
 };
 //Test status

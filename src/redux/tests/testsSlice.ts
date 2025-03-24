@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { TestsState, Test } from "../../types/reduxTypes";
 import {
-  fetchTests,
+  
   fetchAllGroups,
-  createTest,
-  updateTest,
-  deleteTest,
-  copyTest,
+  // createTest,
+  // updateTest,
+  // deleteTest,
+  // copyTest,
   updateTestGroups,
 } from "./testsActions";
 
@@ -28,18 +28,7 @@ const testsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTests.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchTests.fulfilled, (state, action: PayloadAction<Test[]>) => {
-        state.loading = false;
-        state.tests = action.payload ?? [];
-      })
-      .addCase(fetchTests.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload ?? "Fehler beim Abrufen der Tests";
-      })
+      
 
       .addCase(fetchAllGroups.pending, (state) => {
         state.loading = true;
@@ -56,29 +45,29 @@ const testsSlice = createSlice({
         state.error = action.payload ?? "Fehler beim Abrufen der Gruppen";
       })
 
-      .addCase(createTest.fulfilled, (state, action: PayloadAction<Test>) => {
-        state.tests.push(action.payload);
-      })
+      // .addCase(createTest.fulfilled, (state, action: PayloadAction<Test>) => {
+      //   state.tests.push(action.payload);
+      // })
 
-      .addCase(updateTest.fulfilled, (state, action: PayloadAction<Test>) => {
-        state.tests = state.tests.map((test) =>
-          test.id === action.payload.id ? action.payload : test
-        );
-        if (state.currentTest?.id === action.payload.id) {
-          state.currentTest = action.payload;
-        }
-      })
+      // .addCase(updateTest.fulfilled, (state, action: PayloadAction<Test>) => {
+      //   state.tests = state.tests.map((test) =>
+      //     test.id === action.payload.id ? action.payload : test
+      //   );
+      //   if (state.currentTest?.id === action.payload.id) {
+      //     state.currentTest = action.payload;
+      //   }
+      // })
 
-      .addCase(deleteTest.fulfilled, (state, action: PayloadAction<string>) => {
-        state.tests = state.tests.filter((test) => test.id !== action.payload);
-        if (state.currentTest?.id === action.payload) {
-          state.currentTest = null;
-        }
-      })
+      // .addCase(deleteTest.fulfilled, (state, action: PayloadAction<string>) => {
+      //   state.tests = state.tests.filter((test) => test.id !== action.payload);
+      //   if (state.currentTest?.id === action.payload) {
+      //     state.currentTest = null;
+      //   }
+      // })
 
-      .addCase(copyTest.fulfilled, (state, action: PayloadAction<Test>) => {
-        state.tests.push(action.payload);
-      })
+      // .addCase(copyTest.fulfilled, (state, action: PayloadAction<Test>) => {
+      //   state.tests.push(action.payload);
+      // })
 
       .addCase(
         updateTestGroups.fulfilled,
