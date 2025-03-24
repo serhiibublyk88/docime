@@ -6,7 +6,7 @@ import {
   submitTestAttempt,
   getTestAttempt,
 } from "../../services/testAttemptApi";
-import { Question, TestResult } from "../../types/apiTypes";
+import { Question, TestResult } from "../../types/apiTypes"; 
 
 // Создание попытки
 export const fetchCreateTestAttempt = createAsyncThunk<

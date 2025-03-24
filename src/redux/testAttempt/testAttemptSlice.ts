@@ -35,7 +35,7 @@ const slice = createSlice({
   extraReducers: (builder) => {
     builder
       // --- Create Attempt ---
-      .addCase(fetchCreateTestAttempt.pending, (state) => {
+      .addCase(fetchCreateTestAttempt.pending, (state) => { 
         state.loading = true;
         state.error = null;
         state.attemptId = null;

@@ -1,4 +1,4 @@
-// src/pages/TestAttemptPage/TestAttemptPage.tsx
+// src/pages/TestAttemptPage.tsx
 
 import { FC } from "react";
 import {
@@ -21,7 +21,6 @@ const formatTime = (seconds: number) => {
 
 export const TestAttemptPage: FC = () => {
   const {
-    
     questions,
     answers,
     setAnswer,
@@ -37,8 +36,7 @@ export const TestAttemptPage: FC = () => {
     <Container fluid>
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
-          {/* Загрузка */}
-          {loading ? (
+          {loading || (!questions.length && !result) ? (
             <div className="text-center mt-5">
               <Spinner animation="border" />
             </div>
@@ -81,13 +79,13 @@ export const TestAttemptPage: FC = () => {
                     )}
 
                     {/* Single choice */}
-                    {q.type === "single-choice" && q.answers?.length && (
+                    {q.type === "single-choice" && q.answers && (
                       <Form>
                         {q.answers.map((a: AnswerOption) => (
                           <Form.Check
-                            type="radio"
                             key={a.id}
-                            name={q.id}
+                            type="radio"
+                            name={`single-${q.id}`}
                             label={a.text}
                             checked={answers[q.id] === a.id}
                             onChange={() => setAnswer(q.id, a.id)}
@@ -97,14 +95,16 @@ export const TestAttemptPage: FC = () => {
                     )}
 
                     {/* Multiple choice */}
-                    {q.type === "multiple-choice" && q.answers?.length && (
+                    {q.type === "multiple-choice" && q.answers && (
                       <Form>
                         {q.answers.map((a: AnswerOption) => {
-                          const current = (answers[q.id] || []) as string[];
-                          const checked = current.includes(a.id);
+                          const selected = Array.isArray(answers[q.id])
+                            ? (answers[q.id] as string[])
+                            : [];
+                          const checked = selected.includes(a.id);
                           const updated = checked
-                            ? current.filter((id) => id !== a.id)
-                            : [...current, a.id];
+                            ? selected.filter((id) => id !== a.id)
+                            : [...selected, a.id];
 
                           return (
                             <Form.Check
@@ -121,21 +121,24 @@ export const TestAttemptPage: FC = () => {
 
                     {/* Number input */}
                     {q.type === "number-input" && (
-                      <Form.Control
-                        type="number"
-                        value={answers[q.id] || ""}
-                        onChange={(e) => setAnswer(q.id, e.target.value)}
-                      />
+                      <Form.Group className="mt-3">
+                        <Form.Control
+                          type="number"
+                          value={answers[q.id] || ""}
+                          onChange={(e) => setAnswer(q.id, e.target.value)}
+                        />
+                      </Form.Group>
                     )}
 
                     {/* Text input */}
                     {q.type === "text-input" && (
-                      <Form.Control
-                        as="textarea"
-                        rows={2}
-                        value={answers[q.id] || ""}
-                        onChange={(e) => setAnswer(q.id, e.target.value)}
-                      />
+                      <Form.Group className="mt-3">
+                        <Form.Control
+                          type="text"
+                          value={answers[q.id] || ""}
+                          onChange={(e) => setAnswer(q.id, e.target.value)}
+                        />
+                      </Form.Group>
                     )}
                   </Card.Body>
                 </Card>

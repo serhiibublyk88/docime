@@ -1,5 +1,4 @@
-// src/hooks/useTestAttempt.ts
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import {
@@ -18,7 +17,7 @@ type AnswersMap = Record<string, string | string[]>;
 
 export const useTestAttempt = () => {
   const dispatch = useAppDispatch();
-  const { testId } = useParams<{ testId: string }>();
+  const { id: testId } = useParams<{ id: string }>();
 
   const attemptId = useAppSelector(selectAttemptId);
   const questions = useAppSelector(selectAttemptQuestions);
@@ -31,20 +30,19 @@ export const useTestAttempt = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTimeUp, setIsTimeUp] = useState(false);
 
-  // Установить ответ
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Установить ответ на вопрос
   const setAnswer = useCallback(
     (questionId: string, value: string | string[]) => {
-      setAnswers((prev) => ({
-        ...prev,
-        [questionId]: value,
-      }));
+      setAnswers((prev) => ({ ...prev, [questionId]: value }));
     },
     []
   );
 
-  // Завершить тест
+  // Завершить тест и отправить ответы
   const handleSubmit = useCallback(() => {
-    if (!testId || !attemptId) return;
+    if (!testId || !attemptId || isSubmitting) return;
 
     setIsSubmitting(true);
 
@@ -60,35 +58,43 @@ export const useTestAttempt = () => {
     )
       .unwrap()
       .finally(() => setIsSubmitting(false));
-  }, [dispatch, testId, attemptId, answers]);
+  }, [dispatch, testId, attemptId, answers, isSubmitting]);
 
-  // Создание попытки
+  // Создание попытки при загрузке страницы
   useEffect(() => {
     if (testId) {
       dispatch(fetchCreateTestAttempt(testId));
     }
   }, [dispatch, testId]);
 
-  // Инициализация и запуск таймера
+  // Инициализация таймера
   useEffect(() => {
-    if (!timeLimit || result) return;
+    const shouldStartTimer =
+      attemptId && questions.length > 0 && timeLimit > 0 && !result;
 
-    setTimeLeft(timeLimit * 60);
+    if (shouldStartTimer) {
+      setTimeLeft(timeLimit * 60);
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setIsTimeUp(true);
-          handleSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            setIsTimeUp(true);
+            handleSubmit();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
-    return () => clearInterval(timer);
-  }, [timeLimit, result, handleSubmit]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [attemptId, timeLimit, questions.length, result, handleSubmit]);
 
   return {
     attemptId,
