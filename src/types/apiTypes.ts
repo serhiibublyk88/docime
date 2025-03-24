@@ -123,3 +123,9 @@ export interface TestResultsForCreator {
   }[];
 }
 
+export interface UserState {
+  availableTests: AvailableTest[];
+  testResults: UserTestResult[];
+  loading: boolean;
+  error: string | null;
+}

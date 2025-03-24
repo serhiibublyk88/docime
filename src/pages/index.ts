@@ -7,7 +7,7 @@ export { ManageResultsPage } from "./ManageResultsPage/ManageResultsPage";
 export { CreateTestPage } from "./CreateTestPage/CreateTestPage";
 export { NotFoundPage } from "./NotFoundPage/NotFoundPage";
 export { RegisterPage } from "./RegisterPage/RegisterPage";
-export { ResultsPage } from "./ResultsPage/ResultsPage";
+export { UserResultsPage } from "./UserResultsPage/UserResultsPage";
 export { TestPage } from "./TestPage/TestPage";
 export { TestsPage } from "./TestsPage/TestsPage";
 export { GroupPage } from "./GroupPage/GroupPage";

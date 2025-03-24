@@ -14,6 +14,7 @@ export const ItemList: React.FC<ItemListProps> = ({
   onCancel,
   onDelete,
   setEditValue,
+  hideIcons = false, // ✅ по умолчанию иконки показываются
 }) => {
   const clearSelection = useCallback(() => {
     if (document.activeElement instanceof HTMLElement) {
@@ -79,6 +80,15 @@ export const ItemList: React.FC<ItemListProps> = ({
                 autoFocus
                 className={styles.editInput}
               />
+            ) : item.additionalInfo ? (
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <span>
+                  {index + 1}. {item.name}
+                </span>
+                <div className="text-muted small ms-3 text-end">
+                  {item.additionalInfo}
+                </div>
+              </div>
             ) : (
               <span>
                 {index + 1}. {item.name}
@@ -87,7 +97,7 @@ export const ItemList: React.FC<ItemListProps> = ({
           </div>
 
           {/* ✅ Кастомная иконка — всегда видимая */}
-          {item.icon && (
+          {!hideIcons && item.icon && (
             <span
               className={`text-${item.iconColor ?? "secondary"} icon ms-3`}
               title={item.iconTitle}
@@ -101,40 +111,42 @@ export const ItemList: React.FC<ItemListProps> = ({
           )}
 
           {/* ✅ Контейнер для редактирования и удаления */}
-          <div
-            className={styles.iconContainer}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {editItemId === item.id ? (
-              <>
-                <FaSave
-                  className={`${styles.icon} ${styles.saveIcon}`}
-                  title="Speichern"
-                  onClick={handleSave}
-                />
-                <FaTimes
-                  className={`${styles.icon} ${styles.cancelIcon}`}
-                  title="Abbrechen"
-                  onClick={handleCancel}
-                />
-              </>
-            ) : (
-              !item.icon && (
+          {!hideIcons && (
+            <div
+              className={styles.iconContainer}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {editItemId === item.id ? (
                 <>
-                  <FaEdit
-                    className={`${styles.icon} ${styles.editIcon}`}
-                    title="Bearbeiten"
-                    onClick={() => onEdit?.(item.id)}
+                  <FaSave
+                    className={`${styles.icon} ${styles.saveIcon}`}
+                    title="Speichern"
+                    onClick={handleSave}
                   />
-                  <FaTrash
-                    className={`${styles.icon} ${styles.deleteIcon}`}
-                    title="Löschen"
-                    onClick={() => handleDelete(item.id)}
+                  <FaTimes
+                    className={`${styles.icon} ${styles.cancelIcon}`}
+                    title="Abbrechen"
+                    onClick={handleCancel}
                   />
                 </>
-              )
-            )}
-          </div>
+              ) : (
+                !item.icon && (
+                  <>
+                    <FaEdit
+                      className={`${styles.icon} ${styles.editIcon}`}
+                      title="Bearbeiten"
+                      onClick={() => onEdit?.(item.id)}
+                    />
+                    <FaTrash
+                      className={`${styles.icon} ${styles.deleteIcon}`}
+                      title="Löschen"
+                      onClick={() => handleDelete(item.id)}
+                    />
+                  </>
+                )
+              )}
+            </div>
+          )}
         </ListGroup.Item>
       ))}
     </ListGroup>

@@ -67,17 +67,6 @@ export {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 /// **Вопросы**
 export { questionsReducer } from "./questions/questionsSlice";
 export {
@@ -99,7 +88,7 @@ export {
 
 
 /// **Пользователь**
-export { userReducer } from "./user/userSlice";
+export { userReducer, clearUserError } from "./user/userSlice";
 export {
   fetchAvailableTests,
   fetchUserTestResults,

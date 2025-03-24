@@ -78,7 +78,7 @@ export interface ItemListProps {
   items: {
     id: string;
     name: string;
-    additionalInfo?: string;
+    additionalInfo?: React.ReactNode;
     icon?: React.ReactNode; //  добавлено
     iconTitle?: string; //  добавлено
     iconColor?: "primary" | "secondary" | "success" | "danger"; //  добавлено
@@ -106,6 +106,7 @@ export interface ItemListProps {
   onSave?: () => void;
   onCancel?: () => void;
   setEditValue?: (value: string) => void;
+  hideIcons?: boolean;
 }
 
 

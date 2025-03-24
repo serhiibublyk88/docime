@@ -15,7 +15,7 @@ import {
   RegisterPage,
   TestsPage,
   TestPage,
-  ResultsPage,
+  UserResultsPage,
   AvailableTests,
   GroupsPage,
   GroupPage,
@@ -66,7 +66,7 @@ export const App: React.FC = () => {
               <Route path="/tests" element={<AvailableTests />} />
               <Route path="/test/:id" element={<TestPage />} />
               <Route path="/test/:id/attempt" element={<TestAttemptPage />} />
-              <Route path="/results" element={<ResultsPage />} />
+              <Route path="/results" element={<UserResultsPage />} />
             </Route>
             <Route
               element={<ProtectedRoute requiredRole={roles.TEST_CREATOR} />}

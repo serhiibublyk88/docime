@@ -13,3 +13,4 @@ export { useTests } from "./useTests";
 export { useAvailableTests } from "./useAvailableTests";
 export { useAppSelector } from "./useAppSelector";
 export { useTestAttempt } from "./useTestAttempt";
+export { useUserResults } from "./useUserResults";
