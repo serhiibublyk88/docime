@@ -20,7 +20,7 @@ import {
   GroupsPage,
   GroupPage,
   CreateTestPage,
-  ManageResultsPage,
+  TestResultsPage,
   NotFoundPage,
   AccessDeniedPage,
   TestAttemptPage,
@@ -79,7 +79,7 @@ export const App: React.FC = () => {
                 path="/admin/tests/:testId/edit"
                 element={<CreateTestPage />}
               />
-              <Route path="/admin/results" element={<ManageResultsPage />} />
+              <Route path="/admin/results" element={<TestResultsPage />} />
             </Route>
             <Route path="/access-denied" element={<AccessDeniedPage />} />
             <Route path="*" element={<NotFoundPage />} />

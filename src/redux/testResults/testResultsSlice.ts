@@ -1,6 +1,6 @@
 // src/redux/testResults/testResultsSlice.ts
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchTestResultsForCreator } from "./testResultsActions";
 import { TestResultsForCreator } from "../../types/apiTypes";
 
@@ -8,12 +8,16 @@ interface TestResultsState {
   testResults: TestResultsForCreator | null;
   loading: boolean;
   error: string | null;
+  selectedTestId: string | null;
+  selectedGroupId: string | null;
 }
 
 const initialState: TestResultsState = {
   testResults: null,
   loading: false,
   error: null,
+  selectedTestId: null,
+  selectedGroupId: null,
 };
 
 export const testResultsSlice = createSlice({
@@ -21,6 +25,17 @@ export const testResultsSlice = createSlice({
   initialState,
   reducers: {
     resetTestResultsState: () => initialState,
+
+    // 🔹 Добавлено: установка выбранного теста
+    setSelectedTestId: (state, action: PayloadAction<string>) => {
+      state.selectedTestId = action.payload;
+      state.selectedGroupId = null; // сбрасываем выбранную группу
+    },
+
+    // 🔹 Добавлено: установка выбранной группы
+    setSelectedGroupId: (state, action: PayloadAction<string| null>) => {
+      state.selectedGroupId = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -40,5 +55,7 @@ export const testResultsSlice = createSlice({
   },
 });
 
-export const { resetTestResultsState } = testResultsSlice.actions;
+export const { resetTestResultsState, setSelectedTestId, setSelectedGroupId } =
+  testResultsSlice.actions;
+
 export const testResultsReducer = testResultsSlice.reducer;

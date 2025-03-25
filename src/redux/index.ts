@@ -119,11 +119,17 @@ export {
 
 
 /// **Результаты тестов для создателя**
-export { testResultsReducer } from "./testResults/testResultsSlice";
+export { testResultsReducer, setSelectedTestId, setSelectedGroupId, resetTestResultsState } from "./testResults/testResultsSlice";
 export { fetchTestResultsForCreator } from "./testResults/testResultsActions";
 export {
   selectTestResults,
   selectTestResultsLoading,
   selectTestResultsError,
+  selectSelectedTestId,
+  selectSelectedGroupId,
+  selectTestName,
+  selectTestGroups,
+  selectParticipantsForSelectedGroup,
 } from "./testResults/testResultsSelectors";
+
 

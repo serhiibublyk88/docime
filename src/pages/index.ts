@@ -3,7 +3,7 @@ export {AvailableTests } from "./AvailableTests/AvailableTests";
 export { GroupsPage } from "./GroupsPage/GroupsPage";
 export { HomePage } from "./HomePage/HomePage";
 export { LoginPage } from "./LoginPage/LoginPage";
-export { ManageResultsPage } from "./ManageResultsPage/ManageResultsPage";
+export { TestResultsPage } from "./TestResultsPage/TestResultsPage";
 export { CreateTestPage } from "./CreateTestPage/CreateTestPage";
 export { NotFoundPage } from "./NotFoundPage/NotFoundPage";
 export { RegisterPage } from "./RegisterPage/RegisterPage";

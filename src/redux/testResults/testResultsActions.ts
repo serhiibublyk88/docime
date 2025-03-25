@@ -2,7 +2,7 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getTestResults } from "../../services/testResultsApi";
-import { TestResultsForCreator } from "../../types/apiTypes";
+import { TestResultsForCreator } from "../../types/apiTypes"; 
 
 // Получение результатов теста для создателя
 export const fetchTestResultsForCreator = createAsyncThunk<

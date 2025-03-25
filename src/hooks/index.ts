@@ -1,6 +1,3 @@
-
-
-
 export { useRegister } from "./useRegister";
 export { useLogin } from "./useLogin";
 export { useAuthForm } from "./useAuthForm";
@@ -14,3 +11,4 @@ export { useAvailableTests } from "./useAvailableTests";
 export { useAppSelector } from "./useAppSelector";
 export { useTestAttempt } from "./useTestAttempt";
 export { useUserResults } from "./useUserResults";
+export { useTestResults } from "./useTestResults";
