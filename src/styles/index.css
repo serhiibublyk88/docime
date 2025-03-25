@@ -12,6 +12,14 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "greektome";
+  src: url("../assets/fonts/greek to me.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 :root {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
