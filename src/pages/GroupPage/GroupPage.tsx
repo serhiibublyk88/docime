@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useGroup } from "../../hooks";
 import {
@@ -6,7 +7,7 @@ import {
   ItemList,
   Loader,
   AlertMessage,
-  ConfirmActionModal, 
+  ConfirmActionModal,
 } from "../../components";
 
 export const GroupPage = () => {
@@ -30,11 +31,20 @@ export const GroupPage = () => {
     closeError,
   } = useGroup(id || "");
 
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+
+  // ✅ Только при первой загрузке — показываем Loader
+  useEffect(() => {
+    if (!isLoading) {
+      setInitialLoadDone(true);
+    }
+  }, [isLoading]);
+
   return (
     <Container fluid>
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
-          {isLoading ? (
+          {!initialLoadDone ? (
             <div className="text-center">
               <Loader size="md" />
             </div>
@@ -48,17 +58,17 @@ export const GroupPage = () => {
             <p className="text-center text-muted">Keine Gruppen verfügbar</p>
           )}
 
-          {!isLoading && error && (
+          {error && (
             <AlertMessage type="danger" message={error} onClose={closeError} />
           )}
 
-          {!isLoading && !error && members.length === 0 && (
+          {!error && members.length === 0 && (
             <p className="text-center text-muted">
               Keine Mitglieder in dieser Gruppe
             </p>
           )}
 
-          {!isLoading && !error && members.length > 0 && (
+          {!error && members.length > 0 && (
             <ItemList
               items={members.map((member) => ({
                 id: member._id,
@@ -80,7 +90,6 @@ export const GroupPage = () => {
         </Col>
       </Row>
 
-      {/* ✅ Новая модалка подтверждения удаления */}
       {deleteMemberId && (
         <ConfirmActionModal
           show={!!deleteMemberId}
@@ -89,10 +98,10 @@ export const GroupPage = () => {
             members.find((m) => m._id === deleteMemberId)?.username ||
             "dieses Mitglied"
           } aus der Gruppe entfernen möchtest?`}
-          confirmText="Entfernen" // 🔹 Кнопка теперь явно "Entfernen"
-          confirmVariant="danger" // 🔥 Оставляем красную кнопку
-          onConfirm={confirmDeleteMember} // 🔹 Функция удаления
-          onClose={closeDeleteModal} // 🔹 Закрытие модалки
+          confirmText="Entfernen"
+          confirmVariant="danger"
+          onConfirm={confirmDeleteMember}
+          onClose={closeDeleteModal}
           aria-label="Mitglied entfernen Modal"
         />
       )}

@@ -31,10 +31,6 @@ export { testsReducer, setCurrentTest } from "./tests/testsSlice";
 export {
   
   fetchAllGroups,
-  // createTest,
-  // updateTest,
-  // deleteTest,
-  // copyTest,
   updateTestGroups,
 } from "./tests/testsActions";
 export {

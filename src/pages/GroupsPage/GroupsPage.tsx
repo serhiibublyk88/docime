@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import {
   ConfirmActionModal,
@@ -6,7 +7,7 @@ import {
   ItemList,
 } from "../../components";
 import { useGroups } from "../../hooks";
- 
+
 export const GroupsPage: React.FC = () => {
   const {
     isLoading,
@@ -26,13 +27,22 @@ export const GroupsPage: React.FC = () => {
     handleCancel,
   } = useGroups();
 
+  const [firstLoadDone, setFirstLoadDone] = useState(false);
+
+  // ✅ Следим за завершением первой загрузки
+  useEffect(() => {
+    if (!isLoading && groups.length >= 0) {
+      setFirstLoadDone(true);
+    }
+  }, [isLoading, groups]);
+
   return (
     <Container fluid>
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
           <h2 className="mb-3 text-center">Gruppen:</h2>
 
-          {isLoading ? (
+          {!firstLoadDone ? (
             <div className="text-center">
               <Loader size="md" />
             </div>
@@ -53,7 +63,7 @@ export const GroupsPage: React.FC = () => {
               onItemClick={handleItemClick}
               onEdit={(id) => {
                 const group = groups.find((g) => g.id === id);
-                handleEditClick(id, group?.name ?? ""); // ✅ Передаем реальное имя группы
+                handleEditClick(id, group?.name ?? "");
               }}
               onSave={handleSaveClick}
               onCancel={handleCancel}

@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+// src/pages/TestResultsPage.tsx
+
+import { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { Carousel, Loader, AlertMessage } from "../../components";
-import { useTestResults } from "../../hooks";
+import { useTestResults, useAppDispatch } from "../../hooks";
 import { useSelector } from "react-redux";
-import { selectAllTest } from "../../redux";
+import { selectAllTest, getTests } from "../../redux";
 
 interface ParticipantResult {
   userId: string;
@@ -18,8 +20,18 @@ interface ParticipantResult {
 }
 
 export const TestResultsPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const allTests = useSelector(selectAllTest);
+
+  const [firstLoadDone, setFirstLoadDone] = useState(false);
+
+  // ✅ Загружаем все тесты при входе
+  useEffect(() => {
+    dispatch(getTests()).finally(() => setFirstLoadDone(true));
+  }, [dispatch]);
+
   const {
-    isLoading,
+    
     error,
     selectedTestId,
     selectedGroupId,
@@ -29,21 +41,13 @@ export const TestResultsPage: React.FC = () => {
     handleSelectGroup,
   } = useTestResults();
 
-  const allTests = useSelector(selectAllTest);
-
-  useEffect(() => {
-    if (selectedTestId && groups.length > 0 && !selectedGroupId) {
-      handleSelectGroup(groups[0].groupId);
-    }
-  }, [selectedTestId, groups, selectedGroupId, handleSelectGroup]);
-
   return (
     <Container fluid>
       <Row className="align-items-start">
         <Col xs={12} md={8} lg={6} className="mx-auto mt-5">
           <h2 className="mb-4 text-center">Testergebnisse</h2>
 
-          {isLoading ? (
+          {!firstLoadDone ? (
             <div className="text-center">
               <Loader size="md" />
             </div>
@@ -53,6 +57,8 @@ export const TestResultsPage: React.FC = () => {
               type="danger"
               onClose={() => null}
             />
+          ) : allTests.length === 0 ? (
+            <p className="text-center mt-4">Keine verfügbaren Tests.</p>
           ) : (
             <>
               {/* 🔹 Карусель тестов */}
@@ -66,16 +72,14 @@ export const TestResultsPage: React.FC = () => {
               />
 
               {/* 🔹 Карусель групп */}
-              {groups.length > 0 && (
-                <Carousel
-                  items={groups.map((g) => ({
-                    id: g.groupId,
-                    name: g.groupName,
-                  }))}
-                  selectedItemId={selectedGroupId ?? ""}
-                  onSelect={handleSelectGroup}
-                />
-              )}
+              <Carousel
+                items={groups.map((g) => ({
+                  id: g.groupId,
+                  name: g.groupName,
+                }))}
+                selectedItemId={selectedGroupId ?? ""}
+                onSelect={handleSelectGroup}
+              />
 
               {/* 🔹 Список участников */}
               {participants.length > 0 ? (
@@ -89,7 +93,7 @@ export const TestResultsPage: React.FC = () => {
                         <span className="fs-5">
                           {index + 1}. {p.userName || "Unbekannter Benutzer"}
                         </span>
-                        <span className="text-muted  text-end">
+                        <span className="text-muted text-end">
                           {p.hasPassed ? (
                             <>
                               ✅ Durchgeführt: {p.startTime} | ⏱ {p.timeTaken}{" "}

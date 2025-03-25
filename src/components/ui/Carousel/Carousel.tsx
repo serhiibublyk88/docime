@@ -1,27 +1,26 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Loader } from "../../../components";
 import styles from "./Carousel.module.css";
 
 interface CarouselProps {
   items: { id: string; name: string }[];
   selectedItemId: string;
   onSelect: (id: string) => void;
-  isLoading?: boolean; 
 }
 
 export const Carousel: React.FC<CarouselProps> = ({
   items,
   selectedItemId,
   onSelect,
-  isLoading = false, 
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // 🔹 Индекс выбранного элемента
   const selectedIndex = useMemo(() => {
     return items.findIndex((item) => item.id === selectedItemId);
   }, [items, selectedItemId]);
 
+  // 🔹 Синхронизация индекса при смене selectedItemId
   useEffect(() => {
     if (selectedIndex !== -1) {
       setCurrentIndex(selectedIndex);
@@ -30,25 +29,17 @@ export const Carousel: React.FC<CarouselProps> = ({
 
   const handleNext = useCallback(() => {
     if (items.length <= 1) return;
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
-    onSelect(items[(currentIndex + 1) % items.length].id);
+    const nextIndex = (currentIndex + 1) % items.length;
+    setCurrentIndex(nextIndex);
+    onSelect(items[nextIndex].id);
   }, [items, currentIndex, onSelect]);
 
   const handlePrev = useCallback(() => {
     if (items.length <= 1) return;
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + items.length) % items.length
-    );
-    onSelect(items[(currentIndex - 1 + items.length) % items.length].id);
+    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+    setCurrentIndex(prevIndex);
+    onSelect(items[prevIndex].id);
   }, [items, currentIndex, onSelect]);
-
-  if (isLoading) {
-    return (
-      <div className="text-center">
-        <Loader size="md" /> 
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return <p className="text-center text-muted">Keine Gruppen verfügbar</p>;

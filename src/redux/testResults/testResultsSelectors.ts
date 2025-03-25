@@ -1,37 +1,51 @@
 // src/redux/testResults/testResultsSelectors.ts
-
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-// 🔹 Существующие селекторы
-export const selectTestResults = (state: RootState) =>
-  state.testResults.testResults;
+// 🔹 Базовые селекторы
+export const selectTestResultsState = (state: RootState) => state.testResults;
 
-export const selectTestResultsLoading = (state: RootState) =>
-  state.testResults.loading;
+export const selectTestResults = createSelector(
+  selectTestResultsState,
+  (state) => state.testResults
+);
 
-export const selectTestResultsError = (state: RootState) =>
-  state.testResults.error;
+export const selectTestResultsLoading = createSelector(
+  selectTestResultsState,
+  (state) => state.loading
+);
 
-// 🔹 Новый: id выбранного теста
-export const selectSelectedTestId = (state: RootState) =>
-  state.testResults.selectedTestId;
+export const selectTestResultsError = createSelector(
+  selectTestResultsState,
+  (state) => state.error
+);
 
-// 🔹 Новый: id выбранной группы
-export const selectSelectedGroupId = (state: RootState) =>
-  state.testResults.selectedGroupId;
+export const selectSelectedTestId = createSelector(
+  selectTestResultsState,
+  (state) => state.selectedTestId
+);
 
-// 🔹 Новый: название текущего теста
-export const selectTestName = (state: RootState) =>
-  state.testResults.testResults?.testName ?? "";
+export const selectSelectedGroupId = createSelector(
+  selectTestResultsState,
+  (state) => state.selectedGroupId
+);
 
-// 🔹 Новый: список групп текущего теста
-export const selectTestGroups = (state: RootState) =>
-  state.testResults.testResults?.groups ?? [];
+export const selectTestName = createSelector(
+  selectTestResults,
+  (testResults) => testResults?.testName ?? ""
+);
 
-// 🔹 Новый: участники выбранной группы
-export const selectParticipantsForSelectedGroup = (state: RootState) => {
-  const groupId = state.testResults.selectedGroupId;
-  const groups = state.testResults.testResults?.groups ?? [];
-  const group = groups.find((g) => g.groupId === groupId);
-  return group?.participants ?? [];
-};
+// 🔹 Мемоизированный список групп
+export const selectTestGroups = createSelector(
+  selectTestResults,
+  (testResults) => testResults?.groups ?? []
+);
+
+// 🔹 Мемоизированный список участников выбранной группы
+export const selectParticipantsForSelectedGroup = createSelector(
+  [selectTestGroups, selectSelectedGroupId],
+  (groups, selectedGroupId) => {
+    const group = groups.find((g) => g.groupId === selectedGroupId);
+    return group?.participants ?? [];
+  }
+);

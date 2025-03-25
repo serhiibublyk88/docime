@@ -1,3 +1,5 @@
+// src/hooks/useTestResults.ts
+
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "./useAppDispatch";
@@ -30,37 +32,47 @@ export const useTestResults = () => {
   const participants = useSelector(selectParticipantsForSelectedGroup);
   const testName = useSelector(selectTestName);
 
-  const initializedRef = useRef(false);
+  const didLoadRef = useRef(false); // ✅ защита от двойной загрузки
 
-  // ✅ Выбор первого теста при старте — строго один раз
+  // 🔹 Выбираем первый тест при первом заходе
   useEffect(() => {
-    if (!initializedRef.current && allTests.length > 0) {
-      initializedRef.current = true;
+    if (allTests.length > 0 && !selectedTestId && !didLoadRef.current) {
       const firstTestId = allTests[0].id;
       dispatch(setSelectedTestId(firstTestId));
       dispatch(fetchTestResultsForCreator(firstTestId));
+      didLoadRef.current = true;
     }
-  }, [allTests, dispatch]);
+  }, [allTests, selectedTestId, dispatch]);
 
-  // ✅ Установка первой группы после загрузки результатов
+  // 🔹 Загружаем данные, если тест выбран вручную
   useEffect(() => {
-    if (testResults?.groups?.length && !selectedGroupId) {
-      dispatch(setSelectedGroupId(testResults.groups[0].groupId));
+    if (selectedTestId && didLoadRef.current) {
+      dispatch(fetchTestResultsForCreator(selectedTestId));
     }
-  }, [testResults, selectedGroupId, dispatch]);
+  }, [selectedTestId, dispatch]);
 
+  // 🔹 При загрузке результатов — выбираем первую группу
+  useEffect(() => {
+    if (groups.length > 0 && !selectedGroupId) {
+      dispatch(setSelectedGroupId(groups[0].groupId));
+    }
+  }, [groups, selectedGroupId, dispatch]);
+
+  // 🔹 Обработчик: выбор теста
   const handleSelectTest = (testId: string) => {
     dispatch(setSelectedTestId(testId));
     dispatch(setSelectedGroupId(null));
-    dispatch(fetchTestResultsForCreator(testId));
   };
 
+  // 🔹 Обработчик: выбор группы
   const handleSelectGroup = (groupId: string) => {
     dispatch(setSelectedGroupId(groupId));
   };
 
+  // 🔹 Сброс
   const reset = () => {
     dispatch(resetTestResultsState());
+    didLoadRef.current = false;
   };
 
   return {
